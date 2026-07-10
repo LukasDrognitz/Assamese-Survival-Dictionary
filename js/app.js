@@ -475,6 +475,15 @@ function persist() {
   saveRecentWords(state.recentWords);
 }
 
+function pruneCompletedLessonFavorites() {
+  const completed = new Set((state.progress.lessonsCompleted || []).map((id) => String(id)));
+  if (!completed.size) return 0;
+
+  const before = state.favorites.lessons.length;
+  state.favorites.lessons = state.favorites.lessons.filter((lessonId) => !completed.has(String(lessonId)));
+  return before - state.favorites.lessons.length;
+}
+
 function addActivity(text) {
   state.history.unshift({
     text,
@@ -1170,6 +1179,10 @@ function renderHome() {
 
 function renderLessons() {
   const panel = document.getElementById("view-lessons");
+  const removedFavorites = pruneCompletedLessonFavorites();
+  if (removedFavorites > 0) {
+    saveFavorites(state.favorites);
+  }
 
   if (state.lessonsScreen === "congrats") {
     const lesson = state.lessons.find((item) => item.id === state.activeLessonId) || null;
@@ -2339,6 +2352,7 @@ async function onClick(event) {
 
       if (allLessonWordsLearned && !state.progress.lessonsCompleted.includes(lesson.id)) {
         state.progress.lessonsCompleted.push(lesson.id);
+        pruneCompletedLessonFavorites();
         state.progress.dailyGoal.lessonsDone += 1;
         xpGain(30, `Completed lesson ${lesson.title}`);
         if (state.settings.animations) drawConfetti();
@@ -2376,6 +2390,18 @@ async function onClick(event) {
     const lessonId = actionSource.dataset.lesson;
     const list = state.favorites.lessons;
     const idx = list.indexOf(lessonId);
+    const isCompleted = state.progress.lessonsCompleted.includes(lessonId);
+
+    if (isCompleted) {
+      if (idx >= 0) {
+        list.splice(idx, 1);
+        persist();
+      }
+      toast("Completed lessons are removed from favorites");
+      if (state.view === "lessons") renderLessons();
+      return;
+    }
+
     if (idx >= 0) list.splice(idx, 1);
     else list.push(lessonId);
     persist();
@@ -2981,7 +3007,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=145", { updateViaCache: "none" })
+      .register("sw.js?v=146", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
@@ -2998,6 +3024,9 @@ function refreshStateFromStorage() {
     searchHistory: getSearchHistory(),
     recentWords: getRecentWords()
   });
+  if (pruneCompletedLessonFavorites() > 0) {
+    saveFavorites(state.favorites);
+  }
   normalizeSettings();
 }
 
