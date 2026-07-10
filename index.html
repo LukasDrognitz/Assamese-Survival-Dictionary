@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#4CAF50" />
+  <meta name="description" content="Learn Assamese with lessons, flashcards, quizzes, and daily practice." />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="assets/icons/icon-192.svg" />
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.svg" />
+  <title>Assamese Survival Dictionary</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="bg-shape bg-shape-a" aria-hidden="true"></div>
+  <div class="bg-shape bg-shape-b" aria-hidden="true"></div>
+
+  <div class="app-layout" id="app-layout">
+    <aside class="sidebar" id="sidebar" aria-label="Desktop navigation">
+      <button class="icon-btn sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">☰</button>
+      <h1 class="brand">Assamese Survival Dictionary</h1>
+      <p class="tagline">Learn Assamese in moments, not months.</p>
+      <nav class="nav-list" id="desktop-nav"></nav>
+      <button id="install-btn" class="btn ghost hidden" aria-label="Install app">Install App</button>
+    </aside>
+
+    <main class="main-shell">
+      <header class="topbar glass">
+        <div>
+          <p class="eyebrow">Welcome back</p>
+          <h2 id="welcome-name">Learner</h2>
+        </div>
+        <div class="topbar-actions">
+          <button class="icon-btn" id="theme-toggle" aria-label="Toggle dark mode">🌗</button>
+        </div>
+      </header>
+
+      <section id="app-content" class="content-scroll" aria-live="polite">
+        <section id="view-home" class="view active" aria-label="Home"></section>
+        <section id="view-lessons" class="view" aria-label="Lessons"></section>
+        <section id="view-dictionary" class="view" aria-label="Dictionary"></section>
+        <section id="view-practice" class="view" aria-label="Practice"></section>
+        <section id="view-profile" class="view" aria-label="Profile"></section>
+      </section>
+    </main>
+  </div>
+
+  <nav class="mobile-nav glass" id="mobile-nav" aria-label="Mobile navigation"></nav>
+
+  <template id="toast-template">
+    <div class="toast" role="status" aria-live="polite"></div>
+  </template>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,1074 @@
+[
+    {
+        "id":  "greetings",
+        "title":  "Greetings",
+        "icon":  "👋",
+        "description":  "Say hello politely and confidently.",
+        "items":  [
+                      {
+                          "id":  "w001",
+                          "assamese":  "Nomoskar",
+                          "english":  "Hello",
+                          "pronunciation":  "No-mos-kar",
+                          "example":  "Nomoskar! Kene aso?",
+                          "notes":  "Formal and common greeting."
+                      },
+                      {
+                          "id":  "w002",
+                          "assamese":  "Ki khobor?",
+                          "english":  "How are you?",
+                          "pronunciation":  "Ki kho-bor",
+                          "example":  "Nomoskar, ki khobor?",
+                          "notes":  "Informal daily use."
+                      },
+                      {
+                          "id":  "w003",
+                          "assamese":  "Mur bhal",
+                          "english":  "I am fine",
+                          "pronunciation":  "Mur bhal",
+                          "example":  "Mur bhal, dhonnobad.",
+                          "notes":  "Reply to greetings."
+                      },
+                      {
+                          "id":  "w004",
+                          "assamese":  "Dhonnobad",
+                          "english":  "Thank you",
+                          "pronunciation":  "Dhon-no-bad",
+                          "example":  "Apunak dhonnobad.",
+                          "notes":  "Polite gratitude."
+                      },
+                      {
+                          "id":  "w005",
+                          "assamese":  "Onugroho kori",
+                          "english":  "Please",
+                          "pronunciation":  "O-nu-gro-ho ko-ri",
+                          "example":  "Onugroho kori bohi thaakok.",
+                          "notes":  "Soft polite request."
+                      }
+                  ]
+    },
+    {
+        "id":  "introductions",
+        "title":  "Introductions",
+        "icon":  "🙋",
+        "description":  "Introduce yourself with simple phrases.",
+        "items":  [
+                      {
+                          "id":  "w006",
+                          "assamese":  "Tomar naam ki?",
+                          "english":  "What is your name?",
+                          "pronunciation":  "To-mar naam ki",
+                          "example":  "Tomar naam ki?",
+                          "notes":  "Basic introduction question."
+                      },
+                      {
+                          "id":  "w007",
+                          "assamese":  "Mur naam ...",
+                          "english":  "My name is...",
+                          "pronunciation":  "Mur naam",
+                          "example":  "Mur naam Riya.",
+                          "notes":  "Self-introduction phrase."
+                      },
+                      {
+                          "id":  "w008",
+                          "assamese":  "Tumi kot pora?",
+                          "english":  "Where are you from?",
+                          "pronunciation":  "Tu-mi kot po-ra",
+                          "example":  "Tumi kot pora ahila?",
+                          "notes":  "Ask origin."
+                      },
+                      {
+                          "id":  "w009",
+                          "assamese":  "Moi ...ot thaku",
+                          "english":  "I live in...",
+                          "pronunciation":  "Moi ...ot tha-ku",
+                          "example":  "Moi Guwahati-ot thaku.",
+                          "notes":  "State where you live."
+                      }
+                  ]
+    },
+    {
+        "id":  "family",
+        "title":  "Family",
+        "icon":  "👨‍👩‍👧",
+        "description":  "Talk about close family members.",
+        "items":  [
+                      {
+                          "id":  "w010",
+                          "assamese":  "Aai",
+                          "english":  "Mother",
+                          "pronunciation":  "Aa-ee",
+                          "example":  "Mur aai bohut bhal.",
+                          "notes":  "Common family term."
+                      },
+                      {
+                          "id":  "w011",
+                          "assamese":  "Deuta",
+                          "english":  "Father",
+                          "pronunciation":  "Deu-ta",
+                          "example":  "Mur deuta office loi jai.",
+                          "notes":  "Common family term."
+                      },
+                      {
+                          "id":  "w012",
+                          "assamese":  "Bhai",
+                          "english":  "Brother",
+                          "pronunciation":  "Bhai",
+                          "example":  "Mur bhai schoolot pore.",
+                          "notes":  "Sibling noun."
+                      },
+                      {
+                          "id":  "w013",
+                          "assamese":  "Boni",
+                          "english":  "Sister",
+                          "pronunciation":  "Bo-ni",
+                          "example":  "Mur boni gaan gai.",
+                          "notes":  "Sibling noun."
+                      }
+                  ]
+    },
+    {
+        "id":  "house",
+        "title":  "House",
+        "icon":  "🏠",
+        "description":  "Vocabulary by rooms and daily objects.",
+        "items":  [
+                      {
+                          "id":  "w014",
+                          "assamese":  "Ghar",
+                          "english":  "House",
+                          "pronunciation":  "Ghor",
+                          "example":  "Mur ghor dangor.",
+                          "notes":  "Main home word."
+                      },
+                      {
+                          "id":  "w015",
+                          "assamese":  "Drawing room / Boha room",
+                          "english":  "Living Room",
+                          "pronunciation":  "Bo-hon ghor",
+                          "example":  "Ami bohon ghorot bosu.",
+                          "notes":  "Room category."
+                      },
+                      {
+                          "id":  "w016",
+                          "assamese":  "Bedroom",
+                          "english":  "Bedroom",
+                          "pronunciation":  "Shui tha-kar ko-tha",
+                          "example":  "Bedrumot suwa jai.",
+                          "notes":  "Room category."
+                      },
+                      {
+                          "id":  "w017",
+                          "assamese":  "Pakghor",
+                          "english":  "Kitchen",
+                          "pronunciation":  "Ron-na-ghor",
+                          "example":  "Rannaghorot bhaat ranna hoy.",
+                          "notes":  "Room category."
+                      },
+                      {
+                          "id":  "w018",
+                          "assamese":  "Bathroom",
+                          "english":  "Bathroom",
+                          "pronunciation":  "Bath-room",
+                          "example":  "Bathroom khan etiya khali.",
+                          "notes":  "Room category."
+                      },
+                      {
+                          "id":  "w019",
+                          "assamese":  "Bagicha",
+                          "english":  "Garden",
+                          "pronunciation":  "Ba-gi-cha",
+                          "example":  "Bagichat phool ase.",
+                          "notes":  "Outdoor area."
+                      }
+                  ]
+    },
+    {
+        "id":  "kitchen",
+        "title":  "Kitchen Basics",
+        "icon":  "🍽️",
+        "description":  "Useful kitchen nouns for daily use.",
+        "items":  [
+                      {
+                          "id":  "w020",
+                          "assamese":  "Koni",
+                          "english":  "Egg",
+                          "pronunciation":  "Deem",
+                          "example":  "Dim diya breakfast koru.",
+                          "notes":  "Food item."
+                      },
+                      {
+                          "id":  "w021",
+                          "assamese":  "Saul / Bhat (cooked)",
+                          "english":  "Rice",
+                          "pronunciation":  "Bhaat",
+                          "example":  "Moi bhaat khau.",
+                          "notes":  "Staple food."
+                      },
+                      {
+                          "id":  "w022",
+                          "assamese":  "Gakhir",
+                          "english":  "Milk",
+                          "pronunciation":  "Dudh",
+                          "example":  "Dudh cupot diya.",
+                          "notes":  "Drink."
+                      },
+                      {
+                          "id":  "w023",
+                          "assamese":  "Bati",
+                          "english":  "Bowl",
+                          "pronunciation":  "Ba-ti",
+                          "example":  "Bati khon aniba.",
+                          "notes":  "Utensil."
+                      },
+                      {
+                          "id":  "w024",
+                          "assamese":  "Plate",
+                          "english":  "Plate",
+                          "pronunciation":  "Tha-li",
+                          "example":  "Thalit bhaat diya.",
+                          "notes":  "Utensil."
+                      },
+                      {
+                          "id":  "w025",
+                          "assamese":  "Samus",
+                          "english":  "Spoon",
+                          "pronunciation":  "Cha-much",
+                          "example":  "Chamuch diya khai.",
+                          "notes":  "Utensil."
+                      },
+                      {
+                          "id":  "w026",
+                          "assamese":  "Coffee",
+                          "english":  "Coffee",
+                          "pronunciation":  "Co-fee",
+                          "example":  "Sokalot coffee khau.",
+                          "notes":  "Drink."
+                      },
+                      {
+                          "id":  "w027",
+                          "assamese":  "Khirki",
+                          "english":  "Window",
+                          "pronunciation":  "Khi-ri-ki",
+                          "example":  "Khiriki khuli diya.",
+                          "notes":  "Home item."
+                      },
+                      {
+                          "id":  "w028",
+                          "assamese":  "Switch",
+                          "english":  "Switch",
+                          "pronunciation":  "Sui-ch",
+                          "example":  "Switch tola.",
+                          "notes":  "Electrical item."
+                      }
+                  ]
+    },
+    {
+        "id":  "food",
+        "title":  "Food \u0026 Drinks",
+        "icon":  "🍛",
+        "description":  "Talk about meals and ingredients.",
+        "items":  [
+                      {
+                          "id":  "w029",
+                          "assamese":  "Hah",
+                          "english":  "Duck",
+                          "pronunciation":  "Haah",
+                          "example":  "Haahor mangxo bhal lage.",
+                          "notes":  "Food item."
+                      },
+                      {
+                          "id":  "w030",
+                          "assamese":  "Mas",
+                          "english":  "Fish",
+                          "pronunciation":  "Maas",
+                          "example":  "Aji maas ranna hobo.",
+                          "notes":  "Food item."
+                      },
+                      {
+                          "id":  "w031",
+                          "assamese":  "Xak pasoli",
+                          "english":  "Vegetables",
+                          "pronunciation":  "Xaak-paat",
+                          "example":  "Xaak-paat khai swasthya bhal thake.",
+                          "notes":  "Food group."
+                      },
+                      {
+                          "id":  "w032",
+                          "assamese":  "Bilahi",
+                          "english":  "Tomato",
+                          "pronunciation":  "Bi-la-hi",
+                          "example":  "Bilahi saladot diya.",
+                          "notes":  "Vegetable."
+                      },
+                      {
+                          "id":  "w033",
+                          "assamese":  "Alu",
+                          "english":  "Potato",
+                          "pronunciation":  "A-lu",
+                          "example":  "Alu bhaji khub priyo.",
+                          "notes":  "Vegetable."
+                      },
+                      {
+                          "id":  "w034",
+                          "assamese":  "Narikol",
+                          "english":  "Coconut",
+                          "pronunciation":  "Na-ri-kol",
+                          "example":  "Narikol diya chutney.",
+                          "notes":  "Ingredient."
+                      }
+                  ]
+    },
+    {
+        "id":  "work",
+        "title":  "Work \u0026 Study",
+        "icon":  "💼",
+        "description":  "Talk about profession and studies.",
+        "items":  [
+                      {
+                          "id":  "w035",
+                          "assamese":  "Moi kaam koro",
+                          "english":  "I work",
+                          "pronunciation":  "Moi kaam ko-ro",
+                          "example":  "Moi city hospitalot kaam koro.",
+                          "notes":  "Work statement."
+                      },
+                      {
+                          "id":  "w036",
+                          "assamese":  "Moi porhu",
+                          "english":  "I study",
+                          "pronunciation":  "Moi por-hu",
+                          "example":  "Moi university-ot porhu.",
+                          "notes":  "Study statement."
+                      },
+                      {
+                          "id":  "w037",
+                          "assamese":  "Tumi kot kaam kora?",
+                          "english":  "Where do you work?",
+                          "pronunciation":  "Tu-mi kot kaam ko-ra",
+                          "example":  "Tumi kot kaam kora?",
+                          "notes":  "Question form."
+                      }
+                  ]
+    },
+    {
+        "id":  "relationships",
+        "title":  "Love \u0026 Relationships",
+        "icon":  "❤️",
+        "description":  "Warm and respectful emotional phrases.",
+        "items":  [
+                      {
+                          "id":  "w038",
+                          "assamese":  "Moi tumak bhal pau",
+                          "english":  "I love you",
+                          "pronunciation":  "Moi tu-mak bhal pa-u",
+                          "example":  "Moi tumak bohut bhal pau.",
+                          "notes":  "Affection expression."
+                      },
+                      {
+                          "id":  "w039",
+                          "assamese":  "Tumi xundor",
+                          "english":  "You are beautiful",
+                          "pronunciation":  "Tu-mi xun-dor",
+                          "example":  "Tumi bohut xundor.",
+                          "notes":  "Compliment."
+                      }
+                  ]
+    },
+    {
+        "id":  "body",
+        "title":  "Human Body",
+        "icon":  "🧍",
+        "description":  "Name common body parts.",
+        "items":  [
+                      {
+                          "id":  "w040",
+                          "assamese":  "Soku",
+                          "english":  "Eyes",
+                          "pronunciation":  "Aa-khi",
+                          "example":  "Mor aakhi duita ase.",
+                          "notes":  "Body part."
+                      },
+                      {
+                          "id":  "w041",
+                          "assamese":  "Suli",
+                          "english":  "Hair",
+                          "pronunciation":  "Chul",
+                          "example":  "Tar chul lamba.",
+                          "notes":  "Body part."
+                      },
+                      {
+                          "id":  "w042",
+                          "assamese":  "Haat",
+                          "english":  "Hands",
+                          "pronunciation":  "Haat",
+                          "example":  "Haat dhui lobi.",
+                          "notes":  "Body part."
+                      },
+                      {
+                          "id":  "w043",
+                          "assamese":  "Bhaori",
+                          "english":  "Legs",
+                          "pronunciation":  "Bhao-ri",
+                          "example":  "Mor bhaori betha.",
+                          "notes":  "Body part."
+                      },
+                      {
+                          "id":  "w044",
+                          "assamese":  "Pet",
+                          "english":  "Stomach",
+                          "pronunciation":  "Pet",
+                          "example":  "Mor pet bhukat.",
+                          "notes":  "Body part."
+                      },
+                      {
+                          "id":  "w045",
+                          "assamese":  "Dingi",
+                          "english":  "Neck",
+                          "pronunciation":  "Ga-la",
+                          "example":  "Galaot dupatta ase.",
+                          "notes":  "Body part."
+                      },
+                      {
+                          "id":  "w046",
+                          "assamese":  "Nak",
+                          "english":  "Nose",
+                          "pronunciation":  "Naak",
+                          "example":  "Tar naak sundor.",
+                          "notes":  "Body part."
+                      }
+                  ]
+    },
+    {
+        "id":  "numbers",
+        "title":  "Numbers 1-20",
+        "icon":  "🔢",
+        "description":  "Count confidently in Assamese.",
+        "items":  [
+                      {
+                          "id":  "w047",
+                          "assamese":  "Ek",
+                          "english":  "One",
+                          "pronunciation":  "Ek",
+                          "example":  "Ek boi ase.",
+                          "notes":  "Number"
+                      },
+                      {
+                          "id":  "w048",
+                          "assamese":  "Dui",
+                          "english":  "Two",
+                          "pronunciation":  "Dui",
+                          "example":  "Dui jon ahe.",
+                          "notes":  "Number"
+                      },
+                      {
+                          "id":  "w049",
+                          "assamese":  "Tin",
+                          "english":  "Three",
+                          "pronunciation":  "Tin",
+                          "example":  "Tin ta dim.",
+                          "notes":  "Number"
+                      },
+                      {
+                          "id":  "w050",
+                          "assamese":  "Sari",
+                          "english":  "Four",
+                          "pronunciation":  "Sa-ri",
+                          "example":  "Sari ta boi.",
+                          "notes":  "Number"
+                      },
+                      {
+                          "id":  "w051",
+                          "assamese":  "Pach",
+                          "english":  "Five",
+                          "pronunciation":  "Paach",
+                          "example":  "Pach ta phool.",
+                          "notes":  "Number"
+                      },
+                      {
+                          "id":  "w052",
+                          "assamese":  "Dosh",
+                          "english":  "Ten",
+                          "pronunciation":  "Dosh",
+                          "example":  "Dosh porjonto guno.",
+                          "notes":  "Number"
+                      },
+                      {
+                          "id":  "w053",
+                          "assamese":  "Bix",
+                          "english":  "Twenty",
+                          "pronunciation":  "Bix",
+                          "example":  "Bix jon student.",
+                          "notes":  "Number"
+                      }
+                  ]
+    },
+    {
+        "id":  "daily-conversation",
+        "title":  "Daily Conversation",
+        "icon":  "💬",
+        "description":  "Useful day-to-day speaking lines.",
+        "items":  [
+                      {
+                          "id":  "w054",
+                          "assamese":  "Moi bhukat lagise",
+                          "english":  "I am hungry",
+                          "pronunciation":  "Moi bhu-kat la-gi-se",
+                          "example":  "Moi bhukat lagise, khaam.",
+                          "notes":  "Daily feeling."
+                      },
+                      {
+                          "id":  "w055",
+                          "assamese":  "Moi piasa lagise",
+                          "english":  "I am thirsty",
+                          "pronunciation":  "Moi pi-a-sa la-gi-se",
+                          "example":  "Moi piasa lagise, pani dia.",
+                          "notes":  "Daily feeling."
+                      },
+                      {
+                          "id":  "w056",
+                          "assamese":  "Moi klanto",
+                          "english":  "I am tired",
+                          "pronunciation":  "Moi klan-to",
+                          "example":  "Aji moi bohut klanto.",
+                          "notes":  "Daily feeling."
+                      },
+                      {
+                          "id":  "w057",
+                          "assamese":  "Apekha kora",
+                          "english":  "Wait",
+                          "pronunciation":  "A-pe-kha ko-ra",
+                          "example":  "Etu apekha kora.",
+                          "notes":  "Command."
+                      },
+                      {
+                          "id":  "w058",
+                          "assamese":  "Xuna",
+                          "english":  "Listen",
+                          "pronunciation":  "Xu-na",
+                          "example":  "Xuna, moi kobo.",
+                          "notes":  "Command."
+                      },
+                      {
+                          "id":  "w059",
+                          "assamese":  "Bola jau",
+                          "english":  "Let\u0027s go",
+                          "pronunciation":  "Bo-la jau",
+                          "example":  "Etiya bola jau.",
+                          "notes":  "Action phrase."
+                      },
+                      {
+                          "id":  "w060",
+                          "assamese":  "Morot diya",
+                          "english":  "Give it to me",
+                          "pronunciation":  "Mo-rot di-ya",
+                          "example":  "Boi khon morot diya.",
+                          "notes":  "Request."
+                      },
+                      {
+                          "id":  "w061",
+                          "assamese":  "Moi ahi aso",
+                          "english":  "I am coming",
+                          "pronunciation":  "Moi a-hi a-so",
+                          "example":  "Apekha kora, moi ahi aso.",
+                          "notes":  "Movement phrase."
+                      }
+                  ]
+    },
+    {
+        "id":  "food-vocabulary",
+        "title":  "Food Vocabulary",
+        "icon":  "🍚",
+        "description":  "Expanded kitchen and meal words from your dataset.",
+        "items":  [
+                      {
+                          "id":  "w063",
+                          "assamese":  "Bora saul",
+                          "english":  "Sticky rice",
+                          "pronunciation":  "Bo-ra saul",
+                          "example":  "Bora saul khub bhal.",
+                          "notes":  "Food basics."
+                      },
+                      {
+                          "id":  "w068",
+                          "assamese":  "Gahori",
+                          "english":  "Pork",
+                          "pronunciation":  "Ga-ho-ri",
+                          "example":  "Gahori mangxo spicy.",
+                          "notes":  "Food basics."
+                      },
+                      {
+                          "id":  "w069",
+                          "assamese":  "Aam",
+                          "english":  "Mango",
+                          "pronunciation":  "Aam",
+                          "example":  "Aam mitha ase.",
+                          "notes":  "Fruit."
+                      }
+                  ]
+    },
+    {
+        "id":  "living-room",
+        "title":  "Living Room",
+        "icon":  "🛋️",
+        "description":  "Useful words for objects in the living room.",
+        "items":  [
+                      {
+                          "id":  "w075",
+                          "assamese":  "Sofa",
+                          "english":  "Sofa",
+                          "pronunciation":  "So-fa",
+                          "example":  "Sofat bohi asa.",
+                          "notes":  "Furniture."
+                      },
+                      {
+                          "id":  "w076",
+                          "assamese":  "Table",
+                          "english":  "Table",
+                          "pronunciation":  "Te-bol",
+                          "example":  "Tableor uporot boi ase.",
+                          "notes":  "Furniture."
+                      },
+                      {
+                          "id":  "w077",
+                          "assamese":  "Soki",
+                          "english":  "Chair",
+                          "pronunciation":  "So-ki",
+                          "example":  "Sokit bohi thakok.",
+                          "notes":  "Furniture."
+                      },
+                      {
+                          "id":  "w078",
+                          "assamese":  "Carpet",
+                          "english":  "Carpet",
+                          "pronunciation":  "Kar-pet",
+                          "example":  "Carpet khon poriskar kora.",
+                          "notes":  "Object."
+                      },
+                      {
+                          "id":  "w079",
+                          "assamese":  "Photos",
+                          "english":  "Pictures",
+                          "pronunciation":  "Pho-tos",
+                          "example":  "Wallot photos lagise.",
+                          "notes":  "Decor."
+                      },
+                      {
+                          "id":  "w080",
+                          "assamese":  "Vase",
+                          "english":  "Vase",
+                          "pronunciation":  "Vase",
+                          "example":  "Vaseot ful ase.",
+                          "notes":  "Decor."
+                      },
+                      {
+                          "id":  "w081",
+                          "assamese":  "Ful",
+                          "english":  "Flowers",
+                          "pronunciation":  "Ful",
+                          "example":  "Fulor gondho bhal.",
+                          "notes":  "Decor."
+                      },
+                      {
+                          "id":  "w082",
+                          "assamese":  "Lamp",
+                          "english":  "Standing lamp",
+                          "pronunciation":  "Lamp",
+                          "example":  "Standing lamp tu jola.",
+                          "notes":  "Lighting."
+                      },
+                      {
+                          "id":  "w083",
+                          "assamese":  "Hanging light tu",
+                          "english":  "Hanging lamp",
+                          "pronunciation":  "Han-ging light",
+                          "example":  "Hanging light tu sundor.",
+                          "notes":  "Lighting."
+                      }
+                  ]
+    },
+    {
+        "id":  "bedroom-plus",
+        "title":  "Bedroom",
+        "icon":  "🛏️",
+        "description":  "Bedroom words and a useful sentence.",
+        "items":  [
+                      {
+                          "id":  "w085",
+                          "assamese":  "Bisona",
+                          "english":  "Bed",
+                          "pronunciation":  "Bi-so-na",
+                          "example":  "Bisonat suwa jai.",
+                          "notes":  "Furniture."
+                      },
+                      {
+                          "id":  "w086",
+                          "assamese":  "Almari",
+                          "english":  "Closet",
+                          "pronunciation":  "Al-ma-ri",
+                          "example":  "Almarit kapor ase.",
+                          "notes":  "Furniture."
+                      },
+                      {
+                          "id":  "w087",
+                          "assamese":  "Lap",
+                          "english":  "Blanket",
+                          "pronunciation":  "Lap",
+                          "example":  "Lap lobo ne?",
+                          "notes":  "Bedding."
+                      },
+                      {
+                          "id":  "w088",
+                          "assamese":  "Cushion",
+                          "english":  "Cushion",
+                          "pronunciation":  "Cu-shion",
+                          "example":  "Cushion tu komol.",
+                          "notes":  "Bedding."
+                      },
+                      {
+                          "id":  "w089",
+                          "assamese":  "Desk",
+                          "english":  "Desk",
+                          "pronunciation":  "Desk",
+                          "example":  "Deskot bohi porhu.",
+                          "notes":  "Furniture."
+                      },
+                      {
+                          "id":  "w090",
+                          "assamese":  "Aina",
+                          "english":  "Mirror",
+                          "pronunciation":  "Ai-na",
+                          "example":  "Ainat mukh dekhu.",
+                          "notes":  "Object."
+                      },
+                      {
+                          "id":  "w091",
+                          "assamese":  "Porda",
+                          "english":  "Curtains",
+                          "pronunciation":  "Por-da",
+                          "example":  "Porda bondho kori dia.",
+                          "notes":  "Object."
+                      },
+                      {
+                          "id":  "w092",
+                          "assamese":  "Bola bisonale jaw cuddle koribole.",
+                          "english":  "Let\u0027s go to bed to cuddle.",
+                          "pronunciation":  "Bo-la bi-so-na-le jaw",
+                          "example":  "Bola bisonale jaw cuddle koribole.",
+                          "notes":  "Useful sentence."
+                      }
+                  ]
+    },
+    {
+        "id":  "kitchen-plus",
+        "title":  "Kitchen",
+        "icon":  "🍳",
+        "description":  "Kitchen nouns and practical phrases.",
+        "items":  [
+                      {
+                          "id":  "w098",
+                          "assamese":  "Switch tu on kori dia.",
+                          "english":  "Turn on the switch.",
+                          "pronunciation":  "Switch tu on",
+                          "example":  "Switch tu on kori dia.",
+                          "notes":  "Useful phrase."
+                      },
+                      {
+                          "id":  "w099",
+                          "assamese":  "Plate khon muk dia.",
+                          "english":  "Give me the plate.",
+                          "pronunciation":  "Plate khon muk dia",
+                          "example":  "Plate khon muk dia.",
+                          "notes":  "Useful phrase."
+                      }
+                  ]
+    },
+    {
+        "id":  "around-house",
+        "title":  "Around the House",
+        "icon":  "🏡",
+        "description":  "Household object words and locations.",
+        "items":  [
+                      {
+                          "id":  "w101",
+                          "assamese":  "Duar",
+                          "english":  "Door",
+                          "pronunciation":  "Du-ar",
+                          "example":  "Duar khuli dia.",
+                          "notes":  "Object."
+                      },
+                      {
+                          "id":  "w103",
+                          "assamese":  "Bear",
+                          "english":  "Wall",
+                          "pronunciation":  "Bear",
+                          "example":  "Wallot chobi ase.",
+                          "notes":  "Object."
+                      },
+                      {
+                          "id":  "w104",
+                          "assamese":  "Poka",
+                          "english":  "Floor",
+                          "pronunciation":  "Po-ka",
+                          "example":  "Floor poriskar kora.",
+                          "notes":  "Object."
+                      },
+                      {
+                          "id":  "w105",
+                          "assamese":  "Gos",
+                          "english":  "Plant",
+                          "pronunciation":  "Gos",
+                          "example":  "Gosot pani dia.",
+                          "notes":  "Object."
+                      }
+                  ]
+    },
+    {
+        "id":  "asking-questions",
+        "title":  "Asking Questions",
+        "icon":  "❓",
+        "description":  "Natural questions and responses for conversation.",
+        "items":  [
+                      {
+                          "id":  "w106",
+                          "assamese":  "Tumar kiman boyokh hoise?",
+                          "english":  "How old are you?",
+                          "pronunciation":  "Tu-mar ki-man bo-yokh hoi-se",
+                          "example":  "Tumar kiman boyokh hoise?",
+                          "notes":  "Question form."
+                      },
+                      {
+                          "id":  "w107",
+                          "assamese":  "Mur botris bosor hoise.",
+                          "english":  "I\u0027m 32 years old.",
+                          "pronunciation":  "Mur bo-tris bo-sor hoi-se",
+                          "example":  "Mur botris bosor hoise.",
+                          "notes":  "Answer form."
+                      },
+                      {
+                          "id":  "w108",
+                          "assamese":  "Kenekua lagise?",
+                          "english":  "How do you like it?",
+                          "pronunciation":  "Ke-ne-kua la-gi-se",
+                          "example":  "Kenekua lagise?",
+                          "notes":  "Opinion question."
+                      },
+                      {
+                          "id":  "w109",
+                          "assamese":  "Bhal lagise?",
+                          "english":  "Do you like it?",
+                          "pronunciation":  "Bhal la-gi-se",
+                          "example":  "Bhal lagise?",
+                          "notes":  "Opinion question."
+                      },
+                      {
+                          "id":  "w110",
+                          "assamese":  "Bhal!",
+                          "english":  "I like it.",
+                          "pronunciation":  "Bhal",
+                          "example":  "Bhal!",
+                          "notes":  "Positive response."
+                      },
+                      {
+                          "id":  "w111",
+                          "assamese":  "Bhale.",
+                          "english":  "It\u0027s okay.",
+                          "pronunciation":  "Bha-le",
+                          "example":  "Bhale.",
+                          "notes":  "Neutral response."
+                      },
+                      {
+                          "id":  "w112",
+                          "assamese":  "Bhal loga nei.",
+                          "english":  "I don\u0027t like it.",
+                          "pronunciation":  "Bhal lo-ga nei",
+                          "example":  "Bhal loga nei.",
+                          "notes":  "Negative response."
+                      },
+                      {
+                          "id":  "w113",
+                          "assamese":  "Apuni keneke kore le?",
+                          "english":  "How do you do it?",
+                          "pronunciation":  "A-pu-ni ke-ne-ke ko-re le",
+                          "example":  "Apuni keneke kore le?",
+                          "notes":  "Method question."
+                      }
+                  ]
+    },
+    {
+        "id":  "actions-plus",
+        "title":  "Actions",
+        "icon":  "🏃",
+        "description":  "Action commands and practical daily sentences.",
+        "items":  [
+                      {
+                          "id":  "w114",
+                          "assamese":  "Bola gaw.",
+                          "english":  "Let\u0027s go.",
+                          "pronunciation":  "Bo-la gaw",
+                          "example":  "Bola gaw.",
+                          "notes":  "Command."
+                      },
+                      {
+                          "id":  "w115",
+                          "assamese":  "Loi na lobba.",
+                          "english":  "Don\u0027t take it.",
+                          "pronunciation":  "Loi na lo-bba",
+                          "example":  "Loi na lobba.",
+                          "notes":  "Command."
+                      },
+                      {
+                          "id":  "w116",
+                          "assamese":  "Muk dia.",
+                          "english":  "Give it to me.",
+                          "pronunciation":  "Muk di-a",
+                          "example":  "Muk dia.",
+                          "notes":  "Command."
+                      },
+                      {
+                          "id":  "w117",
+                          "assamese":  "Likhi dia.",
+                          "english":  "Write it down.",
+                          "pronunciation":  "Li-khi di-a",
+                          "example":  "Likhi dia.",
+                          "notes":  "Command."
+                      },
+                      {
+                          "id":  "w118",
+                          "assamese":  "Dilu.",
+                          "english":  "I gave it.",
+                          "pronunciation":  "Di-lu",
+                          "example":  "Dilu.",
+                          "notes":  "Action statement."
+                      },
+                      {
+                          "id":  "w119",
+                          "assamese":  "Jam.",
+                          "english":  "I\u0027ll go.",
+                          "pronunciation":  "Jam",
+                          "example":  "Moi etiya jam.",
+                          "notes":  "Action statement."
+                      },
+                      {
+                          "id":  "w120",
+                          "assamese":  "Gym jam abelike.",
+                          "english":  "I\u0027ll go to the gym this evening.",
+                          "pronunciation":  "Gym jam a-be-li-ke",
+                          "example":  "Gym jam abelike.",
+                          "notes":  "Action statement."
+                      },
+                      {
+                          "id":  "w121",
+                          "assamese":  "Smartphone solai sa.",
+                          "english":  "You\u0027re using your phone.",
+                          "pronunciation":  "Smart-phone so-lai sa",
+                          "example":  "Smartphone solai sa.",
+                          "notes":  "Observation."
+                      },
+                      {
+                          "id":  "w122",
+                          "assamese":  "Tumi ghor ot phone solai sa niki?",
+                          "english":  "Are you using your phone inside the house?",
+                          "pronunciation":  "Tu-mi ghorot phone so-lai sa ni-ki",
+                          "example":  "Tumi ghor ot phone solai sa niki?",
+                          "notes":  "Question sentence."
+                      },
+                      {
+                          "id":  "w123",
+                          "assamese":  "Aji tumi ki cinema sala?",
+                          "english":  "Which movie did you watch today?",
+                          "pronunciation":  "A-ji tu-mi ki ci-ne-ma sa-la",
+                          "example":  "Aji tumi ki cinema sala?",
+                          "notes":  "Question sentence."
+                      },
+                      {
+                          "id":  "w124",
+                          "assamese":  "Tumi ki hikila?",
+                          "english":  "What did you learn?",
+                          "pronunciation":  "Tu-mi ki hi-ki-la",
+                          "example":  "Tumi ki hikila?",
+                          "notes":  "Question sentence."
+                      },
+                      {
+                          "id":  "w125",
+                          "assamese":  "Moi bohut hikilo.",
+                          "english":  "I learned a lot.",
+                          "pronunciation":  "Moi bo-hut hi-ki-lo",
+                          "example":  "Moi bohut hikilo.",
+                          "notes":  "Answer sentence."
+                      }
+                  ]
+    },
+    {
+        "id":  "pronouns",
+        "title":  "Pronouns",
+        "icon":  "🧩",
+        "description":  "Foundational Assamese pronouns and connector.",
+        "items":  [
+                      {
+                          "id":  "w126",
+                          "assamese":  "Moi",
+                          "english":  "I",
+                          "pronunciation":  "Moi",
+                          "example":  "Moi axomiya sikhu.",
+                          "notes":  "Pronoun."
+                      },
+                      {
+                          "id":  "w127",
+                          "assamese":  "Mur",
+                          "english":  "My",
+                          "pronunciation":  "Mur",
+                          "example":  "Mur boi eta ase.",
+                          "notes":  "Pronoun."
+                      },
+                      {
+                          "id":  "w128",
+                          "assamese":  "Muk",
+                          "english":  "Me",
+                          "pronunciation":  "Muk",
+                          "example":  "Muk eti dia.",
+                          "notes":  "Pronoun."
+                      },
+                      {
+                          "id":  "w129",
+                          "assamese":  "Ami",
+                          "english":  "We",
+                          "pronunciation":  "A-mi",
+                          "example":  "Ami log pai jam.",
+                          "notes":  "Pronoun."
+                      },
+                      {
+                          "id":  "w130",
+                          "assamese":  "Aru",
+                          "english":  "And",
+                          "pronunciation":  "A-ru",
+                          "example":  "Moi aru tumi.",
+                          "notes":  "Connector."
+                      }
+                  ]
+    },
+    {
+        "id":  "time",
+        "title":  "Time",
+        "icon":  "⏰",
+        "description":  "Basic time words for daily use.",
+        "items":  [
+                      {
+                          "id":  "w131",
+                          "assamese":  "Aji",
+                          "english":  "Today",
+                          "pronunciation":  "A-ji",
+                          "example":  "Aji moi porhu.",
+                          "notes":  "Time word."
+                      },
+                      {
+                          "id":  "w132",
+                          "assamese":  "Abeli",
+                          "english":  "Evening",
+                          "pronunciation":  "A-be-li",
+                          "example":  "Abelite gym jam.",
+                          "notes":  "Time word."
+                      }
+                  ]
+    }
+]
