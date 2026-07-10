@@ -30,7 +30,7 @@ import {
   restoreDeletedDictionaryWord,
   resetDictionaryCache
 } from "./dictionary.js?v=20260710-45";
-import { loadLessons, renderLessonsOverview, renderLessonDetail, flattenLessonWords, resetLessonsCache } from "./lessons.js?v=20260710-53";
+import { loadLessons, renderLessonsOverview, renderLessonDetail, flattenLessonWords, resetLessonsCache } from "./lessons.js?v=20260710-55";
 import { updateSpacedRepetition, shuffleCards, renderFlashcard, renderFlashSummary } from "./flashcards.js?v=20260710-37";
 import { buildQuizQuestions, renderQuizView } from "./quiz.js?v=20260710-33";
 import {
@@ -345,7 +345,7 @@ const state = {
   view: "home",
   practiceTab: "flashcards",
   lessonsScreen: "overview",
-  lessonsTypeFilter: "single-word",
+  lessonsTypeFilter: "all",
   lessons: [],
   dictionary: [],
   activeLessonId: null,
@@ -1201,9 +1201,12 @@ function renderLessons() {
 
   if (state.lessonsScreen === "overview") {
     const isPhraseMode = state.lessonsTypeFilter === "phrase-sentence";
-    const selectedLessons = state.lessons.filter((lesson) =>
-      isPhraseMode ? lesson.kind === "phrase-sentence" : lesson.kind !== "phrase-sentence"
-    );
+    const isSingleWordMode = state.lessonsTypeFilter === "single-word";
+    const selectedLessons = state.lessons.filter((lesson) => {
+      if (isPhraseMode) return lesson.kind === "phrase-sentence";
+      if (isSingleWordMode) return lesson.kind !== "phrase-sentence";
+      return true;
+    });
     const favoriteLessons = selectedLessons.filter((lesson) => state.favorites.lessons.includes(lesson.id));
     const favoritesArea = favoriteLessons.length
       ? renderLessonsOverview(favoriteLessons, state.progress, state.activeLessonId, state.favorites)
@@ -1212,11 +1215,19 @@ function renderLessons() {
       ? renderLessonsOverview(selectedLessons, state.progress, state.activeLessonId, state.favorites)
       : isPhraseMode
         ? "<p class='meta'>No phrase/sentence lessons available yet.</p>"
-        : "<p class='meta'>No single-word lessons available yet.</p>";
-    const lessonsHeading = isPhraseMode ? "Whole Phrases / Sentences" : "Single Words";
+        : isSingleWordMode
+          ? "<p class='meta'>No single-word lessons available yet.</p>"
+          : "<p class='meta'>No lessons available yet.</p>";
+    const lessonsHeading = isPhraseMode
+      ? "Whole Phrases / Sentences"
+      : isSingleWordMode
+        ? "Single Words"
+        : "All Lessons";
     const lessonsDescription = isPhraseMode
       ? "Practice complete expressions and sentence patterns."
-      : "Learn one-word vocabulary items first.";
+      : isSingleWordMode
+        ? "Learn one-word vocabulary items first."
+        : "See both single-word and phrase/sentence lessons together.";
 
     panel.classList.remove("lesson-focus");
     document.body.classList.remove("lesson-immersive");
@@ -1226,6 +1237,7 @@ function renderLessons() {
           <h3>Lesson Type</h3>
           <p class="meta">Choose which lesson type to practice.</p>
           <select id="lessons-type-filter" class="input" aria-label="Lesson type filter">
+            <option value="all" ${state.lessonsTypeFilter === "all" ? "selected" : ""}>All lessons</option>
             <option value="single-word" ${state.lessonsTypeFilter === "single-word" ? "selected" : ""}>Single words</option>
             <option value="phrase-sentence" ${state.lessonsTypeFilter === "phrase-sentence" ? "selected" : ""}>Whole phrases / sentences</option>
           </select>
@@ -2869,7 +2881,9 @@ function onInput(event) {
   }
 
   if (target.id === "lessons-type-filter") {
-    state.lessonsTypeFilter = target.value === "phrase-sentence" ? "phrase-sentence" : "single-word";
+    state.lessonsTypeFilter = ["all", "single-word", "phrase-sentence"].includes(target.value)
+      ? target.value
+      : "all";
     renderLessons();
   }
 
@@ -2967,7 +2981,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=141", { updateViaCache: "none" })
+      .register("sw.js?v=145", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.

@@ -122,9 +122,21 @@ function isPhraseOrSentence(text) {
   return tokenizePhrase(value).length > 1;
 }
 
+function normalizeEntryType(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (["phrase", "phrases", "phrase-sentence", "sentence", "sentences"].includes(normalized)) {
+    return "phrase";
+  }
+  if (["word", "words", "single-word", "single word"].includes(normalized)) {
+    return "word";
+  }
+  return "";
+}
+
 function isPhraseEntry(item) {
-  if (item?.entryType === "phrase") return true;
-  if (item?.entryType === "word") return false;
+  const normalizedType = normalizeEntryType(item?.entryType);
+  if (normalizedType === "phrase") return true;
+  if (normalizedType === "word") return false;
   return isPhraseOrSentence(item.assamese) || isPhraseOrSentence(item.english);
 }
 
@@ -135,10 +147,12 @@ function buildLessonsFromDictionary(entries) {
     const category = normalizeDictionaryCategory(entry.category);
     if (!category) return;
 
+    const explicitEntryType = normalizeEntryType(entry.entryType) || undefined;
+
     if (!grouped.has(category)) grouped.set(category, []);
     grouped.get(category).push({
       id: String(entry.id || lessonItemKey(entry)),
-      entryType: entry.entryType === "phrase" ? "phrase" : "word",
+      ...(explicitEntryType ? { entryType: explicitEntryType } : {}),
       assamese: entry.assamese || "-",
       english: entry.english || "-",
       pronunciation: entry.pronunciation || "-",
