@@ -1,0 +1,10 @@
+name = "assamese-survival-sync"
+main = "src/index.js"
+compatibility_date = "2026-07-10"
+
+[[kv_namespaces]]
+binding = "STATE_KV"
+id = "__SET_ME__"
+
+[vars]
+SYNC_TOKEN = ""

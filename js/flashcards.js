@@ -45,10 +45,17 @@ export function shuffleCards(cards) {
   return arr;
 }
 
-export function renderFlashcard(word, flipped, index, total) {
+export function renderFlashcard(word, flipped, index, total, playMode = "normal") {
   if (!word) {
     return `<article class="card"><p>No cards available. Learn a few words first.</p></article>`;
   }
+
+  const modeLabelById = {
+    normal: "Normal",
+    shuffle: "Shuffle",
+    random: "Random"
+  };
+  const modeLabel = modeLabelById[playMode] || "Normal";
 
   return `
     <article class="card grid">
@@ -56,6 +63,7 @@ export function renderFlashcard(word, flipped, index, total) {
         <h3>Flashcards</h3>
         <span class="pill">${index + 1}/${total}</span>
       </div>
+      <p class="meta">Mode: ${modeLabel}</p>
       <div class="flip">
         <section class="flash-card ${flipped ? "flipped" : ""}" id="flash-card">
           <div class="flash-face front">
@@ -72,9 +80,8 @@ export function renderFlashcard(word, flipped, index, total) {
         <button class="btn ghost" data-action="flash-grade" data-grade="hard">Hard</button>
         <button class="btn accent" data-action="flash-grade" data-grade="easy">Easy</button>
       </div>
-      <div class="row" style="flex-wrap: wrap;">
-        <button class="btn ghost" data-action="flash-shuffle">Shuffle</button>
-        <button class="btn ghost" data-action="flash-random">Random mode</button>
+      <div class="row" style="justify-content:flex-start;">
+        <button class="btn ghost" data-action="flash-back-overview">Restart</button>
       </div>
     </article>
   `;
@@ -93,7 +100,8 @@ export function renderFlashSummary({ total, hardCount, easyCount, hasHardWords }
         <div class="stat"><span class="label">Easy words</span><span class="value">${easyCount}</span></div>
       </div>
       <div class="row flash-summary-actions" style="flex-wrap: wrap;">
-        <button class="btn accent" data-action="flash-repeat-hard" ${hasHardWords ? "" : "disabled"}>Repeat Hard Words</button>
+        ${hasHardWords ? '<button class="btn accent" data-action="flash-repeat-hard">Repeat Hard Words</button>' : ""}
+        <button class="btn secondary" data-action="flash-new-session">Start New Session</button>
         <button class="btn ghost" data-action="flash-restart">Restart Full Deck</button>
       </div>
       ${hasHardWords ? "" : "<p class='meta flash-summary-note'>No hard words in this round. Great work!</p>"}

@@ -7,8 +7,36 @@ import {
 
 let dictionaryCache = null;
 
+const CATEGORY_DISPLAY_ORDER = [
+  "Actions",
+  "Questions",
+  "Conversations",
+  "Family",
+  "Food & Drinks",
+  "Greetings",
+  "House",
+  "Human Body",
+  "Introduction",
+  "Love",
+  "Numbers",
+  "Pronouns",
+  "Time",
+  "Work"
+];
+
 function entryKey(entry) {
   return `${String(entry.english || "").trim().toLowerCase()}|${String(entry.assamese || "").trim().toLowerCase()}`;
+}
+
+function inferredEntryType(entry) {
+  if (entry?.entryType === "phrase") return "phrase";
+  if (entry?.entryType === "word") return "word";
+
+  const hasPhrasePattern = [entry?.english, entry?.assamese]
+    .map((text) => String(text || "").trim())
+    .some((text) => /[?.!]/.test(text) || text.split(/\s+/).filter(Boolean).length > 1);
+
+  return hasPhrasePattern ? "phrase" : "word";
 }
 
 function normalizedCategory(category) {
@@ -16,6 +44,26 @@ function normalizedCategory(category) {
   if (!text) return "Custom";
 
   const lower = text.toLowerCase();
+
+  if (["introduction", "introductions"].includes(lower)) {
+    return "Introduction";
+  }
+
+  if (["asking questions", "question", "questions"].includes(lower)) {
+    return "Questions";
+  }
+
+  if (["daily conversation", "conversation", "conversations"].includes(lower)) {
+    return "Conversations";
+  }
+
+  if (["love", "love & relationships", "love and relationships", "relationships"].includes(lower)) {
+    return "Love";
+  }
+
+  if (["work & study", "work and study", "study", "work"].includes(lower)) {
+    return "Work";
+  }
 
   if (["bedroom", "kitchen", "living room", "livingroom"].includes(lower) || lower.includes("house")) {
     return "House";
@@ -26,6 +74,22 @@ function normalizedCategory(category) {
   }
 
   return text;
+}
+
+export function normalizeDictionaryCategory(category) {
+  return normalizedCategory(category);
+}
+
+export function compareCategoryDisplayOrder(a, b) {
+  const aText = String(a || "");
+  const bText = String(b || "");
+  const aIndex = CATEGORY_DISPLAY_ORDER.indexOf(aText);
+  const bIndex = CATEGORY_DISPLAY_ORDER.indexOf(bText);
+
+  if (aIndex >= 0 && bIndex >= 0) return aIndex - bIndex;
+  if (aIndex >= 0) return -1;
+  if (bIndex >= 0) return 1;
+  return aText.localeCompare(bText);
 }
 
 function getBaseKey(entry) {
@@ -90,12 +154,14 @@ export function addCustomDictionaryWord({
   english,
   assamese,
   category = "Custom",
+  entryType = "word",
   exampleAssamese = "",
   exampleEnglish = ""
 }) {
   const englishText = String(english || "").trim();
   const assameseText = String(assamese || "").trim();
   const categoryText = String(category || "Custom").trim() || "Custom";
+  const selectedType = entryType === "phrase" ? "phrase" : "word";
   const exampleAssameseText = String(exampleAssamese || "").trim();
   const exampleEnglishText = String(exampleEnglish || "").trim();
 
@@ -106,6 +172,7 @@ export function addCustomDictionaryWord({
   const entry = {
     id: `c-${Date.now()}`,
     category: categoryText,
+    entryType: selectedType,
     assamese: assameseText,
     english: englishText,
     pronunciation: "-",
@@ -141,6 +208,16 @@ export function editDictionaryWord(baseKey, updates) {
   const english = String(updates.english || "").trim();
   const assamese = String(updates.assamese || "").trim();
   const category = String(updates.category || target.category || "Custom").trim() || "Custom";
+  const entryType = updates.entryType === "phrase" ? "phrase" : "word";
+  const hasExampleAssamese = Object.prototype.hasOwnProperty.call(updates || {}, "exampleAssamese");
+  const hasExampleEnglish = Object.prototype.hasOwnProperty.call(updates || {}, "exampleEnglish");
+  const rawExampleAssamese = hasExampleAssamese
+    ? String(updates.exampleAssamese || "").trim()
+    : String(target.example || "").trim();
+  const example = rawExampleAssamese || `${assamese} · ${english}`;
+  const exampleEnglish = hasExampleEnglish
+    ? String(updates.exampleEnglish ?? "").trim()
+    : String(target.exampleEnglish || "").trim();
   if (!english || !assamese) return { ok: false, reason: "missing-fields" };
 
   const duplicate = current.some((entry) => {
@@ -154,7 +231,9 @@ export function editDictionaryWord(baseKey, updates) {
     english,
     assamese,
     category,
-    example: target.example || `${assamese} · ${english}`
+    entryType,
+    example,
+    exampleEnglish
   };
 
   if (String(key).startsWith("custom:")) {
@@ -165,7 +244,9 @@ export function editDictionaryWord(baseKey, updates) {
             english: nextEntry.english,
             assamese: nextEntry.assamese,
             category: nextEntry.category,
-            example: nextEntry.example
+            entryType: nextEntry.entryType,
+            example: nextEntry.example,
+            exampleEnglish: nextEntry.exampleEnglish
           }
         : item
     );
@@ -178,7 +259,9 @@ export function editDictionaryWord(baseKey, updates) {
         english: nextEntry.english,
         assamese: nextEntry.assamese,
         category: nextEntry.category,
-        example: nextEntry.example
+        entryType: nextEntry.entryType,
+        example: nextEntry.example,
+        exampleEnglish: nextEntry.exampleEnglish
       }
     };
     mutations.deleted = (mutations.deleted || []).filter((item) => item !== key);
@@ -229,10 +312,12 @@ export function restoreDeletedDictionaryWord(entry) {
       const restoredCustom = {
         id: entry.id,
         category: entry.category,
+        entryType: entry.entryType === "phrase" ? "phrase" : "word",
         assamese: entry.assamese,
         english: entry.english,
         pronunciation: entry.pronunciation,
         example: entry.example,
+        exampleEnglish: entry.exampleEnglish,
         __baseKey: key,
         __isCustom: true
       };
@@ -279,7 +364,7 @@ export function filterDictionary(entries, { query = "", category = "all", favori
 export function categoriesFromDictionary(entries) {
   return [
     "all",
-    ...Array.from(new Set(entries.map((item) => normalizedCategory(item.category)))).sort((a, b) => a.localeCompare(b))
+    ...Array.from(new Set(entries.map((item) => normalizedCategory(item.category)))).sort(compareCategoryDisplayOrder)
   ];
 }
 
@@ -287,6 +372,7 @@ export function renderDictionaryView({ entries, categories, filters, favorites, 
   const cards = entries
     .map((entry) => {
       const key = encodeURIComponent(getBaseKey(entry));
+      const entryTypeLabel = inferredEntryType(entry) === "phrase" ? "Phrase" : "Word";
       const assameseExample = String(entry.example || "-").trim() || "-";
       const rawExampleTranslation =
         String(entry.exampleEnglish || "").trim() ||
@@ -305,6 +391,7 @@ export function renderDictionaryView({ entries, categories, filters, favorites, 
         <article class="word-card" data-word-id="${entry.id}">
           <div class="row">
             <h4>${entry.assamese}</h4>
+            <span class="pill">${entryTypeLabel}</span>
           </div>
           <p><strong>${entry.english || "-"}</strong></p>
           <p class="meta">${normalizedCategory(entry.category)}</p>
@@ -326,6 +413,13 @@ export function renderDictionaryView({ entries, categories, filters, favorites, 
   const addCategoryOptions = addWordCategories
     .map((cat) => `<option value="${cat}" ${cat === "Custom" ? "selected" : ""}>${cat}</option>`)
     .join("");
+  const editCategoryValue = editDraft?.category || "Custom";
+  const editWordCategories = addWordCategories.includes(editCategoryValue)
+    ? addWordCategories
+    : [editCategoryValue, ...addWordCategories];
+  const editCategoryOptions = editWordCategories
+    .map((cat) => `<option value="${cat}" ${cat === editCategoryValue ? "selected" : ""}>${cat}</option>`)
+    .join("");
 
   const history = searchHistory
     .slice(0, 8)
@@ -338,9 +432,15 @@ export function renderDictionaryView({ entries, categories, filters, favorites, 
         <h3>Edit Word</h3>
         <p class="meta">Update the selected word for dictionary and learning areas.</p>
         <div class="grid" style="margin-top:10px">
+          <select class="select" id="edit-word-entry-type" aria-label="Edit dictionary entry type">
+            <option value="word" ${inferredEntryType(editDraft) === "word" ? "selected" : ""}>Word</option>
+            <option value="phrase" ${inferredEntryType(editDraft) === "phrase" ? "selected" : ""}>Phrase</option>
+          </select>
           <input class="input" id="edit-word-english" value="${editDraft.english || ""}" placeholder="English" aria-label="Edit English word" />
           <input class="input" id="edit-word-assamese" value="${editDraft.assamese || ""}" placeholder="Assamese" aria-label="Edit Assamese word" />
-          <input class="input" id="edit-word-category" value="${editDraft.category || "Custom"}" placeholder="Category" aria-label="Edit word category" />
+          <input class="input" id="edit-word-example-assamese" value="${editDraft.example || ""}" placeholder="Assamese example phrase" aria-label="Edit Assamese example phrase" />
+          <input class="input" id="edit-word-example-english" value="${editDraft.exampleEnglish || ""}" placeholder="English translation for example phrase" aria-label="Edit English example translation" />
+          <select class="select" id="edit-word-category" aria-label="Edit word category">${editCategoryOptions}</select>
           <div class="row" style="justify-content:flex-start;">
             <button class="btn accent" data-action="dictionary-save-edit">Save Changes</button>
             <button class="btn ghost" data-action="dictionary-cancel-edit">Cancel</button>
@@ -369,6 +469,10 @@ export function renderDictionaryView({ entries, categories, filters, favorites, 
         <h3>Add New Word</h3>
         <p class="meta">Add your own vocabulary pair in English and Assamese.</p>
         <div class="grid" style="margin-top:10px">
+          <select class="select" id="new-word-entry-type" aria-label="New dictionary entry type">
+            <option value="word" selected>Word</option>
+            <option value="phrase">Phrase</option>
+          </select>
           <input class="input" id="new-word-english" placeholder="English word or phrase" aria-label="New English word" />
           <input class="input" id="new-word-assamese" placeholder="Assamese translation" aria-label="New Assamese translation" />
           <input class="input" id="new-word-example-assamese" placeholder="Assamese example phrase (optional)" aria-label="New Assamese example phrase" />

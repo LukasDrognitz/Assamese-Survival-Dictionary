@@ -12,13 +12,17 @@ function uniqueOptions(correct, pool, count = 4) {
   return [...options].sort(() => Math.random() - 0.5);
 }
 
-export function buildQuizQuestions(words, size = 10) {
+export function buildQuizQuestions(words, size = 10, mode = "mixed") {
   const shuffled = [...words].sort(() => Math.random() - 0.5).slice(0, size);
   const englishPool = words.map((w) => w.english);
   const assamesePool = words.map((w) => w.assamese);
 
   return shuffled.map((word, idx) => {
-    const toEnglish = Math.random() < 0.5;
+    const toEnglish = mode === "assamese-to-english"
+      ? true
+      : mode === "english-to-assamese"
+      ? false
+      : Math.random() < 0.5;
 
     if (toEnglish) {
       return {
@@ -40,7 +44,13 @@ export function buildQuizQuestions(words, size = 10) {
   });
 }
 
-export function renderQuizView({ question, total, score, answered, selected, showCongrats, showSummary }) {
+export function renderQuizView({ question, total, score, answered, selected, showCongrats, showSummary, mode = "mixed" }) {
+  const modeLabelById = {
+    "english-to-assamese": "English to Assamese",
+    "assamese-to-english": "Assamese to English",
+    mixed: "Mixed"
+  };
+  const modeLabel = modeLabelById[mode] || "Mixed";
   const wrong = Math.max(0, total - score);
   const summaryPose = score < 5 ? "bad-job" : "good-job";
   const summaryTitle = score >= 5 ? "Good Job!" : "Keep Going!";
@@ -125,6 +135,7 @@ export function renderQuizView({ question, total, score, answered, selected, sho
   return `
     <article class="quiz-card card grid">
       <h3>Quiz Challenge</h3>
+      <p class="quiz-meta">Mode: ${modeLabel}</p>
       <p class="quiz-meta">Score: ${score}/${total}</p>
       <h4>${question.prompt}</h4>
       <div class="grid">${optionsHtml}</div>

@@ -8,6 +8,7 @@ export const NAV_ITEMS = [
 
 export function renderNavigation(container, activeView) {
   const isDesktopNav = container.id === "desktop-nav";
+  const isMobileNav = container.id === "mobile-nav";
   const isCollapsed = Boolean(container.closest(".sidebar")?.classList.contains("collapsed"));
 
   container.innerHTML = NAV_ITEMS
@@ -15,6 +16,14 @@ export function renderNavigation(container, activeView) {
       const iconOnly = isDesktopNav && isCollapsed;
       const shortLabel = item.label.split(" ")[0];
       const label = iconOnly ? shortLabel : item.label;
+
+      if (isMobileNav) {
+        const parts = item.label.split(" ");
+        const icon = parts[0] || "";
+        const text = parts.slice(1).join(" ") || item.id;
+        return `<button class="nav-btn ${item.id === activeView ? "active" : ""}" data-nav="${item.id}" aria-label="${item.label}"><span class="nav-icon">${icon}</span><span class="nav-text">${text}</span></button>`;
+      }
+
       return `<button class="nav-btn ${item.id === activeView ? "active" : ""}" data-nav="${item.id}" aria-label="${item.label}">${label}</button>`;
     })
     .join("");
@@ -25,9 +34,9 @@ export function renderProgressCircle(percent, size = 120) {
   const lineWidth = Math.max(70, Math.round(size));
   return `
     <div class="progress-inline" aria-label="Progress ${clamped}%">
-      <span class="progress-inline-value">${clamped}%</span>
       <span class="progress-inline-track" style="width:${lineWidth}px">
         <span class="progress-inline-fill" style="width:${clamped}%"></span>
+        <span class="progress-inline-inside">${clamped}%</span>
       </span>
     </div>
   `;

@@ -1,21 +1,22 @@
-const CACHE_NAME = "assamese-survival-dictionary-v6";
+const CACHE_NAME = "assamese-survival-dictionary-v141";
 
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./css/style.css",
-  "./js/app.js",
-  "./js/dictionary.js",
-  "./js/lessons.js",
-  "./js/flashcards.js",
-  "./js/quiz.js",
-  "./js/storage.js",
-  "./js/ui.js",
+  "./css/style.css?v=20260710-71",
+  "./js/app.js?v=20260710-130",
+  "./js/dictionary.js?v=20260710-45",
+  "./js/lessons.js?v=20260710-53",
+  "./js/flashcards.js?v=20260710-37",
+  "./js/quiz.js?v=20260710-33",
+  "./js/storage.js?v=20260710-36",
+  "./js/ui.js?v=20260710-32",
   "./data/dictionary.json",
   "./data/lessons.json",
   "./manifest.webmanifest",
   "./assets/icons/icon-192.svg",
-  "./assets/icons/icon-512.svg"
+  "./assets/icons/icon-512.svg",
+  "./assets/vendor/chart.umd.min.js"
 ];
 
 self.addEventListener("install", (event) => {
@@ -45,6 +46,11 @@ self.addEventListener("fetch", (event) => {
 
   if (!isSameOrigin) {
     event.respondWith(fetch(event.request));
+    return;
+  }
+
+  if (requestUrl.pathname.startsWith("/api/")) {
+    event.respondWith(fetch(event.request, { cache: "no-store" }));
     return;
   }
 

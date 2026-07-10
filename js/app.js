@@ -14,8 +14,11 @@ import {
   exportDataBundle,
   importDataBundle,
   resetAllData,
-  todayIso
-} from "./storage.js";
+  todayIso,
+  testSyncConnection,
+  syncStateFromServer,
+  startAutoSync
+} from "./storage.js?v=20260710-36";
 import {
   loadDictionary,
   filterDictionary,
@@ -26,20 +29,19 @@ import {
   deleteDictionaryWord,
   restoreDeletedDictionaryWord,
   resetDictionaryCache
-} from "./dictionary.js";
-import { loadLessons, renderLessonsOverview, renderLessonDetail, flattenLessonWords, resetLessonsCache } from "./lessons.js";
-import { pickFlashcards, updateSpacedRepetition, shuffleCards, renderFlashcard, renderFlashSummary } from "./flashcards.js";
-import { buildQuizQuestions, renderQuizView } from "./quiz.js";
+} from "./dictionary.js?v=20260710-45";
+import { loadLessons, renderLessonsOverview, renderLessonDetail, flattenLessonWords, resetLessonsCache } from "./lessons.js?v=20260710-53";
+import { updateSpacedRepetition, shuffleCards, renderFlashcard, renderFlashSummary } from "./flashcards.js?v=20260710-37";
+import { buildQuizQuestions, renderQuizView } from "./quiz.js?v=20260710-33";
 import {
   NAV_ITEMS,
   renderNavigation,
   renderProgressCircle,
   toast,
   safeSpeak,
-  randomWordOfTheDay,
   drawConfetti,
   renderTeacherAvatar
-} from "./ui.js";
+} from "./ui.js?v=20260710-32";
 
 const AVATAR_REWARDS = [
   { value: "🦜", unlockLevel: 1 },
@@ -55,10 +57,295 @@ const AVATAR_REWARDS = [
   { value: "🦄", unlockLevel: 10 }
 ];
 
+const ASSAM_DID_YOU_KNOW_FACTS = [
+  {
+    title: "Kaziranga is a UNESCO World Heritage Site.",
+    detail: "Kaziranga National Park in Assam is home to the world's largest population of one-horned rhinoceroses.",
+    sourceLabel: "UNESCO - Kaziranga National Park",
+    sourceUrl: "https://whc.unesco.org/en/list/337/",
+    imageQuery: "Kaziranga one horned rhinoceros Assam",
+    imageAlt: "One-horned rhinoceros in Kaziranga National Park",
+    imageEmoji: "🦏"
+  },
+  {
+    title: "Assam tea is famous worldwide.",
+    detail: "The state's lowland tea gardens produce bold black tea that is used in breakfast blends across the globe.",
+    sourceLabel: "Britannica - Assam Tea",
+    sourceUrl: "https://www.britannica.com/topic/Assam-tea",
+    imageQuery: "Assam tea garden India",
+    imageAlt: "Tea plantation landscape in Assam",
+    imageEmoji: "🍃"
+  },
+  {
+    title: "Bihu celebrates Assam's seasons.",
+    detail: "Assam has three Bihu festivals, and Rongali Bihu in spring is known for music, dance, and community feasts.",
+    sourceLabel: "Government of Assam - Festivals",
+    sourceUrl: "https://assam.gov.in/inside-page/festivals",
+    imageQuery: "Bihu dance Assam",
+    imageAlt: "Traditional Bihu dance performance",
+    imageEmoji: "💃"
+  },
+  {
+    title: "Majuli is one of the world's largest river islands.",
+    detail: "Located in the Brahmaputra, Majuli is known for satras, mask making, and vibrant Vaishnavite culture.",
+    sourceLabel: "UNESCO - Majuli (Cultural Landscape)",
+    sourceUrl: "https://whc.unesco.org/en/tentativelists/5892/",
+    imageQuery: "Majuli river island Assam",
+    imageAlt: "River island landscape in Majuli",
+    imageEmoji: "🏝️"
+  },
+  {
+    title: "The Brahmaputra shapes Assamese life.",
+    detail: "This mighty river supports farming, transport, and local livelihoods while shaping Assam's geography and identity.",
+    sourceLabel: "Britannica - Brahmaputra River",
+    sourceUrl: "https://www.britannica.com/place/Brahmaputra-River",
+    imageQuery: "Brahmaputra river Assam",
+    imageAlt: "Brahmaputra river view in Assam",
+    imageEmoji: "🌊"
+  },
+  {
+    title: "Muga silk is unique to Assam.",
+    detail: "Muga silk has a natural golden shine and is prized for durability, often passed down across generations.",
+    sourceLabel: "India Handloom Brand - Muga Silk",
+    sourceUrl: "https://www.indiahandloombrand.gov.in/muga-silk",
+    imageQuery: "Muga silk weaving Assam",
+    imageAlt: "Traditional Muga silk weaving",
+    imageEmoji: "🧵"
+  },
+  {
+    title: "Kamakhya Temple is an important pilgrimage site.",
+    detail: "Situated on Nilachal Hill in Guwahati, the temple is one of the most significant Shakti peethas in India.",
+    sourceLabel: "Wikipedia - Kamakhya Temple",
+    sourceUrl: "https://en.wikipedia.org/wiki/Kamakhya_Temple",
+    imageQuery: "Kamakhya temple Guwahati Assam",
+    imageAlt: "Kamakhya Temple in Guwahati",
+    imageEmoji: "🛕"
+  },
+  {
+    title: "Traditional Assamese food uses local herbs.",
+    detail: "Many dishes feature fresh greens, bamboo shoot, and regional flavors that balance simplicity and nutrition.",
+    sourceLabel: "Assam Tourism - Cuisine",
+    sourceUrl: "https://tourism.assam.gov.in/portlets/cuisine",
+    imageQuery: "Assamese traditional food",
+    imageAlt: "Traditional Assamese cuisine served on table",
+    imageEmoji: "🍲"
+  },
+  {
+    title: "Bhaona is a classical Assamese theater tradition.",
+    detail: "Introduced by Srimanta Sankardev, Bhaona combines storytelling, music, costume, and devotional performance.",
+    sourceLabel: "Sangeet Natak Akademi - Bhaona",
+    sourceUrl: "https://www.sangeetnatak.gov.in/sna/Bhaona.php",
+    imageQuery: "Bhaona performance Assam",
+    imageAlt: "Artists performing Bhaona theater",
+    imageEmoji: "🎭"
+  },
+  {
+    title: "Xorai is a symbol of Assamese hospitality.",
+    detail: "The decorated metal offering stand called Xorai is used to welcome guests during cultural and ceremonial events.",
+    sourceLabel: "Sahapedia - Xorai",
+    sourceUrl: "https://www.sahapedia.org/xorai-the-symbol-assamese-hospitality",
+    imageQuery: "Xorai Assamese hospitality",
+    imageAlt: "Traditional Assamese Xorai ceremonial stand",
+    imageEmoji: "🏺"
+  },
+  {
+    title: "Sualkuchi is known as Assam's silk village.",
+    detail: "This town near Guwahati is famous for handloom weaving, especially Mekhela Chador made with local silk.",
+    sourceLabel: "Assam Tourism - Sualkuchi",
+    sourceUrl: "https://tourism.assam.gov.in/portlets/sualkuchi",
+    imageQuery: "Sualkuchi handloom Assam",
+    imageAlt: "Handloom weaving in Sualkuchi",
+    imageEmoji: "🧶"
+  },
+  {
+    title: "Assamese has its own script tradition.",
+    detail: "The Assamese script evolved over centuries and is closely related to Bengali while retaining distinct forms.",
+    sourceLabel: "Britannica - Assamese Language",
+    sourceUrl: "https://www.britannica.com/topic/Assamese-language",
+    imageQuery: "Assamese script calligraphy",
+    imageAlt: "Assamese script written on paper",
+    imageEmoji: "✍️"
+  }
+];
+
+const ACHIEVEMENT_CANDIDATES = [
+  {
+    id: "first-word",
+    label: "First Word",
+    icon: "🔤",
+    description: "Learn your first Assamese word.",
+    check: () => state.progress.wordsLearned.length >= 1
+  },
+  {
+    id: "word-collector",
+    label: "Word Collector",
+    icon: "📘",
+    description: "Learn 25 Assamese words.",
+    check: () => state.progress.wordsLearned.length >= 25
+  },
+  {
+    id: "word-explorer",
+    label: "Word Explorer",
+    icon: "🧭",
+    description: "Learn 100 Assamese words.",
+    check: () => state.progress.wordsLearned.length >= 100
+  },
+  {
+    id: "lesson-starter",
+    label: "Lesson Starter",
+    icon: "📚",
+    description: "Complete your first lesson.",
+    check: () => state.progress.lessonsCompleted.length >= 1
+  },
+  {
+    id: "lesson-climber",
+    label: "Lesson Climber",
+    icon: "🗻",
+    description: "Complete 10 lessons.",
+    check: () => state.progress.lessonsCompleted.length >= 10
+  },
+  {
+    id: "quiz-starter",
+    label: "Quiz Starter",
+    icon: "🧠",
+    description: "Attempt your first quiz question.",
+    check: () => state.progress.quizAttempts >= 1
+  },
+  {
+    id: "quiz-ace",
+    label: "Quiz Ace",
+    icon: "🎯",
+    description: "Reach at least 80% quiz accuracy with 10+ attempts.",
+    check: () => state.progress.quizAttempts >= 10 && (state.progress.quizCorrect / Math.max(1, state.progress.quizAttempts)) >= 0.8
+  },
+  {
+    id: "xp-rookie",
+    label: "XP Rookie",
+    icon: "⚡",
+    description: "Earn 100 total XP.",
+    check: () => state.progress.xp >= 100
+  },
+  {
+    id: "xp-pro",
+    label: "XP Pro",
+    icon: "🚀",
+    description: "Earn 500 total XP.",
+    check: () => state.progress.xp >= 500
+  },
+  {
+    id: "streak-hero",
+    label: "Streak Hero",
+    icon: "🔥",
+    description: "Build a 7-day learning streak.",
+    check: () => state.progress.longestStreak >= 7
+  },
+  {
+    id: "level-5-learner",
+    label: "Level 5 Learner",
+    icon: "🧗",
+    description: "Reach Level 5.",
+    check: () => levelMetaFromXp(state.progress.xp).level >= 5
+  },
+  {
+    id: "level-10-learner",
+    label: "Level 10 Learner",
+    icon: "👑",
+    description: "Reach Level 10.",
+    check: () => levelMetaFromXp(state.progress.xp).level >= 10
+  }
+];
+
+const CONVERSATION_TOPICS = {
+  introductions: {
+    label: "Introductions",
+    opening: {
+      as: "Nomoskar! Let us practice introductions. How are you doing?",
+      en: "Hello! Let us practice introductions. How are you doing?"
+    },
+    prompts: [
+      {
+        as: "Bhal! Where are you coming from?",
+        en: "Great! Where are you coming from?"
+      },
+      {
+        as: "Nice to meet you. What is your name?",
+        en: "Nice to meet you. What is your name?"
+      },
+      {
+        as: "Excellent. What do you do?",
+        en: "Excellent. What do you do?"
+      }
+    ],
+    expected: [
+      ["fine", "good", "great", "ok", "okay", "bhal"],
+      ["from", "i am from", "come from"],
+      ["name", "i am", "my name", "call me"],
+      ["work", "job", "student", "engineer", "teacher", "business"]
+    ],
+    closing: {
+      as: "Great introduction practice. Ask me a question or pick another topic.",
+      en: "Great introduction practice. Ask me a question or pick another topic."
+    }
+  },
+  daily: {
+    label: "Daily Life",
+    opening: {
+      as: "Let us talk about daily life. How is your day going?",
+      en: "Let us talk about daily life. How is your day going?"
+    },
+    prompts: [
+      {
+        as: "Good. What did you eat today?",
+        en: "Good. What did you eat today?"
+      },
+      {
+        as: "Nice. What are your plans for tomorrow?",
+        en: "Nice. What are your plans for tomorrow?"
+      }
+    ],
+    expected: [
+      ["good", "fine", "busy", "tired", "great", "bhal"],
+      ["ate", "eat", "rice", "tea", "food", "lunch", "dinner", "breakfast"],
+      ["tomorrow", "plan", "will", "going to"]
+    ],
+    closing: {
+      as: "Great daily-life practice. We can continue or switch topic.",
+      en: "Great daily-life practice. We can continue or switch topic."
+    }
+  },
+  travel: {
+    label: "Travel",
+    opening: {
+      as: "Let us practice travel conversation. Where do you want to go?",
+      en: "Let us practice travel conversation. Where do you want to go?"
+    },
+    prompts: [
+      {
+        as: "Nice destination. How will you travel there?",
+        en: "Nice destination. How will you travel there?"
+      },
+      {
+        as: "Great. Who will travel with you?",
+        en: "Great. Who will travel with you?"
+      }
+    ],
+    expected: [
+      ["go", "visit", "trip", "travel", "to", "want"],
+      ["train", "bus", "car", "flight", "plane", "walk"],
+      ["with", "friend", "family", "alone", "colleague"]
+    ],
+    closing: {
+      as: "Good travel practice. Ask one more question or choose another topic.",
+      en: "Good travel practice. Ask one more question or choose another topic."
+    }
+  }
+};
+
 const state = {
   view: "home",
   practiceTab: "flashcards",
   lessonsScreen: "overview",
+  lessonsTypeFilter: "single-word",
   lessons: [],
   dictionary: [],
   activeLessonId: null,
@@ -72,20 +359,35 @@ const state = {
     key: "",
     english: "",
     assamese: "",
-    category: "Custom"
+    example: "",
+    exampleEnglish: "",
+    category: "Custom",
+    entryType: "word"
   },
   dictionaryPendingDelete: null,
+  dictionaryDeleteDialog: {
+    isOpen: false,
+    key: "",
+    entryAssamese: "",
+    entryEnglish: "",
+    entryType: "word"
+  },
   flash: {
     cards: [],
     index: 0,
     flipped: false,
-    randomMode: false,
+    setupStage: "type",
+    playMode: "normal",
+    categoryTypeFilter: "",
+    selectedCategories: [],
     mode: "session",
     reviewedCount: 0,
     sessionTotal: 0,
     hardCount: 0,
     easyCount: 0,
-    hardWordIds: []
+    hardWordIds: [],
+    categoryDropAnimating: false,
+    categoryDropFromType: "words"
   },
   quiz: {
     questions: [],
@@ -94,15 +396,21 @@ const state = {
     answered: false,
     selected: "",
     showCongrats: false,
-    showSummary: false
+    showSummary: false,
+    mode: "",
+    setupStage: "mode"
   },
   chat: [
     {
       who: "bot",
-      text: "Nomoskar! Type a message and I will reply with Assamese practice phrases.",
-      translation: "Hello!"
+      text: "Nomoskar! Pick a topic below and let us have a guided conversation.",
+      translation: "Hello! Pick a topic below and let us have a guided conversation."
     }
   ],
+  chatSession: {
+    topicId: "",
+    step: 0
+  },
   progress: getProgress(),
   settings: getSettings(),
   favorites: getFavorites(),
@@ -116,9 +424,13 @@ const state = {
     step: 1,
     name: "Learner",
     avatar: "🦜",
-    dailyWordsTarget: 5,
+    dailyXpTarget: 120,
     preferredTheme: "light"
-  }
+  },
+  achievementQueue: [],
+  achievementCelebrationActive: false,
+  levelUpQueue: [],
+  levelUpCelebrationActive: false
 };
 
 const dom = {
@@ -132,12 +444,26 @@ const dom = {
   sidebarToggle: document.getElementById("sidebar-toggle")
 };
 
+function hasLearningProgress() {
+  const learnedCount = learnedWordsCount();
+  return state.progress.xp > 0 || learnedCount > 0 || state.progress.lessonsCompleted.length > 0;
+}
+
+function escapeHtmlAttr(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;");
+}
+
 function normalizeSettings() {
   state.settings.onboardingCompleted = Boolean(state.settings.onboardingCompleted);
   state.settings.profileName = state.settings.profileName || "Learner";
   const knownAvatars = AVATAR_REWARDS.map((item) => item.value);
   const defaultAvatar = knownAvatars[0] || "🦜";
   state.settings.avatar = knownAvatars.includes(state.settings.avatar) ? state.settings.avatar : defaultAvatar;
+  state.settings.syncEndpoint = String(state.settings.syncEndpoint || "").trim();
+  state.settings.syncToken = String(state.settings.syncToken || "").trim();
 }
 
 function persist() {
@@ -173,6 +499,19 @@ function updateHeaderControls() {
   `;
 }
 
+function animateHeaderLevelBadge(fromLevel, toLevel) {
+  const badge = document.querySelector(".welcome-level-badge");
+  if (!badge) return;
+
+  badge.innerHTML = `
+    <span class="level-badge-number level-badge-old">${fromLevel}</span>
+    <span class="level-badge-number level-badge-new">${toLevel}</span>
+  `;
+  badge.classList.remove("level-badge-transition");
+  void badge.offsetWidth;
+  badge.classList.add("level-badge-transition");
+}
+
 function createOnboardingModal() {
   const container = document.createElement("section");
   container.id = "onboarding-modal";
@@ -184,6 +523,324 @@ function createOnboardingModal() {
     <div class="onboarding-shell glass" id="onboarding-shell"></div>
   `;
   document.body.appendChild(container);
+}
+
+function createDictionaryDeleteModal() {
+  if (document.getElementById("dictionary-delete-modal")) return;
+
+  const container = document.createElement("section");
+  container.id = "dictionary-delete-modal";
+  container.className = "dictionary-delete-confirmation hidden";
+  container.setAttribute("role", "dialog");
+  container.setAttribute("aria-modal", "true");
+  container.setAttribute("aria-label", "Confirm dictionary deletion");
+  container.innerHTML = `
+    <article class="dictionary-delete-card glass">
+      <p class="eyebrow">Delete Entry</p>
+      <h2 id="dictionary-delete-title">Delete this entry?</h2>
+      <p class="meta" id="dictionary-delete-subtitle">This will remove it from Dictionary, Lessons, Flashcards, and Quiz.</p>
+      <div class="row" style="justify-content:flex-end;">
+        <button class="btn ghost" data-action="dictionary-cancel-delete">Cancel</button>
+        <button class="btn danger" data-action="dictionary-confirm-delete">Delete</button>
+      </div>
+    </article>
+  `;
+  document.body.appendChild(container);
+}
+
+function openDictionaryDeleteDialog(entry, key) {
+  const modal = document.getElementById("dictionary-delete-modal");
+  const title = document.getElementById("dictionary-delete-title");
+  const subtitle = document.getElementById("dictionary-delete-subtitle");
+  if (!modal || !title || !subtitle) return;
+
+  const entryType = inferDictionaryEntryType(entry);
+  const entryTypeLabel = entryType === "phrase" ? "phrase" : "word";
+  const assamese = String(entry?.assamese || "").trim() || "(no Assamese text)";
+  const english = String(entry?.english || "").trim() || "(no English text)";
+
+  state.dictionaryDeleteDialog = {
+    isOpen: true,
+    key,
+    entryAssamese: assamese,
+    entryEnglish: english,
+    entryType
+  };
+
+  title.textContent = `Delete this ${entryTypeLabel}?`;
+  subtitle.textContent = `"${assamese}" (${english}) will be removed from Dictionary, Lessons, Flashcards, and Quiz.`;
+  modal.classList.remove("hidden");
+  document.body.classList.add("lock-scroll");
+}
+
+function closeDictionaryDeleteDialog() {
+  const modal = document.getElementById("dictionary-delete-modal");
+  if (!modal) return;
+
+  modal.classList.add("hidden");
+  document.body.classList.remove("lock-scroll");
+  state.dictionaryDeleteDialog = {
+    isOpen: false,
+    key: "",
+    entryAssamese: "",
+    entryEnglish: "",
+    entryType: "word"
+  };
+}
+
+function performDictionaryDelete(key) {
+  const deletedEntry = state.dictionary.find((entry) => encodeURIComponent(entry.__baseKey || "") === key);
+  if (!deletedEntry) {
+    toast("Word not found");
+    return;
+  }
+
+  const result = deleteDictionaryWord(key);
+  if (!result.ok) {
+    toast("Unable to delete word");
+    return;
+  }
+
+  const token = Date.now();
+  state.dictionaryPendingDelete = {
+    token,
+    entry: { ...deletedEntry }
+  };
+
+  refreshLanguageData();
+  if (state.dictionaryEdit.key === key) {
+    state.dictionaryEdit = {
+      key: "",
+      english: "",
+      assamese: "",
+      example: "",
+      exampleEnglish: "",
+      category: "Custom",
+      entryType: "word"
+    };
+  }
+  renderCurrentView();
+  toast("Word deleted", {
+    actionLabel: "Undo",
+    duration: 5000,
+    onAction: () => {
+      if (!state.dictionaryPendingDelete || state.dictionaryPendingDelete.token !== token) return;
+
+      const undoResult = restoreDeletedDictionaryWord(state.dictionaryPendingDelete.entry);
+      if (!undoResult.ok) {
+        toast("Unable to undo delete");
+        return;
+      }
+
+      state.dictionaryPendingDelete = null;
+      refreshLanguageData();
+      renderCurrentView();
+      toast("Deletion undone");
+    }
+  });
+
+  setTimeout(() => {
+    if (state.dictionaryPendingDelete?.token === token) {
+      state.dictionaryPendingDelete = null;
+    }
+  }, 5200);
+}
+
+function createAchievementCelebrationModal() {
+  if (document.getElementById("achievement-celebration")) return;
+
+  const container = document.createElement("section");
+  container.id = "achievement-celebration";
+  container.className = "achievement-celebration hidden";
+  container.setAttribute("role", "dialog");
+  container.setAttribute("aria-modal", "true");
+  container.setAttribute("aria-live", "polite");
+  container.setAttribute("aria-label", "Achievement unlocked");
+  container.innerHTML = `
+    <article class="achievement-celebration-card glass">
+      <div class="achievement-unlock-copy" id="achievement-unlock-copy">
+        <p class="eyebrow">New Achievement</p>
+        <h2 id="achievement-unlock-title">Congratulations!</h2>
+        <p class="meta" id="achievement-unlock-subtitle">You unlocked a new achievement.</p>
+      </div>
+      <div class="achievement-unlock-trophy" id="achievement-unlock-trophy" aria-hidden="true">🏆</div>
+      <button class="btn accent" data-action="unlock-achievement">Unlock Achievement</button>
+    </article>
+  `;
+  document.body.appendChild(container);
+}
+
+function createLevelUpCelebrationModal() {
+  if (document.getElementById("level-up-celebration")) return;
+
+  const container = document.createElement("section");
+  container.id = "level-up-celebration";
+  container.className = "level-up-celebration hidden";
+  container.setAttribute("role", "dialog");
+  container.setAttribute("aria-modal", "true");
+  container.setAttribute("aria-live", "polite");
+  container.setAttribute("aria-label", "Level up");
+  container.innerHTML = `
+    <article class="level-up-card glass">
+      <p class="eyebrow">Level Up</p>
+      <h2 id="level-up-title">Congratulations!</h2>
+      <p class="meta" id="level-up-subtitle">You reached a new level.</p>
+      <div class="level-up-meter" aria-label="Level transition">
+        <span class="level-up-number level-up-old" id="level-up-old">1</span>
+        <span class="level-up-number level-up-new" id="level-up-new">2</span>
+      </div>
+      <button class="btn accent" data-action="level-up-continue">Continue</button>
+    </article>
+  `;
+  document.body.appendChild(container);
+}
+
+function showNextLevelUpCelebration() {
+  if (state.levelUpCelebrationActive) return;
+  const payload = state.levelUpQueue.shift();
+  if (!payload) return;
+
+  const dialog = document.getElementById("level-up-celebration");
+  const title = document.getElementById("level-up-title");
+  const subtitle = document.getElementById("level-up-subtitle");
+  const oldNode = document.getElementById("level-up-old");
+  const newNode = document.getElementById("level-up-new");
+  if (!dialog || !title || !subtitle || !oldNode || !newNode) return;
+
+  title.textContent = "Congratulations!";
+  subtitle.textContent = `Level ${payload.to} unlocked. Keep the streak alive.`;
+  oldNode.textContent = String(payload.from);
+  newNode.textContent = String(payload.to);
+
+  dialog.classList.remove("hidden");
+  dialog.classList.remove("animate");
+  document.body.classList.add("level-up-open");
+  state.levelUpCelebrationActive = true;
+
+  window.setTimeout(() => {
+    dialog.classList.add("animate");
+  }, 20);
+
+  if (state.settings.animations) {
+    drawConfetti();
+    toast(`Level ${payload.to} reached!`);
+  }
+}
+
+function closeLevelUpCelebration() {
+  const dialog = document.getElementById("level-up-celebration");
+  if (!dialog) return;
+  dialog.classList.add("hidden");
+  dialog.classList.remove("animate");
+  document.body.classList.remove("level-up-open");
+  state.levelUpCelebrationActive = false;
+}
+
+function getProfileNavButton() {
+  const mobile = document.querySelector("#mobile-nav [data-nav='profile']");
+  if (mobile && mobile.offsetParent !== null) return mobile;
+
+  const desktop = document.querySelector("#desktop-nav [data-nav='profile']");
+  if (desktop && desktop.offsetParent !== null) return desktop;
+
+  return null;
+}
+
+function syncAchievements(showCelebration = false) {
+  const previous = new Set(state.progress.achievements || []);
+  const unlockedNow = ACHIEVEMENT_CANDIDATES.filter((item) => item.check());
+  const nextIds = unlockedNow.map((item) => item.id);
+  const next = new Set(nextIds);
+  const newlyUnlocked = unlockedNow.filter((item) => !previous.has(item.id));
+
+  state.progress.achievements = nextIds;
+
+  if (showCelebration && newlyUnlocked.length) {
+    state.achievementQueue.push(...newlyUnlocked);
+    showNextAchievementCelebration();
+  }
+
+  return previous.size !== next.size || [...previous].some((id) => !next.has(id));
+}
+
+function showNextAchievementCelebration() {
+  if (state.achievementCelebrationActive) return;
+  const nextAchievement = state.achievementQueue.shift();
+  if (!nextAchievement) return;
+
+  const dialog = document.getElementById("achievement-celebration");
+  const title = document.getElementById("achievement-unlock-title");
+  const subtitle = document.getElementById("achievement-unlock-subtitle");
+  const badge = document.getElementById("achievement-unlock-trophy");
+  if (!dialog || !title || !subtitle || !badge) return;
+
+  title.textContent = `Congratulations! ${nextAchievement.label}`;
+  subtitle.textContent = `${nextAchievement.description} Tap the button to send your trophy to Profile.`;
+  badge.textContent = nextAchievement.icon || "🏆";
+  dialog.classList.remove("hidden");
+  dialog.classList.remove("flying");
+  document.body.classList.add("achievement-open");
+  state.achievementCelebrationActive = true;
+}
+
+function closeAchievementCelebration() {
+  const dialog = document.getElementById("achievement-celebration");
+  if (!dialog) return;
+  dialog.classList.add("hidden");
+  dialog.classList.remove("flying");
+  document.body.classList.remove("achievement-open");
+  state.achievementCelebrationActive = false;
+}
+
+function animateAchievementToProfile() {
+  const dialog = document.getElementById("achievement-celebration");
+  const source = document.getElementById("achievement-unlock-trophy");
+  const target = getProfileNavButton();
+
+  if (!dialog || !source || !target) {
+    closeAchievementCelebration();
+    showNextAchievementCelebration();
+    return;
+  }
+
+  dialog.classList.add("flying");
+
+  const sourceRect = source.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+
+  const flyer = document.createElement("div");
+  flyer.className = "achievement-flyer";
+  flyer.setAttribute("aria-hidden", "true");
+  flyer.textContent = source.textContent || "🏆";
+  document.body.appendChild(flyer);
+
+  const startX = sourceRect.left + sourceRect.width / 2;
+  const startY = sourceRect.top + sourceRect.height / 2;
+  const endX = targetRect.left + targetRect.width / 2;
+  const endY = targetRect.top + targetRect.height / 2;
+
+  flyer.style.left = `${startX}px`;
+  flyer.style.top = `${startY}px`;
+
+  const animation = flyer.animate(
+    [
+      { transform: "translate(-50%, -50%) scale(1)", opacity: 1 },
+      { transform: `translate(${endX - startX - 10}px, ${endY - startY - 10}px) scale(0.6)`, opacity: 1 }
+    ],
+    {
+      duration: 850,
+      easing: "cubic-bezier(0.2, 0.8, 0.2, 1)",
+      fill: "forwards"
+    }
+  );
+
+  animation.onfinish = () => {
+    flyer.remove();
+    target.classList.add("achievement-target-hit");
+    setTimeout(() => target.classList.remove("achievement-target-hit"), 700);
+    closeAchievementCelebration();
+    showNextAchievementCelebration();
+  };
 }
 
 function onboardingStepTemplate() {
@@ -238,8 +895,8 @@ function onboardingStepTemplate() {
     <p class="eyebrow">Step 3 of 3</p>
     <h2>Set your first goal</h2>
     <p class="meta">Choose a daily target and your preferred theme.</p>
-    <label for="onboarding-daily-words" class="meta">Daily words target</label>
-    <input class="input" id="onboarding-daily-words" type="number" min="1" max="30" value="${state.onboarding.dailyWordsTarget}" aria-label="Daily words target" />
+    <label for="onboarding-daily-xp" class="meta">Daily XP target</label>
+    <input class="input" id="onboarding-daily-xp" type="number" min="20" max="5000" value="${state.onboarding.dailyXpTarget}" aria-label="Daily XP target" />
     <div class="row" style="justify-content:flex-start;">
       <label class="pill"><input type="radio" name="onboarding-theme" value="light" ${state.onboarding.preferredTheme === "light" ? "checked" : ""} /> Light</label>
       <label class="pill"><input type="radio" name="onboarding-theme" value="dark" ${state.onboarding.preferredTheme === "dark" ? "checked" : ""} /> Dark</label>
@@ -257,7 +914,7 @@ function openOnboarding() {
   state.onboarding.step = 1;
   state.onboarding.name = state.settings.profileName || "Learner";
   state.onboarding.avatar = state.settings.avatar || "🦜";
-  state.onboarding.dailyWordsTarget = state.progress.dailyGoal.targetWords || 5;
+  state.onboarding.dailyXpTarget = state.progress.dailyGoal.targetXp || 120;
   state.onboarding.preferredTheme = state.settings.theme || "light";
 
   const modal = document.getElementById("onboarding-modal");
@@ -277,14 +934,14 @@ function closeOnboarding() {
 
 function finishOnboarding() {
   const cleanName = (state.onboarding.name || "Learner").trim() || "Learner";
-  const dailyWords = Math.max(1, Math.min(30, Number(state.onboarding.dailyWordsTarget) || 5));
+  const dailyXp = Math.max(20, Math.min(5000, Number(state.onboarding.dailyXpTarget) || 120));
 
   state.settings.profileName = cleanName;
   state.settings.avatar = state.onboarding.avatar;
   state.settings.theme = state.onboarding.preferredTheme;
   state.settings.onboardingCompleted = true;
 
-  state.progress.dailyGoal.targetWords = dailyWords;
+  state.progress.dailyGoal.targetXp = dailyXp;
 
   applyTheme();
   updateHeaderControls();
@@ -295,8 +952,25 @@ function finishOnboarding() {
 }
 
 function xpGain(amount, reason) {
+  const previousLevel = levelMetaFromXp(state.progress.xp).level;
   state.progress.xp += amount;
+  state.progress.dailyGoal.gainedXp += amount;
+  const currentLevel = levelMetaFromXp(state.progress.xp).level;
+
+  if (currentLevel > previousLevel) {
+    for (let level = previousLevel + 1; level <= currentLevel; level += 1) {
+      state.levelUpQueue.push({ from: level - 1, to: level });
+    }
+  }
+
+  syncAchievements(true);
   updateHeaderControls();
+
+  if (currentLevel > previousLevel) {
+    animateHeaderLevelBadge(previousLevel, currentLevel);
+    showNextLevelUpCelebration();
+  }
+
   addActivity(`+${amount} XP: ${reason}`);
   if (state.settings.animations) toast(`+${amount} XP`);
 }
@@ -320,19 +994,15 @@ async function ensureData() {
     state.dictionary = await loadDictionary();
   }
   if (!state.lessons.length) {
-    state.lessons = await loadLessons();
+    state.lessons = await loadLessons(state.dictionary);
   }
 }
 
 function homeCompletionPercent() {
   const goals = state.progress.dailyGoal;
-  const parts = [
-    Math.min(goals.learnedWords / goals.targetWords, 1),
-    Math.min(goals.flashcardsDone / goals.flashcardsTarget, 1),
-    Math.min(goals.lessonsDone / goals.lessonsTarget, 1),
-    Math.min(goals.quizDone / goals.quizTarget, 1)
-  ];
-  return Math.round((parts.reduce((sum, value) => sum + value, 0) / parts.length) * 100);
+  const targetXp = Math.max(1, Number(goals.targetXp) || 0);
+  const gainedXp = Math.max(0, Number(goals.gainedXp) || 0);
+  return Math.round(Math.min(gainedXp / targetXp, 1) * 100);
 }
 
 function updateStreak() {
@@ -354,13 +1024,42 @@ function updateStreak() {
 }
 
 function buildQuickCards() {
+  const navIconById = Object.fromEntries(
+    NAV_ITEMS.map((item) => {
+      const parts = String(item.label || "").split(" ");
+      return [item.id, parts[0] || ""];
+    })
+  );
+
   return [
-    { id: "lessons", title: "Lessons", subtitle: "Scenario based units" },
-    { id: "dictionary", title: "Dictionary", subtitle: "Search full vocabulary" },
-    { id: "flashcards", title: "Flashcards", subtitle: "Spaced repetition" },
-    { id: "quiz", title: "Quiz", subtitle: "Challenge mode" },
-    { id: "conversation", title: "Conversation", subtitle: "Chat practice" }
+    { id: "lessons", title: "Lessons", subtitle: "Scenario based units", icon: navIconById.lessons || "📚" },
+    { id: "dictionary", title: "Dictionary", subtitle: "Search full vocabulary", icon: navIconById.dictionary || "📖" },
+    { id: "flashcards", title: "Flashcards", subtitle: "Spaced repetition", icon: navIconById.practice || "🧠" },
+    { id: "quiz", title: "Quiz", subtitle: "Challenge mode", icon: navIconById.practice || "🧠" },
+    { id: "conversation", title: "Conversation", subtitle: "Chat practice", icon: navIconById.practice || "🧠" }
   ];
+}
+
+function getDailyAssamFact(seedDate) {
+  const key = String(seedDate || todayIso());
+  if (!ASSAM_DID_YOU_KNOW_FACTS.length) {
+    return {
+      title: "Assam has a rich linguistic heritage.",
+      detail: "Come back tomorrow for another cultural fact.",
+      sourceLabel: "Encyclopaedia Britannica",
+      sourceUrl: "https://www.britannica.com/place/Assam",
+      imageQuery: "Assam landscape",
+      imageAlt: "Landscape view from Assam",
+      imageEmoji: "🌄"
+    };
+  }
+
+  let hash = 0;
+  for (let i = 0; i < key.length; i += 1) {
+    hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
+  }
+
+  return ASSAM_DID_YOU_KNOW_FACTS[hash % ASSAM_DID_YOU_KNOW_FACTS.length];
 }
 
 function learnedWordsCount() {
@@ -412,11 +1111,14 @@ function renderHome() {
   const home = document.getElementById("view-home");
   const progressPercent = homeCompletionPercent();
   const learnedCount = learnedWordsCount();
-  const wordDay = randomWordOfTheDay(state.dictionary, todayIso());
+  const hasStartedLearning = hasLearningProgress();
+  const continueCtaLabel = hasStartedLearning ? "Resume" : "Start";
+  const didYouKnowFact = getDailyAssamFact(todayIso());
   const quickCards = buildQuickCards()
     .map(
       (card) => `
         <article class="quick-card" data-action="quick-open" data-target="${card.id}">
+          <span class="quick-card-icon" aria-hidden="true">${card.icon || ""}</span>
           <h4>${card.title}</h4>
           <p>${card.subtitle}</p>
         </article>
@@ -426,22 +1128,25 @@ function renderHome() {
 
   home.innerHTML = `
     <section class="grid" style="gap:14px">
-      <article class="card grid" style="gap:12px; background: linear-gradient(150deg, rgba(76,175,80,0.2), rgba(63,81,181,0.15));">
-        <div class="row">
+      <article class="card grid continue-card" style="gap:12px; background: linear-gradient(150deg, rgba(76,175,80,0.2), rgba(63,81,181,0.15));">
+        <div class="row continue-head">
           <div>
             <h3>Continue Learning</h3>
-            <p class="meta">${learnedCount} words learned so far</p>
           </div>
-          <button class="btn primary" data-action="continue-learning">Resume</button>
+          <div class="stat continue-streak-head">
+            <span class="value">${state.progress.streak} 🔥</span>
+          </div>
         </div>
-        <div class="grid auto">
-          <div class="stat"><span class="label">Current streak</span><span class="value">${state.progress.streak} 🔥</span></div>
-          <div class="stat"><span class="label">XP</span><span class="value">${state.progress.xp}</span></div>
+        <div class="grid continue-stats">
           <div class="stat"><span class="label">Words learned</span><span class="value">${learnedCount}</span></div>
+          <div class="stat"><span class="label">XP</span><span class="value">${state.progress.xp}</span></div>
           <div class="stat daily-goal-stat">
             <span class="label">Daily goal</span>
-            <span class="value">${renderProgressCircle(progressPercent, 88)}</span>
+            <span class="value">${renderProgressCircle(progressPercent, 100)}</span>
           </div>
+        </div>
+        <div class="row continue-actions">
+          <button class="btn primary continue-cta" data-action="continue-learning">${continueCtaLabel}</button>
         </div>
       </article>
 
@@ -451,9 +1156,13 @@ function renderHome() {
       </article>
 
       <article class="card">
-        <h3>Word Of The Day</h3>
-        <p><strong>${wordDay.assamese}</strong> · ${wordDay.english}</p>
-        <p class="meta">${wordDay.example}</p>
+        <h3>Did You Know?</h3>
+        <div class="did-you-know-tile" role="group" aria-label="Daily Assam fact">
+          <p class="did-you-know-emoji" aria-hidden="true">${didYouKnowFact.imageEmoji || "🌿"}</p>
+          <p class="did-you-know-title">${didYouKnowFact.title}</p>
+          <p class="did-you-know-detail">${didYouKnowFact.detail}</p>
+          <p><a class="did-you-know-link" href="${didYouKnowFact.sourceUrl}" target="_self" rel="noreferrer">Learn more: ${didYouKnowFact.sourceLabel}</a></p>
+        </div>
       </article>
     </section>
   `;
@@ -491,25 +1200,47 @@ function renderLessons() {
   }
 
   if (state.lessonsScreen === "overview") {
-    const favoriteLessons = state.lessons.filter((lesson) => state.favorites.lessons.includes(lesson.id));
+    const isPhraseMode = state.lessonsTypeFilter === "phrase-sentence";
+    const selectedLessons = state.lessons.filter((lesson) =>
+      isPhraseMode ? lesson.kind === "phrase-sentence" : lesson.kind !== "phrase-sentence"
+    );
+    const favoriteLessons = selectedLessons.filter((lesson) => state.favorites.lessons.includes(lesson.id));
     const favoritesArea = favoriteLessons.length
       ? renderLessonsOverview(favoriteLessons, state.progress, state.activeLessonId, state.favorites)
       : "<p class='meta'>No favorite lessons yet. Tap ☆ on a lesson to add it here.</p>";
+    const lessonsArea = selectedLessons.length
+      ? renderLessonsOverview(selectedLessons, state.progress, state.activeLessonId, state.favorites)
+      : isPhraseMode
+        ? "<p class='meta'>No phrase/sentence lessons available yet.</p>"
+        : "<p class='meta'>No single-word lessons available yet.</p>";
+    const lessonsHeading = isPhraseMode ? "Whole Phrases / Sentences" : "Single Words";
+    const lessonsDescription = isPhraseMode
+      ? "Practice complete expressions and sentence patterns."
+      : "Learn one-word vocabulary items first.";
 
     panel.classList.remove("lesson-focus");
     document.body.classList.remove("lesson-immersive");
     panel.innerHTML = `
       <section class="grid" style="gap:14px">
+        <article class="card grid" style="gap:10px;">
+          <h3>Lesson Type</h3>
+          <p class="meta">Choose which lesson type to practice.</p>
+          <select id="lessons-type-filter" class="input" aria-label="Lesson type filter">
+            <option value="single-word" ${state.lessonsTypeFilter === "single-word" ? "selected" : ""}>Single words</option>
+            <option value="phrase-sentence" ${state.lessonsTypeFilter === "phrase-sentence" ? "selected" : ""}>Whole phrases / sentences</option>
+          </select>
+        </article>
+
         <article class="card">
           <h3>Favorite Lessons</h3>
-          <p class="meta">Your starred lessons only.</p>
+          <p class="meta">Your starred lessons in this lesson type.</p>
           <div style="margin-top:10px">${favoritesArea}</div>
         </article>
 
         <article class="card">
-          <h3>Lesson Categories</h3>
-          <p class="meta">Choose a lesson to open its dedicated learning screen.</p>
-          <div style="margin-top:10px">${renderLessonsOverview(state.lessons, state.progress, state.activeLessonId, state.favorites)}</div>
+          <h3>${lessonsHeading}</h3>
+          <p class="meta">${lessonsDescription}</p>
+          <div style="margin-top:10px">${lessonsArea}</div>
         </article>
       </section>
     `;
@@ -577,6 +1308,17 @@ function renderDictionaryPreserveSearchCaret() {
   }
 }
 
+function focusDictionaryEditPanel() {
+  const editPanel = document.querySelector("#view-dictionary [data-action='dictionary-save-edit']")?.closest(".card");
+  if (!editPanel) return;
+
+  editPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+  window.setTimeout(() => {
+    const firstInput = document.getElementById("edit-word-english");
+    firstInput?.focus();
+  }, 120);
+}
+
 function refreshLanguageData() {
   resetDictionaryCache();
   resetLessonsCache();
@@ -584,21 +1326,258 @@ function refreshLanguageData() {
   state.lessons = [];
 }
 
-function ensureFlashDeck() {
-  if (state.flash.cards.length) return;
+function allFlashCategoryIds() {
+  return state.lessons.map((lesson) => lesson.id);
+}
+
+function cleanFlashCategoryLabel(title) {
+  return String(title || "")
+    .trim()
+    .replace(/\s*\((words|phrases)\)$/i, "")
+    .replace(/\s+/g, " ");
+}
+
+function inferDictionaryEntryType(entry) {
+  if (entry?.entryType === "phrase") return "phrase";
+  if (entry?.entryType === "word") return "word";
+
+  const looksLikePhrase = [entry?.english, entry?.assamese]
+    .map((text) => String(text || "").trim())
+    .some((text) => /[?.!]/.test(text) || text.split(/\s+/).filter(Boolean).length > 1);
+
+  return looksLikePhrase ? "phrase" : "word";
+}
+
+function flashLessonsByType() {
+  if (!state.flash.categoryTypeFilter || !["words", "phrases"].includes(state.flash.categoryTypeFilter)) {
+    return [];
+  }
+
+  const wantsPhrases = state.flash.categoryTypeFilter === "phrases";
+  return state.lessons.filter((lesson) =>
+    wantsPhrases ? lesson.kind === "phrase-sentence" : lesson.kind !== "phrase-sentence"
+  );
+}
+
+function normalizeFlashCategorySelection() {
+  const allowed = new Set(allFlashCategoryIds());
+  const selected = (state.flash.selectedCategories || []).filter((id) => allowed.has(id));
+  state.flash.selectedCategories = selected;
+}
+
+function applyFlashTypeSelectionFilter() {
+  normalizeFlashCategorySelection();
+  const visibleIds = new Set(flashLessonsByType().map((lesson) => lesson.id));
+  const selectedVisible = (state.flash.selectedCategories || []).filter((id) => visibleIds.has(id));
+  state.flash.selectedCategories = selectedVisible;
+}
+
+function filteredFlashWords() {
+  normalizeFlashCategorySelection();
+  const selected = new Set(state.flash.selectedCategories || []);
   const words = flattenLessonWords(state.lessons);
-  state.flash.cards = pickFlashcards(words, state.progress, 40);
+  return words.filter((word) => selected.has(word.lessonId));
+}
+
+function selectedFlashCategoryWords() {
+  normalizeFlashCategorySelection();
+  const selected = new Set(state.flash.selectedCategories || []);
+
+  return state.lessons
+    .filter((lesson) => selected.has(lesson.id))
+    .flatMap((lesson) =>
+      (lesson.items || []).map((item) => ({
+        ...item,
+        lessonId: lesson.id
+      }))
+    );
+}
+
+function buildFlashDeckByMode(words, mode) {
+  const orderedWords = [...words];
+
+  if (mode === "random") {
+    return shuffleCards(orderedWords).slice(0, 40);
+  }
+
+  if (mode === "shuffle") {
+    const byCategory = new Map();
+    orderedWords.forEach((word) => {
+      if (!byCategory.has(word.lessonId)) byCategory.set(word.lessonId, []);
+      byCategory.get(word.lessonId).push(word);
+    });
+
+    const selectedInOrder = state.lessons
+      .map((lesson) => lesson.id)
+      .filter((lessonId) => byCategory.has(lessonId));
+
+    const groupedShuffled = selectedInOrder.flatMap((lessonId) => shuffleCards(byCategory.get(lessonId)));
+    return groupedShuffled.slice(0, 40);
+  }
+
+  return orderedWords.slice(0, 40);
+}
+
+function resetFlashSession(words) {
+  state.flash.cards = words;
   state.flash.index = 0;
   state.flash.flipped = false;
+  state.flash.setupStage = "session";
   state.flash.mode = "session";
   state.flash.reviewedCount = 0;
-  state.flash.sessionTotal = state.flash.cards.length;
+  state.flash.sessionTotal = words.length;
   state.flash.hardCount = 0;
   state.flash.easyCount = 0;
   state.flash.hardWordIds = [];
 }
 
+function renderFlashCategoryControls() {
+  applyFlashTypeSelectionFilter();
+  const selected = new Set(state.flash.selectedCategories || []);
+  const categoryOptions = flashLessonsByType();
+  const typeLabel = state.flash.categoryTypeFilter === "phrases" ? "Phrases" : "Words";
+  const animateDrop = state.flash.categoryDropAnimating;
+  const sourceType = state.flash.categoryDropFromType === "phrases" ? "phrases" : "words";
+
+  const chips = categoryOptions
+    .map((lesson) => {
+      const active = selected.has(lesson.id);
+      return `<button class="flash-category-chip ${active ? "active" : ""}" data-action="flash-toggle-category" data-category="${lesson.id}" aria-pressed="${active}">${cleanFlashCategoryLabel(lesson.title)}</button>`;
+    })
+    .join("");
+
+  return `
+    <article class="card grid flash-setup-card" style="gap:10px;">
+      <div class="row" style="flex-wrap: wrap; align-items: center;">
+        <h3>Flashcard Categories</h3>
+        <span class="pill">${selected.size} selected</span>
+      </div>
+      <div class="flash-setup-main ${animateDrop ? "flash-categories-main-enter" : ""}">
+        <p class="meta">Type: ${typeLabel}</p>
+        <div class="flash-drop-origin ${sourceType}">
+          <span class="flash-drop-origin-label">${sourceType === "phrases" ? "Phrases" : "Words"}</span>
+        </div>
+        <div class="flash-category-drop ${animateDrop ? "is-entering" : ""}">
+          <div class="flash-category-grid flash-category-grid-scroll">${chips}</div>
+        </div>
+      </div>
+      <div class="row flash-setup-actions" style="justify-content:space-between; flex-wrap:wrap;">
+        <button class="btn ghost" data-action="flash-back-type">Back</button>
+        <button class="btn accent" data-action="flash-next-mode">Next: Choose mode</button>
+      </div>
+    </article>
+  `;
+}
+
+function renderFlashTypeControls() {
+  const selectedType = ["words", "phrases"].includes(state.flash.categoryTypeFilter)
+    ? state.flash.categoryTypeFilter
+    : "";
+  const hasSelectedType = Boolean(selectedType);
+  const selected = new Set(state.flash.selectedCategories || []);
+  const categoryOptions = flashLessonsByType();
+  const animateDrop = state.flash.categoryDropAnimating;
+
+  const typeCard = (type, title, detail) => `
+    <button class="btn flash-type-btn ${selectedType === type ? "accent" : "ghost"}" data-action="flash-set-type" data-type="${type}">
+      <strong>${title}</strong><br /><span class="meta">${detail}</span>
+    </button>
+  `;
+
+  const chips = categoryOptions
+    .map((lesson) => {
+      const active = selected.has(lesson.id);
+      return `<button class="flash-category-chip ${active ? "active" : ""}" data-action="flash-toggle-category" data-category="${lesson.id}" aria-pressed="${active}">${cleanFlashCategoryLabel(lesson.title)}</button>`;
+    })
+    .join("");
+
+  const singleTypeCard =
+    selectedType === "phrases"
+      ? typeCard("phrases", "Phrases", "Practice whole phrases and sentences.")
+      : typeCard("words", "Words", "Practice single-word vocabulary.");
+
+  const typeOptionsHtml = hasSelectedType
+    ? singleTypeCard
+    : `${typeCard("words", "Words", "Practice single-word vocabulary.")}${typeCard("phrases", "Phrases", "Practice whole phrases and sentences.")}`;
+
+  const categoriesHtml = hasSelectedType
+    ? `<div class="flash-category-drop ${animateDrop ? "is-entering" : ""}">
+          <div class="flash-category-grid flash-category-grid-scroll">${chips}</div>
+        </div>`
+    : "";
+
+  const heading = hasSelectedType ? "Flashcard Categories" : "Flashcard Type";
+  const subline = hasSelectedType
+    ? "Choose the categories by clicking on them."
+    : "First choose what you want to learn.";
+  const nextModeDisabled = hasSelectedType && selected.size ? "" : "disabled";
+  const backButtonHtml = hasSelectedType
+    ? `<button class="btn ghost" data-action="flash-back-type"><span class="flash-nav-arrow" aria-hidden="true">←</span> Back</button>`
+    : "";
+  const actionButtonsHtml = hasSelectedType
+    ? `<div class="row flash-setup-actions" style="justify-content:space-between;">
+        ${backButtonHtml}
+        <button class="btn accent" data-action="flash-next-mode" ${nextModeDisabled}>Next <span class="flash-nav-arrow" aria-hidden="true">→</span></button>
+      </div>`
+    : "";
+
+  return `
+    <article class="card grid flash-setup-card ${hasSelectedType ? "flash-categories-stage" : "flash-type-stage"}" style="gap:10px;">
+      <h3>${heading}</h3>
+      <div class="flash-setup-main ${hasSelectedType && animateDrop ? "flash-categories-main-enter" : ""}">
+        <p class="meta">${subline}</p>
+        <div class="grid flash-type-options ${hasSelectedType ? "flash-type-options-single" : ""}" style="gap:8px;">
+          ${typeOptionsHtml}
+        </div>
+        ${categoriesHtml}
+      </div>
+      ${actionButtonsHtml}
+    </article>
+  `;
+}
+
+function renderFlashModeControls() {
+  const mode = state.flash.playMode || "normal";
+  const modeCard = (value, title, detail) => `
+    <button class="btn ${mode === value ? "accent" : "ghost"}" data-action="flash-set-mode" data-mode="${value}">
+      <strong>${title}</strong><br /><span class="meta">${detail}</span>
+    </button>
+  `;
+
+  return `
+    <article class="card grid flash-setup-card flash-mode-stage" style="gap:10px;">
+      <h3>Flashcard Mode</h3>
+      <div class="flash-setup-main">
+        <p class="meta">Pick how cards are ordered for this session.</p>
+        <div class="grid" style="gap:8px;">
+          ${modeCard("normal", "Normal", "Cards stay in normal category order.")}
+          ${modeCard("shuffle", "Shuffle", "Cards are shuffled inside each category, one category after another.")}
+          ${modeCard("random", "Random", "Cards from all selected categories are fully random.")}
+        </div>
+      </div>
+      <div class="row flash-setup-actions" style="flex-wrap:wrap; justify-content:space-between;">
+        <button class="btn ghost" data-action="flash-back-categories"><span class="flash-nav-arrow" aria-hidden="true">←</span> Back</button>
+        <button class="btn accent" data-action="flash-start-session">Start session</button>
+      </div>
+    </article>
+  `;
+}
+
+function ensureFlashDeck() {
+  if (state.flash.cards.length) return;
+  const words = selectedFlashCategoryWords();
+  const deck = buildFlashDeckByMode(words, state.flash.playMode);
+  resetFlashSession(deck);
+}
+
 function renderConversationPanel() {
+  const topicButtons = Object.entries(CONVERSATION_TOPICS)
+    .map(([id, topic]) => {
+      const active = state.chatSession.topicId === id;
+      return `<button class="chat-topic-chip ${active ? "active" : ""}" data-action="chat-topic" data-topic="${id}" aria-pressed="${active}">${topic.label}</button>`;
+    })
+    .join("");
+
   const bubbles = state.chat
     .map(
       (msg) => `
@@ -613,25 +1592,61 @@ function renderConversationPanel() {
   return `
     <article class="card grid">
       <h3>Conversation Practice</h3>
+      <div class="chat-topic-row">${topicButtons}</div>
       <div class="chat-panel" id="chat-panel">${bubbles}</div>
       <div class="row">
         <input id="chat-input" class="input" placeholder="Type: Hello / How are you?" aria-label="Chat input" />
         <button class="btn accent" data-action="chat-send">Send</button>
       </div>
-      <div class="row" style="flex-wrap: wrap;">
-        <button class="btn ghost" data-action="chat-voice">Voice Input</button>
+    </article>
+  `;
+}
+
+function renderQuizModeControls() {
+  const mode = ["english-to-assamese", "assamese-to-english", "mixed"].includes(state.quiz.mode)
+    ? state.quiz.mode
+    : "";
+  const startDisabled = mode ? "" : "disabled";
+  const modeCard = (value, title, detail, flagsHtml) => `
+    <button class="btn quiz-mode-btn ${mode === value ? "accent" : "ghost"}" data-action="quiz-set-mode" data-mode="${value}">
+      <span class="quiz-mode-title">${title}</span>
+      <span class="quiz-mode-detail">${detail}</span>
+      <span class="quiz-mode-flags" aria-hidden="true">${flagsHtml}</span>
+    </button>
+  `;
+
+  return `
+    <article class="card quiz-mode-card grid" style="gap:10px;">
+      <h3>Quiz Mode</h3>
+      <p class="meta">Pick your language direction before the challenge starts.</p>
+      <div class="grid quiz-mode-grid" style="gap:8px;">
+        ${modeCard(
+          "english-to-assamese",
+          "English to Assamese",
+          "See English prompts and pick Assamese answers.",
+          `<span class="quiz-flag-pill" title="USA flag" aria-label="USA flag"><span class="quiz-flag-symbol">🇺🇸</span><span class="quiz-flag-label">USA</span></span><span class="quiz-flag-arrow">→</span><span class="quiz-flag-pill assam" title="India flag" aria-label="India flag"><span class="quiz-flag-symbol">🇮🇳</span><span class="quiz-flag-label">Assam</span></span>`
+        )}
+        ${modeCard(
+          "assamese-to-english",
+          "Assamese to English",
+          "See Assamese prompts and pick English answers.",
+          `<span class="quiz-flag-pill assam" title="India flag" aria-label="India flag"><span class="quiz-flag-symbol">🇮🇳</span><span class="quiz-flag-label">Assam</span></span><span class="quiz-flag-arrow">→</span><span class="quiz-flag-pill" title="USA flag" aria-label="USA flag"><span class="quiz-flag-symbol">🇺🇸</span><span class="quiz-flag-label">USA</span></span>`
+        )}
+        ${modeCard(
+          "mixed",
+          "Mixed",
+          "Questions randomly switch both directions.",
+          `<span class="quiz-flag-pill"><span class="quiz-flag-symbol">🇺🇸</span><span class="quiz-flag-label">USA</span></span><span class="quiz-flag-pill assam"><span class="quiz-flag-symbol">🇮🇳</span><span class="quiz-flag-label">Assam</span></span>`
+        )}
+      </div>
+      <div class="row" style="justify-content:flex-end;">
+        <button class="btn accent" data-action="quiz-start" ${startDisabled}>Start Quiz</button>
       </div>
     </article>
   `;
 }
 
 function renderPractice() {
-  ensureFlashDeck();
-
-  if (!state.quiz.questions.length) {
-    state.quiz.questions = buildQuizQuestions(state.dictionary, 10);
-  }
-
   const currentIndex = Math.min(state.flash.cards.length - 1, Math.max(0, state.flash.index));
   const currentFlash = state.flash.cards[currentIndex];
 
@@ -657,20 +1672,38 @@ function renderPractice() {
                 easyCount: state.flash.easyCount,
                 hasHardWords: state.flash.hardWordIds.length > 0
               })
-            : renderFlashcard(currentFlash, state.flash.flipped, state.flash.reviewedCount, state.flash.sessionTotal)
+            : state.flash.setupStage === "type"
+              ? renderFlashTypeControls()
+              : state.flash.setupStage === "mode"
+                ? renderFlashModeControls()
+                : `${(() => {
+                    ensureFlashDeck();
+                    const sessionIndex = Math.min(state.flash.cards.length - 1, Math.max(0, state.flash.index));
+                    const sessionCard = state.flash.cards[sessionIndex];
+                    return renderFlashcard(
+                      sessionCard,
+                      state.flash.flipped,
+                      state.flash.reviewedCount,
+                      state.flash.sessionTotal,
+                      state.flash.playMode
+                    );
+                  })()}`
           : ""
       }
       ${
         state.practiceTab === "quiz"
-          ? renderQuizView({
-              question: currentQuestion,
-              total: state.quiz.questions.length,
-              score: state.quiz.score,
-              answered: state.quiz.answered,
-              selected: state.quiz.selected,
-              showCongrats: state.quiz.showCongrats,
-              showSummary: state.quiz.showSummary
-            })
+          ? state.quiz.setupStage === "mode"
+            ? renderQuizModeControls()
+            : renderQuizView({
+                question: currentQuestion,
+                total: state.quiz.questions.length,
+                score: state.quiz.score,
+                answered: state.quiz.answered,
+                selected: state.quiz.selected,
+                showCongrats: state.quiz.showCongrats,
+                showSummary: state.quiz.showSummary,
+                mode: state.quiz.mode
+              })
           : ""
       }
       ${state.practiceTab === "conversation" ? renderConversationPanel() : ""}
@@ -679,26 +1712,54 @@ function renderPractice() {
 }
 
 function renderAchievements() {
-  const earned = new Set(state.progress.achievements);
-  const candidates = [
-    { id: "first-word", label: "First Word", check: () => state.progress.wordsLearned.length >= 1 },
-    { id: "ten-words", label: "Word Collector", check: () => state.progress.wordsLearned.length >= 10 },
-    { id: "first-quiz", label: "Quiz Starter", check: () => state.progress.quizAttempts >= 1 },
-    { id: "xp-100", label: "XP Rookie", check: () => state.progress.xp >= 100 }
+  const earned = new Set(state.progress.achievements || []);
+  const tiers = [
+    {
+      title: "Beginner",
+      ids: ["first-word", "lesson-starter", "quiz-starter", "xp-rookie"]
+    },
+    {
+      title: "Intermediate",
+      ids: ["word-collector", "lesson-climber", "word-explorer", "level-5-learner"]
+    },
+    {
+      title: "Advanced",
+      ids: ["quiz-ace", "xp-pro", "streak-hero", "level-10-learner"]
+    }
   ];
 
-  candidates.forEach((item) => {
-    if (item.check()) earned.add(item.id);
-  });
+  const byId = new Map(ACHIEVEMENT_CANDIDATES.map((item) => [item.id, item]));
 
-  state.progress.achievements = [...earned];
+  return tiers
+    .map((tier) => {
+      const cards = tier.ids
+        .map((id) => byId.get(id))
+        .filter(Boolean)
+        .map((item) => `
+          <div class="achievement ${earned.has(item.id) ? "unlocked" : "locked"}">
+            <div class="achievement-badge" aria-hidden="true">
+              <span class="achievement-trophy">🏆</span>
+              <span class="achievement-icon">${item.icon}</span>
+            </div>
+            <h4>${item.label}</h4>
+            <p class="achievement-desc">${item.description}</p>
+            <p class="achievement-state">${earned.has(item.id) ? "Unlocked" : "Locked"}</p>
+          </div>
+        `)
+        .join("");
 
-  return candidates
-    .map((item) => `<div class="achievement"><h4>${item.label}</h4><p>${earned.has(item.id) ? "Unlocked" : "Locked"}</p></div>`)
+      return `
+        <section class="achievement-tier">
+          <h4 class="achievement-tier-title">${tier.title}</h4>
+          <div class="grid auto achievement-tier-grid">${cards}</div>
+        </section>
+      `;
+    })
     .join("");
 }
 
 function renderProfile() {
+  syncAchievements(false);
   const panel = document.getElementById("view-profile");
   const accuracy = state.progress.quizAttempts
     ? Math.round((state.progress.quizCorrect / state.progress.quizAttempts) * 100)
@@ -706,6 +1767,8 @@ function renderProfile() {
   const currentLevel = levelMetaFromXp(state.progress.xp).level;
   const xpToNextLevel = xpNeededForNextLevel(state.progress.xp);
   const nextLevelCopy = xpToNextLevel === 0 ? "Max level reached" : `${xpToNextLevel} XP to next level`;
+  const syncEndpoint = escapeHtmlAttr(state.settings.syncEndpoint || "");
+  const syncToken = escapeHtmlAttr(state.settings.syncToken || "");
   const avatarChips = AVATAR_REWARDS.map((item) => {
     const isCurrent = state.settings.avatar === item.value;
     const unlocked = isAvatarUnlocked(item.value, currentLevel) || isCurrent;
@@ -720,7 +1783,7 @@ function renderProfile() {
       <article class="card row" style="align-items:flex-start; flex-wrap: wrap;">
         <div>
           <h3>👤 Learner Profile</h3>
-          <p class="meta">Achievements, settings, export/import, and statistics.</p>
+          <p class="meta">Settings, statistics and achievements.</p>
         </div>
         <div class="pill">Avatar: ${state.settings.avatar}</div>
       </article>
@@ -745,16 +1808,40 @@ function renderProfile() {
 
       <article class="card">
         <h3>Achievements</h3>
-        <div class="grid auto" style="margin-top:10px">${renderAchievements()}</div>
+        <div class="achievement-groups" style="margin-top:10px">${renderAchievements()}</div>
+      </article>
+
+      <article class="card grid xp-rules-card">
+        <h3>XP Rewards</h3>
+        <p class="meta">How XP is earned in each activity.</p>
+        <ul class="xp-rules-list" aria-label="XP reward rules">
+          <li><span>Learn a new word</span><strong>+12 XP</strong></li>
+          <li><span>Complete a lesson</span><strong>+30 XP</strong></li>
+          <li><span>Flashcard review</span><strong>+4 XP</strong></li>
+          <li><span>Correct quiz answer</span><strong>+8 XP</strong></li>
+          <li><span>Finish a quiz</span><strong>+20 XP</strong></li>
+          <li><span>Conversation message</span><strong>+2 XP</strong></li>
+        </ul>
       </article>
 
       <article class="card grid">
-        <h3>Settings</h3>
-        <label class="pill"><input type="checkbox" id="setting-notifications" ${state.settings.notifications ? "checked" : ""} /> Notifications</label>
+        <h3>Cloud Sync (Cross-Device)</h3>
+        <p class="meta">Use a hosted API to sync progress between laptop and iPhone, even when your laptop is offline.</p>
+        <label for="profile-sync-endpoint" class="meta">Sync endpoint</label>
+        <input id="profile-sync-endpoint" class="input" value="${syncEndpoint}" placeholder="https://your-worker-domain/api/state" aria-label="Cloud sync endpoint" />
+        <label for="profile-sync-token" class="meta">Sync token</label>
+        <input id="profile-sync-token" class="input" type="password" value="${syncToken}" placeholder="Optional shared secret" aria-label="Cloud sync token" />
+        <div class="row" style="flex-wrap: wrap; justify-content:flex-start;">
+          <button class="btn accent" data-action="sync-save-config">Save Sync Settings</button>
+          <button class="btn ghost" data-action="sync-test-config">Test Sync</button>
+          <button class="btn ghost" data-action="sync-clear-config">Clear</button>
+        </div>
+      </article>
+
+      <article class="card grid">
+        <h3>Daily XP Goal</h3>
+        <input id="profile-daily-goal" class="input" type="number" min="20" max="5000" value="${state.progress.dailyGoal.targetXp}" aria-label="Daily XP goal" />
         <div class="row" style="flex-wrap: wrap;">
-          <button class="btn ghost" data-action="export-data">Export Data</button>
-          <label class="btn ghost" for="import-data-input" style="display:inline-flex; align-items:center;">Import Data</label>
-          <input class="hidden" id="import-data-input" type="file" accept="application/json" />
           <button class="btn danger" data-action="reset-progress">Reset progress</button>
         </div>
       </article>
@@ -824,6 +1911,68 @@ function toggleFavoriteWord(id) {
 
 function chatbotReply(input) {
   const text = input.trim().toLowerCase();
+
+  const matchesExpectedStep = (topic, step, userText) => {
+    const expected = topic?.expected?.[step] || [];
+    if (!expected.length) return true;
+    return expected.some((hint) => userText.includes(hint));
+  };
+
+  const reciprocalReplies = [
+    {
+      keys: ["how are you", "ki khobor"],
+      answer: ["Mur bhal! Tumar?", "I am fine! And you?"]
+    },
+    {
+      keys: ["where are you from", "where do you come from", "coming from"],
+      answer: ["Moi Guwahati pora ahisu.", "I am from Guwahati."]
+    },
+    {
+      keys: ["your name", "what is your name", "who are you"],
+      answer: ["Mur naam Axomia Bot.", "My name is Axomia Bot."]
+    },
+    {
+      keys: ["thank", "dhonnobad"],
+      answer: ["Apunak dhonnobad!", "Thank you too!"]
+    }
+  ];
+
+  const reciprocal = reciprocalReplies.find((item) => item.keys.some((key) => text.includes(key)));
+  const topic = CONVERSATION_TOPICS[state.chatSession.topicId] || null;
+
+  if (topic) {
+    const pieces = [];
+    const translations = [];
+    const currentStep = state.chatSession.step;
+
+    if (reciprocal) {
+      pieces.push(reciprocal.answer[0]);
+      translations.push(reciprocal.answer[1]);
+    }
+
+    if (currentStep < topic.prompts.length) {
+      const expectedOk = matchesExpectedStep(topic, currentStep, text);
+
+      if (!expectedOk) {
+        const repeatedPrompt = currentStep === 0 ? topic.opening : topic.prompts[currentStep - 1];
+        pieces.push(`Let us stay with this step: ${repeatedPrompt.as}`);
+        translations.push(`Let us stay with this step: ${repeatedPrompt.en}`);
+      } else {
+        const nextPrompt = topic.prompts[currentStep];
+        state.chatSession.step += 1;
+        pieces.push(nextPrompt.as);
+        translations.push(nextPrompt.en);
+      }
+    } else {
+      pieces.push(topic.closing.as);
+      translations.push(topic.closing.en);
+    }
+
+    return {
+      answer: [pieces.join(" "), translations.join(" ")]
+    };
+  }
+
   const patterns = [
     { keys: ["hello", "hi", "nomoskar"], answer: ["Nomoskar!", "Hello!"] },
     { keys: ["how are you", "ki khobor"], answer: ["Mur bhal! Tumar?", "I am fine! And you?"] },
@@ -833,14 +1982,14 @@ function chatbotReply(input) {
   ];
 
   const found = patterns.find((item) => item.keys.some((key) => text.includes(key)));
-  return found || { answer: ["Aru kobo? Let's keep practicing Assamese.", "Tell me more."] };
+  return found || { answer: ["Pick a topic and we can do a guided chat.", "Pick a topic and we can do a guided chat."] };
 }
 
 function addRecentWord(wordId) {
   state.recentWords = [wordId, ...state.recentWords.filter((id) => id !== wordId)].slice(0, 20);
 }
 
-function onClick(event) {
+async function onClick(event) {
   const target = event.target;
   const actionTarget = target.closest("[data-action]");
   const action = actionTarget?.dataset.action;
@@ -852,8 +2001,9 @@ function onClick(event) {
     persist();
   }
 
-  if (target.dataset.nav) {
-    setView(target.dataset.nav);
+  const navTarget = target.closest("[data-nav]");
+  if (navTarget?.dataset.nav) {
+    setView(navTarget.dataset.nav);
     return;
   }
 
@@ -875,10 +2025,11 @@ function onClick(event) {
     const english = document.getElementById("new-word-english")?.value || "";
     const assamese = document.getElementById("new-word-assamese")?.value || "";
     const category = document.getElementById("new-word-category")?.value || "Custom";
+    const entryType = document.getElementById("new-word-entry-type")?.value || "word";
     const exampleAssamese = document.getElementById("new-word-example-assamese")?.value || "";
     const exampleEnglish = document.getElementById("new-word-example-english")?.value || "";
 
-    const result = addCustomDictionaryWord({ english, assamese, category, exampleAssamese, exampleEnglish });
+    const result = addCustomDictionaryWord({ english, assamese, category, entryType, exampleAssamese, exampleEnglish });
     if (!result.ok) {
       toast(result.reason === "duplicate" ? "That word pair already exists" : "Please enter both English and Assamese");
       return;
@@ -889,7 +2040,10 @@ function onClick(event) {
       key: "",
       english: "",
       assamese: "",
-      category: "Custom"
+      example: "",
+      exampleEnglish: "",
+      category: "Custom",
+      entryType: "word"
     };
     renderCurrentView();
     toast("New word added");
@@ -907,9 +2061,13 @@ function onClick(event) {
       key,
       english: current.english || "",
       assamese: current.assamese || "",
-      category: current.category || "Custom"
+      example: current.example || "",
+      exampleEnglish: current.exampleEnglish || current.exampleTranslation || current.translation || "",
+      category: current.category || "Custom",
+      entryType: inferDictionaryEntryType(current)
     };
     renderDictionary();
+    requestAnimationFrame(() => focusDictionaryEditPanel());
     return;
   }
 
@@ -917,10 +2075,17 @@ function onClick(event) {
     const key = state.dictionaryEdit.key;
     if (!key) return;
 
+    const currentEntry = state.dictionary.find((entry) => encodeURIComponent(entry.__baseKey || "") === key);
+    const previousEntryType = inferDictionaryEntryType(currentEntry);
+    const nextEntryType = state.dictionaryEdit.entryType === "phrase" ? "phrase" : "word";
+
     const result = editDictionaryWord(key, {
       english: state.dictionaryEdit.english,
       assamese: state.dictionaryEdit.assamese,
-      category: state.dictionaryEdit.category
+      exampleAssamese: state.dictionaryEdit.example,
+      exampleEnglish: state.dictionaryEdit.exampleEnglish,
+      category: state.dictionaryEdit.category,
+      entryType: state.dictionaryEdit.entryType
     });
 
     if (!result.ok) {
@@ -933,10 +2098,18 @@ function onClick(event) {
       key: "",
       english: "",
       assamese: "",
-      category: "Custom"
+      example: "",
+      exampleEnglish: "",
+      category: "Custom",
+      entryType: "word"
     };
     renderCurrentView();
-    toast("Word updated");
+    if (previousEntryType !== nextEntryType) {
+      const nextEntryLabel = nextEntryType === "phrase" ? "Phrase" : "Word";
+      toast(`Word updated. Lessons moved to ${nextEntryLabel}.`);
+    } else {
+      toast("Word updated");
+    }
     return;
   }
 
@@ -945,7 +2118,10 @@ function onClick(event) {
       key: "",
       english: "",
       assamese: "",
-      category: "Custom"
+      example: "",
+      exampleEnglish: "",
+      category: "Custom",
+      entryType: "word"
     };
     renderDictionary();
     return;
@@ -959,52 +2135,23 @@ function onClick(event) {
       return;
     }
 
-    const result = deleteDictionaryWord(key);
-    if (!result.ok) {
-      toast("Unable to delete word");
+    openDictionaryDeleteDialog(deletedEntry, key);
+    return;
+  }
+
+  if (action === "dictionary-cancel-delete") {
+    closeDictionaryDeleteDialog();
+    return;
+  }
+
+  if (action === "dictionary-confirm-delete") {
+    const key = state.dictionaryDeleteDialog.key;
+    closeDictionaryDeleteDialog();
+    if (!key) {
+      toast("Word not found");
       return;
     }
-
-    const token = Date.now();
-    state.dictionaryPendingDelete = {
-      token,
-      entry: { ...deletedEntry }
-    };
-
-    refreshLanguageData();
-    if (state.dictionaryEdit.key === key) {
-      state.dictionaryEdit = {
-        key: "",
-        english: "",
-        assamese: "",
-        category: "Custom"
-      };
-    }
-    renderCurrentView();
-    toast("Word deleted", {
-      actionLabel: "Undo",
-      duration: 5000,
-      onAction: () => {
-        if (!state.dictionaryPendingDelete || state.dictionaryPendingDelete.token !== token) return;
-
-        const undoResult = restoreDeletedDictionaryWord(state.dictionaryPendingDelete.entry);
-        if (!undoResult.ok) {
-          toast("Unable to undo delete");
-          return;
-        }
-
-        state.dictionaryPendingDelete = null;
-        refreshLanguageData();
-        renderCurrentView();
-        toast("Deletion undone");
-      }
-    });
-
-    setTimeout(() => {
-      if (state.dictionaryPendingDelete?.token === token) {
-        state.dictionaryPendingDelete = null;
-      }
-    }, 5200);
+    performDictionaryDelete(key);
     return;
   }
 
@@ -1035,6 +2182,17 @@ function onClick(event) {
 
   if (action === "onboarding-finish") {
     finishOnboarding();
+    return;
+  }
+
+  if (action === "unlock-achievement") {
+    animateAchievementToProfile();
+    return;
+  }
+
+  if (action === "level-up-continue") {
+    closeLevelUpCelebration();
+    showNextLevelUpCelebration();
     return;
   }
 
@@ -1143,7 +2301,7 @@ function onClick(event) {
   }
 
   if (action === "mark-learned") {
-    const wordId = actionSource.dataset.word;
+    const wordId = String(actionSource.dataset.word || "").trim();
     if (!wordId) {
       toast("This lesson item cannot be marked as learned");
       return;
@@ -1153,11 +2311,10 @@ function onClick(event) {
     let lessonJustCompleted = false;
 
     // Normalize persisted state before updating counters.
-    state.progress.wordsLearned = [...new Set((state.progress.wordsLearned || []).filter(Boolean))];
+    state.progress.wordsLearned = [...new Set((state.progress.wordsLearned || []).filter(Boolean).map((id) => String(id)))];
 
     if (!state.progress.wordsLearned.includes(wordId)) {
       state.progress.wordsLearned.push(wordId);
-      state.progress.dailyGoal.learnedWords += 1;
       xpGain(12, "Learned a new word");
       addActivity(`Learned word ${wordId}`);
       addRecentWord(wordId);
@@ -1166,7 +2323,7 @@ function onClick(event) {
 
     const lesson = state.lessons.find((item) => item.id === state.activeLessonId);
     if (lesson) {
-      const allLessonWordsLearned = lesson.items.every((item) => state.progress.wordsLearned.includes(item.id));
+      const allLessonWordsLearned = lesson.items.every((item) => state.progress.wordsLearned.includes(String(item.id)));
 
       if (allLessonWordsLearned && !state.progress.lessonsCompleted.includes(lesson.id)) {
         state.progress.lessonsCompleted.push(lesson.id);
@@ -1229,6 +2386,17 @@ function onClick(event) {
   if (action === "practice-tab") {
     const nextTab = actionSource.dataset.tab;
     if (!nextTab || nextTab === state.practiceTab) return;
+    if (nextTab === "quiz") {
+      state.quiz.questions = [];
+      state.quiz.index = 0;
+      state.quiz.score = 0;
+      state.quiz.answered = false;
+      state.quiz.selected = "";
+      state.quiz.showCongrats = false;
+      state.quiz.showSummary = false;
+      state.quiz.mode = "";
+      state.quiz.setupStage = "mode";
+    }
     state.practiceTab = nextTab;
     renderPractice();
     return;
@@ -1258,40 +2426,112 @@ function onClick(event) {
 
     if (state.flash.reviewedCount >= state.flash.sessionTotal) {
       state.flash.mode = "summary";
-      state.flash.randomMode = false;
       persist();
       renderPractice();
       return;
     }
 
-    if (state.flash.randomMode) {
-      state.flash.index = Math.floor(Math.random() * state.flash.cards.length);
-    } else {
-      state.flash.index = Math.min(state.flash.cards.length - 1, state.flash.index + 1);
-    }
+    state.flash.index = Math.min(state.flash.cards.length - 1, state.flash.index + 1);
 
     persist();
     renderPractice();
     return;
   }
 
-  if (action === "flash-shuffle") {
-    state.flash.cards = shuffleCards(state.flash.cards);
-    state.flash.index = 0;
-    state.flash.flipped = false;
+  if (action === "flash-next-mode") {
+    if (!state.flash.selectedCategories.length) {
+      toast("Choose at least one category first");
+      return;
+    }
+    state.flash.categoryDropAnimating = false;
+    state.flash.setupStage = "mode";
     renderPractice();
     return;
   }
 
-  if (action === "flash-random") {
-    state.flash.randomMode = !state.flash.randomMode;
-    toast(state.flash.randomMode ? "Random mode on" : "Random mode off");
+  if (action === "flash-next-categories") {
+    applyFlashTypeSelectionFilter();
+    state.flash.categoryDropFromType = state.flash.categoryTypeFilter === "phrases" ? "phrases" : "words";
+    state.flash.categoryDropAnimating = true;
+    state.flash.setupStage = "type";
+    renderPractice();
+    return;
+  }
+
+  if (action === "flash-back-categories") {
+    state.flash.categoryDropAnimating = false;
+    state.flash.setupStage = "type";
+    renderPractice();
+    return;
+  }
+
+  if (action === "flash-back-type") {
+    state.flash.categoryTypeFilter = "";
+    state.flash.categoryDropAnimating = false;
+    state.flash.categoryDropFromType = "words";
+    state.flash.selectedCategories = [];
+    state.flash.cards = [];
+    state.flash.setupStage = "type";
+    renderPractice();
+    return;
+  }
+
+  if (action === "flash-set-type") {
+    const nextType = actionSource.dataset.type;
+    if (!nextType || !["words", "phrases"].includes(nextType)) return;
+
+    const changedType = state.flash.categoryTypeFilter !== nextType;
+    state.flash.categoryTypeFilter = nextType;
+    state.flash.categoryDropFromType = nextType;
+    state.flash.categoryDropAnimating = changedType;
+    state.flash.cards = [];
+    applyFlashTypeSelectionFilter();
+    renderPractice();
+    return;
+  }
+
+  if (action === "flash-set-mode") {
+    const nextMode = actionSource.dataset.mode;
+    if (!nextMode || !["normal", "shuffle", "random"].includes(nextMode)) return;
+    state.flash.playMode = nextMode;
+    renderPractice();
+    return;
+  }
+
+  if (action === "flash-start-session") {
+    const words = selectedFlashCategoryWords();
+    const deck = buildFlashDeckByMode(words, state.flash.playMode);
+    if (!deck.length) {
+      toast("No words available for selected categories");
+      return;
+    }
+
+    resetFlashSession(deck);
+    renderPractice();
+    return;
+  }
+
+  if (action === "flash-back-overview") {
+    state.flash.cards = [];
+    state.flash.index = 0;
+    state.flash.flipped = false;
+    state.flash.mode = "session";
+    state.flash.setupStage = "type";
+    state.flash.categoryTypeFilter = "";
+    state.flash.categoryDropAnimating = false;
+    state.flash.categoryDropFromType = "words";
+    state.flash.selectedCategories = [];
+    state.flash.reviewedCount = 0;
+    state.flash.sessionTotal = 0;
+    state.flash.hardCount = 0;
+    state.flash.easyCount = 0;
+    state.flash.hardWordIds = [];
     renderPractice();
     return;
   }
 
   if (action === "flash-repeat-hard") {
-    const words = flattenLessonWords(state.lessons);
+    const words = filteredFlashWords();
     const hardSet = new Set(state.flash.hardWordIds);
     const hardCards = words.filter((word) => hardSet.has(word.id));
     if (!hardCards.length) {
@@ -1302,7 +2542,7 @@ function onClick(event) {
     state.flash.cards = hardCards;
     state.flash.index = 0;
     state.flash.flipped = false;
-    state.flash.randomMode = false;
+    state.flash.setupStage = "session";
     state.flash.mode = "session";
     state.flash.reviewedCount = 0;
     state.flash.sessionTotal = hardCards.length;
@@ -1314,15 +2554,25 @@ function onClick(event) {
   }
 
   if (action === "flash-restart") {
-    const words = flattenLessonWords(state.lessons);
-    const cards = pickFlashcards(words, state.progress, 40);
-    state.flash.cards = cards;
+    const words = selectedFlashCategoryWords();
+    const deck = buildFlashDeckByMode(words, state.flash.playMode);
+    resetFlashSession(deck);
+    renderPractice();
+    return;
+  }
+
+  if (action === "flash-new-session") {
+    state.flash.cards = [];
     state.flash.index = 0;
     state.flash.flipped = false;
-    state.flash.randomMode = false;
     state.flash.mode = "session";
+    state.flash.setupStage = "type";
+    state.flash.categoryTypeFilter = "";
+    state.flash.categoryDropAnimating = false;
+    state.flash.categoryDropFromType = "words";
+    state.flash.selectedCategories = [];
     state.flash.reviewedCount = 0;
-    state.flash.sessionTotal = cards.length;
+    state.flash.sessionTotal = 0;
     state.flash.hardCount = 0;
     state.flash.easyCount = 0;
     state.flash.hardWordIds = [];
@@ -1330,14 +2580,57 @@ function onClick(event) {
     return;
   }
 
+  if (action === "flash-toggle-category") {
+    const categoryId = actionSource.dataset.category;
+    if (!categoryId) return;
+
+    normalizeFlashCategorySelection();
+    const selected = new Set(state.flash.selectedCategories || []);
+    if (selected.has(categoryId)) {
+      selected.delete(categoryId);
+    } else {
+      selected.add(categoryId);
+    }
+
+    state.flash.selectedCategories = Array.from(selected);
+    state.flash.cards = [];
+    state.flash.categoryDropAnimating = false;
+    state.flash.setupStage = "type";
+    renderPractice();
+    return;
+  }
+
   if (action === "quiz-start") {
-    state.quiz.questions = buildQuizQuestions(state.dictionary, 10);
+    if (!["english-to-assamese", "assamese-to-english", "mixed"].includes(state.quiz.mode)) {
+      toast("Choose a quiz mode first");
+      state.quiz.setupStage = "mode";
+      renderPractice();
+      return;
+    }
+
+    state.quiz.questions = buildQuizQuestions(state.dictionary, 10, state.quiz.mode);
     state.quiz.index = 0;
     state.quiz.score = 0;
     state.quiz.answered = false;
     state.quiz.selected = "";
     state.quiz.showCongrats = false;
     state.quiz.showSummary = false;
+    state.quiz.setupStage = "session";
+    if (!state.quiz.questions.length) {
+      toast("No words available for quiz");
+      state.quiz.setupStage = "mode";
+      renderPractice();
+      return;
+    }
+    renderPractice();
+    return;
+  }
+
+  if (action === "quiz-set-mode") {
+    const mode = actionSource.dataset.mode;
+    if (!["english-to-assamese", "assamese-to-english", "mixed"].includes(mode)) return;
+    state.quiz.mode = mode;
+    state.quiz.setupStage = "mode";
     renderPractice();
     return;
   }
@@ -1350,6 +2643,7 @@ function onClick(event) {
     state.quiz.answered = true;
 
     state.progress.quizAttempts += 1;
+    syncAchievements(true);
     if (option === current.answer) {
       state.quiz.score += 1;
       state.progress.quizCorrect += 1;
@@ -1390,13 +2684,15 @@ function onClick(event) {
   }
 
   if (action === "quiz-restart") {
-    state.quiz.questions = buildQuizQuestions(state.dictionary, 10);
+    state.quiz.questions = [];
     state.quiz.index = 0;
     state.quiz.score = 0;
     state.quiz.answered = false;
     state.quiz.selected = "";
     state.quiz.showCongrats = false;
     state.quiz.showSummary = false;
+    state.quiz.mode = "";
+    state.quiz.setupStage = "mode";
     renderPractice();
     return;
   }
@@ -1416,23 +2712,21 @@ function onClick(event) {
     return;
   }
 
-  if (action === "chat-voice") {
-    const recognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!recognitionCtor) {
-      toast("Speech recognition is not supported in this browser");
-      return;
-    }
+  if (action === "chat-topic") {
+    const topicId = actionSource.dataset.topic || "";
+    const topic = CONVERSATION_TOPICS[topicId];
+    if (!topic) return;
 
-    const recognition = new recognitionCtor();
-    recognition.lang = "en-US";
-    recognition.onresult = (e) => {
-      const transcript = e.results[0][0].transcript;
-      state.chat.push({ who: "user", text: transcript, translation: "(voice input)" });
-      const response = chatbotReply(transcript);
-      state.chat.push({ who: "bot", text: response.answer[0], translation: response.answer[1] });
-      renderPractice();
-    };
-    recognition.start();
+    state.chatSession.topicId = topicId;
+    state.chatSession.step = 0;
+    state.chat = [
+      {
+        who: "bot",
+        text: topic.opening.as,
+        translation: topic.opening.en
+      }
+    ];
+    renderPractice();
     return;
   }
 
@@ -1446,10 +2740,58 @@ function onClick(event) {
     return;
   }
 
+  if (action === "sync-save-config") {
+    const endpointInput = document.getElementById("profile-sync-endpoint");
+    const tokenInput = document.getElementById("profile-sync-token");
+    state.settings.syncEndpoint = String(endpointInput?.value || "").trim();
+    state.settings.syncToken = String(tokenInput?.value || "").trim();
+    persist();
+    toast("Sync settings saved");
+    return;
+  }
+
+  if (action === "sync-clear-config") {
+    state.settings.syncEndpoint = "";
+    state.settings.syncToken = "";
+    persist();
+    renderProfile();
+    toast("Sync settings cleared");
+    return;
+  }
+
+  if (action === "sync-test-config") {
+    const endpointInput = document.getElementById("profile-sync-endpoint");
+    const tokenInput = document.getElementById("profile-sync-token");
+    state.settings.syncEndpoint = String(endpointInput?.value || "").trim();
+    state.settings.syncToken = String(tokenInput?.value || "").trim();
+    persist();
+
+    const result = await testSyncConnection();
+    const ok = typeof result === "boolean" ? result : Boolean(result?.ok);
+    if (!ok) {
+      const authFailed = typeof result === "object" && result?.status === "auth-failed";
+      toast(authFailed ? "Sync auth failed" : "Sync connection failed");
+      return;
+    }
+
+    const changed = await syncStateFromServer();
+    if (changed) {
+      refreshStateFromStorage();
+      refreshLanguageData();
+      updateHeaderControls();
+      await renderCurrentView();
+    }
+
+    toast("Sync connection successful");
+    return;
+  }
+
   if (action === "reset-progress") {
-    const ok = window.confirm("Reset all saved progress?");
+    const ok = window.confirm(
+      "Reset all saved progress? Your custom dictionary words and dictionary edits will be kept."
+    );
     if (!ok) return;
-    resetAllData();
+    resetAllData({ preserveDictionaryData: true });
     Object.assign(state, {
       progress: getProgress(),
       settings: getSettings(),
@@ -1462,11 +2804,11 @@ function onClick(event) {
     persist();
     applyTheme();
     updateHeaderControls();
-    renderCurrentView();
+    setView("home");
     if (!state.settings.onboardingCompleted) {
       openOnboarding();
     }
-    toast("Progress reset");
+    toast("Progress reset. Dictionary words and edits kept.");
   }
 }
 
@@ -1477,8 +2819,8 @@ function onInput(event) {
     state.onboarding.name = target.value;
   }
 
-  if (target.id === "onboarding-daily-words") {
-    state.onboarding.dailyWordsTarget = target.value;
+  if (target.id === "onboarding-daily-xp") {
+    state.onboarding.dailyXpTarget = target.value;
   }
 
   if (target.name === "onboarding-theme") {
@@ -1489,6 +2831,23 @@ function onInput(event) {
     state.settings.profileName = target.value.trim() || "Learner";
     updateHeaderControls();
     persist();
+  }
+
+  if (target.id === "profile-daily-goal") {
+    const next = Math.max(20, Math.min(5000, Number(target.value) || 120));
+    state.progress.dailyGoal.targetXp = next;
+    persist();
+    if (state.view === "home") {
+      renderHome();
+    }
+  }
+
+  if (target.id === "profile-sync-endpoint") {
+    state.settings.syncEndpoint = String(target.value || "").trim();
+  }
+
+  if (target.id === "profile-sync-token") {
+    state.settings.syncToken = String(target.value || "").trim();
   }
 
   if (target.id === "dictionary-search") {
@@ -1509,12 +2868,29 @@ function onInput(event) {
     persist();
   }
 
+  if (target.id === "lessons-type-filter") {
+    state.lessonsTypeFilter = target.value === "phrase-sentence" ? "phrase-sentence" : "single-word";
+    renderLessons();
+  }
+
   if (target.id === "edit-word-english") {
     state.dictionaryEdit.english = target.value;
   }
 
   if (target.id === "edit-word-assamese") {
     state.dictionaryEdit.assamese = target.value;
+  }
+
+  if (target.id === "edit-word-example-assamese") {
+    state.dictionaryEdit.example = target.value;
+  }
+
+  if (target.id === "edit-word-example-english") {
+    state.dictionaryEdit.exampleEnglish = target.value;
+  }
+
+  if (target.id === "edit-word-entry-type") {
+    state.dictionaryEdit.entryType = target.value === "phrase" ? "phrase" : "word";
   }
 
   if (target.id === "edit-word-category") {
@@ -1559,6 +2935,7 @@ function onInput(event) {
 function bindGlobalEvents() {
   document.addEventListener("click", onClick);
   document.addEventListener("input", onInput);
+  document.addEventListener("change", onInput);
 
   dom.themeToggle.addEventListener("click", () => {
     state.settings.theme = state.settings.theme === "dark" ? "light" : "dark";
@@ -1590,7 +2967,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=6", { updateViaCache: "none" })
+      .register("sw.js?v=141", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
@@ -1598,12 +2975,38 @@ function initServiceWorker() {
   }
 }
 
-async function init() {
+function refreshStateFromStorage() {
+  Object.assign(state, {
+    progress: getProgress(),
+    settings: getSettings(),
+    favorites: getFavorites(),
+    history: getRecentActivity(),
+    searchHistory: getSearchHistory(),
+    recentWords: getRecentWords()
+  });
   normalizeSettings();
+}
+
+async function init() {
+  await syncStateFromServer();
+  refreshStateFromStorage();
+  if (!state.settings.onboardingCompleted) {
+    state.view = "home";
+  }
   createOnboardingModal();
+  createDictionaryDeleteModal();
+  createAchievementCelebrationModal();
+  createLevelUpCelebrationModal();
+  syncAchievements(false);
   applyTheme();
   updateHeaderControls();
   bindGlobalEvents();
+  startAutoSync(async () => {
+    refreshStateFromStorage();
+    refreshLanguageData();
+    updateHeaderControls();
+    await renderCurrentView();
+  });
   updateStreak();
   updateTopbarVisibility();
   renderNavigation(dom.mobileNav, state.view);

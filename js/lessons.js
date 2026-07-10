@@ -1,6 +1,29 @@
 import { getDictionaryMutations } from "./storage.js";
+import { normalizeDictionaryCategory, compareCategoryDisplayOrder } from "./dictionary.js";
 
 let lessonsCache = null;
+
+const LESSON_ICON_BY_CATEGORY = {
+  Greetings: "👋",
+  Introduction: "🙋",
+  Introductions: "🙋",
+  Family: "👨‍👩‍👧",
+  House: "🏠",
+  "Food & Drinks": "🍛",
+  Conversations: "💬",
+  "Daily Conversation": "💬",
+  Work: "💼",
+  "Work & Study": "💼",
+  Love: "❤️",
+  "Love & Relationships": "❤️",
+  "Human Body": "🧍",
+  Numbers: "🔢",
+  Questions: "❓",
+  Actions: "🏃",
+  Pronouns: "🧩",
+  Time: "⏰",
+  Custom: "✨"
+};
 
 function lessonItemKey(item) {
   return `${String(item.english || "").trim().toLowerCase()}|${String(item.assamese || "").trim().toLowerCase()}`;
@@ -44,8 +67,133 @@ function dedupeLessons(lessons) {
   }));
 }
 
-export async function loadLessons() {
+function escapeHtml(text) {
+  return String(text || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function lessonHeadlineSizeClass(title) {
+  const normalizedTitle = String(title || "").trim().replace(/\s+/g, " ");
+  const words = normalizedTitle.split(" ").filter(Boolean);
+  const longestWord = words.reduce((max, word) => Math.max(max, word.length), 0);
+
+  if (longestWord >= 12 || normalizedTitle.length >= 20) return "lesson-title-text-xs";
+  if (longestWord >= 9 || normalizedTitle.length >= 14) return "lesson-title-text-sm";
+  return "lesson-title-text-md";
+}
+
+function renderLessonHeadline(icon, title) {
+  const safeIcon = escapeHtml(icon || "📘");
+  const normalizedTitle = String(title || "").trim().replace(/\s+/g, " ");
+  const sizeClass = lessonHeadlineSizeClass(normalizedTitle);
+  return `<span class="lesson-title-icon">${safeIcon}</span><span class="lesson-title-text ${sizeClass}">${escapeHtml(normalizedTitle)}</span>`;
+}
+
+function cleanLessonCardTitle(title) {
+  return String(title || "")
+    .trim()
+    .replace(/\s*\((words|phrases)\)$/i, "")
+    .replace(/\s+/g, " ");
+}
+
+function lessonIdFromCategory(category) {
+  return `cat-${String(category || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")}`;
+}
+
+function tokenizePhrase(text) {
+  return String(text || "")
+    .replace(/[()\[\],/\\-]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+}
+
+function isPhraseOrSentence(text) {
+  const value = String(text || "").trim();
+  if (!value) return false;
+  if (/[?.!]/.test(value)) return true;
+  return tokenizePhrase(value).length > 1;
+}
+
+function isPhraseEntry(item) {
+  if (item?.entryType === "phrase") return true;
+  if (item?.entryType === "word") return false;
+  return isPhraseOrSentence(item.assamese) || isPhraseOrSentence(item.english);
+}
+
+function buildLessonsFromDictionary(entries) {
+  const grouped = new Map();
+
+  (entries || []).forEach((entry) => {
+    const category = normalizeDictionaryCategory(entry.category);
+    if (!category) return;
+
+    if (!grouped.has(category)) grouped.set(category, []);
+    grouped.get(category).push({
+      id: String(entry.id || lessonItemKey(entry)),
+      entryType: entry.entryType === "phrase" ? "phrase" : "word",
+      assamese: entry.assamese || "-",
+      english: entry.english || "-",
+      pronunciation: entry.pronunciation || "-",
+      example: entry.example || `${entry.assamese || ""} · ${entry.english || ""}`.trim(),
+      notes: entry.notes || `Vocabulary from the ${category} category.`
+    });
+  });
+
+  const lessons = Array.from(grouped.entries())
+    .sort(([a], [b]) => compareCategoryDisplayOrder(a, b))
+    .flatMap(([category, items]) => {
+      const uniqueItems = dedupeItems(items);
+      const singleWordItems = uniqueItems.filter((item) => !isPhraseEntry(item));
+      const phraseItems = uniqueItems.filter((item) => isPhraseEntry(item));
+      const baseId = lessonIdFromCategory(category);
+      const icon = LESSON_ICON_BY_CATEGORY[category] || "📘";
+
+      const bucketed = [];
+      if (singleWordItems.length) {
+        bucketed.push({
+          id: `${baseId}-words`,
+          title: category,
+          icon,
+          kind: "single-word",
+          description: `Practice single words from the ${category} dictionary category.`,
+          items: singleWordItems
+        });
+      }
+
+      if (phraseItems.length) {
+        bucketed.push({
+          id: `${baseId}-phrases`,
+          title: category,
+          icon,
+          kind: "phrase-sentence",
+          description: `Practice whole phrases and sentences from the ${category} dictionary category.`,
+          items: phraseItems
+        });
+      }
+
+      return bucketed;
+    })
+    .filter((lesson) => lesson.items.length > 0);
+
+  return dedupeLessons(lessons);
+}
+
+export async function loadLessons(dictionaryEntries = null) {
   if (lessonsCache) return lessonsCache;
+
+  if (Array.isArray(dictionaryEntries) && dictionaryEntries.length) {
+    lessonsCache = buildLessonsFromDictionary(dictionaryEntries);
+    return lessonsCache;
+  }
+
   const response = await fetch("data/lessons.json");
   const raw = await response.json();
   lessonsCache = dedupeLessons(applyLessonMutations(raw));
@@ -73,24 +221,34 @@ export function renderLessonsOverview(lessons, progress, activeLessonId, favorit
       const active = activeLessonId === lesson.id;
       const isCompleted = progress.lessonsCompleted.includes(lesson.id);
       const buttonLabel = isCompleted ? "Completed" : active ? "Continue" : "Start";
+      const lessonActionButton = isCompleted
+        ? `<button class="btn ghost" disabled aria-disabled="true">${buttonLabel}</button>`
+        : `<button class="btn ${active ? "accent" : "ghost"}" data-action="open-lesson" data-lesson="${lesson.id}">${buttonLabel}</button>`;
       const isFavorite = favorites.lessons.includes(lesson.id);
+      const favoriteButton = isCompleted
+        ? ""
+        : `<button class="icon-btn" data-action="favorite-lesson" data-lesson="${lesson.id}" aria-label="Toggle favorite lesson">${isFavorite ? "⭐" : "☆"}</button>`;
+      const unitLabel = lesson.kind === "phrase-sentence" ? "phrases" : "words";
+      const displayTitle = cleanLessonCardTitle(lesson.title);
       return `
         <article class="lesson-card">
-          <div class="row">
-            <h4>${lesson.icon} ${lesson.title}</h4>
-            <span class="pill">${lesson.items.length} words</span>
+          <span class="pill lesson-word-count">${lesson.items.length} ${unitLabel}</span>
+          <div class="row lesson-card-head">
+            <h4>${renderLessonHeadline(lesson.icon, displayTitle)}</h4>
           </div>
-          <p class="meta">${lesson.description}</p>
-          <div class="progress-wrap" style="margin:10px 0"><div class="progress-bar" style="width:${pct}%"></div></div>
-          <div class="row">
-            <button class="btn ${active ? "accent" : "ghost"}" data-action="open-lesson" data-lesson="${lesson.id}">${buttonLabel}</button>
-            <button class="icon-btn" data-action="favorite-lesson" data-lesson="${lesson.id}" aria-label="Toggle favorite lesson">${isFavorite ? "⭐" : "☆"}</button>
+          <div class="progress-wrap lesson-progress"><div class="progress-bar" style="width:${pct}%"></div></div>
+          <div class="row lesson-main-actions">
+            ${lessonActionButton}
+            ${favoriteButton}
           </div>
-          ${
-            isCompleted
-              ? `<div class="row" style="justify-content:flex-start; margin-top:8px;"><button class="btn ghost small" data-action="restart-lesson" data-lesson="${lesson.id}">Restart lesson</button></div>`
-              : ""
-          }
+          <div class="row lesson-restart-row">
+            <button
+              class="btn ghost small ${isCompleted ? "" : "lesson-restart-placeholder"}"
+              data-action="restart-lesson"
+              data-lesson="${lesson.id}"
+              ${isCompleted ? "" : "disabled tabindex='-1' aria-hidden='true'"}
+            >Restart lesson</button>
+          </div>
         </article>
       `;
     })
@@ -106,7 +264,7 @@ export function renderLessonDetail(lesson, index, progress, isFavorite) {
 
   const item = lesson.items[index] || lesson.items[0];
   const pct = Math.round(((index + 1) / lesson.items.length) * 100);
-  const learned = progress.wordsLearned.includes(item.id);
+  const learned = progress.wordsLearned.includes(String(item.id));
 
   return `
     <article class="card lesson-detail-card">
@@ -119,9 +277,7 @@ export function renderLessonDetail(lesson, index, progress, isFavorite) {
 
       <h2>${item.assamese}</h2>
       <p><strong>${item.english}</strong></p>
-      <p class="meta">Pronunciation: ${item.pronunciation}</p>
       <p style="margin:8px 0">Example: ${item.example}</p>
-      <p class="meta">Notes: ${item.notes || "No extra notes"}</p>
 
       <div class="row" style="margin-top:28px; flex-wrap: wrap;">
         <button class="btn ghost" data-action="lesson-prev">Previous</button>
