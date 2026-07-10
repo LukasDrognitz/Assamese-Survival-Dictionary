@@ -6,7 +6,9 @@ const KEYS = {
   search: "assamese_search_history_v1",
   recentWords: "assamese_recent_words_v1",
   customWords: "assamese_custom_words_v1",
+  customWordsBackup: "assamese_custom_words_backup_v1",
   dictionaryMutations: "assamese_dictionary_mutations_v1",
+  dictionaryMutationsBackup: "assamese_dictionary_mutations_backup_v1",
   syncMeta: "assamese_sync_meta_v1"
 };
 
@@ -80,6 +82,38 @@ function safeParse(value, fallback) {
 
 function read(key, fallback) {
   return safeParse(localStorage.getItem(key), fallback);
+}
+
+function safeReadFromPrimaryOrBackup(primaryKey, backupKey, fallback) {
+  const primaryRaw = localStorage.getItem(primaryKey);
+  const backupRaw = localStorage.getItem(backupKey);
+
+  if (primaryRaw !== null) {
+    const parsedPrimary = safeParse(primaryRaw, undefined);
+    if (parsedPrimary !== undefined) {
+      if (backupRaw === null) {
+        localStorage.setItem(backupKey, JSON.stringify(parsedPrimary));
+      }
+      return parsedPrimary;
+    }
+  }
+
+  if (backupRaw !== null) {
+    const parsedBackup = safeParse(backupRaw, undefined);
+    if (parsedBackup !== undefined) {
+      localStorage.setItem(primaryKey, JSON.stringify(parsedBackup));
+      return parsedBackup;
+    }
+  }
+
+  return fallback;
+}
+
+function normalizeDictionaryMutations(mutations) {
+  return {
+    overrides: mutations?.overrides || {},
+    deleted: Array.isArray(mutations?.deleted) ? mutations.deleted : []
+  };
 }
 
 function estimateTodayXpFromActivity(items) {
@@ -403,25 +437,29 @@ export function saveRecentWords(items) {
 }
 
 export function getCustomWords() {
-  return read(KEYS.customWords, []);
+  const words = safeReadFromPrimaryOrBackup(KEYS.customWords, KEYS.customWordsBackup, []);
+  return Array.isArray(words) ? words : [];
 }
 
 export function saveCustomWords(items) {
-  write(KEYS.customWords, items);
+  const normalizedItems = Array.isArray(items) ? items : [];
+  write(KEYS.customWords, normalizedItems);
+  write(KEYS.customWordsBackup, normalizedItems);
 }
 
 export function getDictionaryMutations() {
-  return read(KEYS.dictionaryMutations, {
-    overrides: {},
-    deleted: []
-  });
+  const mutations = safeReadFromPrimaryOrBackup(
+    KEYS.dictionaryMutations,
+    KEYS.dictionaryMutationsBackup,
+    { overrides: {}, deleted: [] }
+  );
+  return normalizeDictionaryMutations(mutations);
 }
 
 export function saveDictionaryMutations(mutations) {
-  write(KEYS.dictionaryMutations, {
-    overrides: mutations?.overrides || {},
-    deleted: Array.isArray(mutations?.deleted) ? mutations.deleted : []
-  });
+  const normalized = normalizeDictionaryMutations(mutations);
+  write(KEYS.dictionaryMutations, normalized);
+  write(KEYS.dictionaryMutationsBackup, normalized);
 }
 
 export function exportDataBundle() {
@@ -449,14 +487,16 @@ export function resetAllData(options = {}) {
   Object.values(KEYS).forEach((key) => localStorage.removeItem(key));
 
   if (preserveDictionaryData) {
-    localStorage.setItem(KEYS.customWords, JSON.stringify(Array.isArray(preservedCustomWords) ? preservedCustomWords : []));
+    const normalizedCustomWords = Array.isArray(preservedCustomWords) ? preservedCustomWords : [];
+    const normalizedMutations = normalizeDictionaryMutations(preservedDictionaryMutations);
+
+    localStorage.setItem(KEYS.customWords, JSON.stringify(normalizedCustomWords));
+    localStorage.setItem(KEYS.customWordsBackup, JSON.stringify(normalizedCustomWords));
     localStorage.setItem(
       KEYS.dictionaryMutations,
-      JSON.stringify({
-        overrides: preservedDictionaryMutations?.overrides || {},
-        deleted: Array.isArray(preservedDictionaryMutations?.deleted) ? preservedDictionaryMutations.deleted : []
-      })
+      JSON.stringify(normalizedMutations)
     );
+    localStorage.setItem(KEYS.dictionaryMutationsBackup, JSON.stringify(normalizedMutations));
   }
 
   suppressRemoteSync = false;

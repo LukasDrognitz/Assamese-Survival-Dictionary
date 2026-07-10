@@ -18,7 +18,7 @@ import {
   testSyncConnection,
   syncStateFromServer,
   startAutoSync
-} from "./storage.js?v=20260710-36";
+} from "./storage.js?v=20260710-37";
 import {
   loadDictionary,
   filterDictionary,
@@ -3007,7 +3007,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=146", { updateViaCache: "none" })
+      .register("sw.js?v=147", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
