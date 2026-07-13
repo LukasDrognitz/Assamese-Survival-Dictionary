@@ -1,10 +1,10 @@
-const CACHE_NAME = "assamese-survival-dictionary-v151";
+const CACHE_NAME = "assamese-survival-dictionary-v152";
 
 const APP_SHELL = [
   "./",
   "./index.html",
   "./css/style.css?v=20260710-71",
-  "./js/app.js?v=20260713-139",
+  "./js/app.js?v=20260713-140",
   "./js/dictionary.js?v=20260710-45",
   "./js/lessons.js?v=20260710-55",
   "./js/flashcards.js?v=20260710-37",
@@ -16,6 +16,8 @@ const APP_SHELL = [
   "./manifest.webmanifest",
   "./assets/icons/icon-192.svg",
   "./assets/icons/icon-512.svg",
+  "./assets/images/Tutor.png",
+  "./assets/images/Come back soon.png",
   "./assets/vendor/chart.umd.min.js"
 ];
 

@@ -367,6 +367,7 @@ const state = {
   chatSession: {
     topicId: "",
     isStarted: false,
+    isStopped: false,
     turn: 0,
     introducedEntryIds: [],
     recentEntryIds: [],
@@ -1558,6 +1559,17 @@ function ensureFlashDeck() {
 }
 
 function renderConversationPanel() {
+  if (state.chatSession.isStopped) {
+    return `
+      <article class="card grid" style="justify-items:center; text-align:center; gap:12px;">
+        <h3>Conversation Practice</h3>
+        <img src="assets/images/Come back soon.png" alt="Tutor in a flower garden" style="width:min(260px, 68vw); height:auto;" />
+        <p style="max-width:560px;">See you soon! I'll be relaxing in my mom's garden while I wait for you. The chrysanthemums are in bloom and smell amazing!</p>
+        <button class="btn accent" data-action="chat-start">Start Again</button>
+      </article>
+    `;
+  }
+
   if (!state.chatSession.isStarted) {
     return `
       <article class="card grid" style="justify-items:center; text-align:center; gap:12px;">
@@ -1588,6 +1600,7 @@ function renderConversationPanel() {
         <input id="chat-input" class="input" placeholder="Type in English or Assamese" aria-label="Chat input" />
         <button class="btn accent" data-action="chat-send">Send</button>
         <button class="btn ghost" data-action="chat-explain-last">Explain last phrase</button>
+        <button class="btn ghost" data-action="chat-stop">Stop Conversation</button>
       </div>
       <p class="meta">The tutor automatically follows your topic. Use "Explain last phrase" for English explanation.</p>
     </article>
@@ -2542,6 +2555,7 @@ async function onClick(event) {
     }
     if (nextTab === "conversation") {
       state.chatSession.isStarted = false;
+      state.chatSession.isStopped = false;
     }
     state.practiceTab = nextTab;
     renderPractice();
@@ -2550,6 +2564,7 @@ async function onClick(event) {
 
   if (action === "chat-start") {
     state.chatSession.isStarted = true;
+    state.chatSession.isStopped = false;
     state.chatSession.topicId = "";
     state.chatSession.turn = 0;
     state.chatSession.introducedEntryIds = [];
@@ -2557,6 +2572,13 @@ async function onClick(event) {
     state.chatSession.lastExplainedEntryId = "";
     state.chatSession.lastUserText = "";
     state.chat = [{ who: "bot", text: "Nomoskar!", translation: "" }];
+    renderPractice();
+    return;
+  }
+
+  if (action === "chat-stop") {
+    state.chatSession.isStarted = false;
+    state.chatSession.isStopped = true;
     renderPractice();
     return;
   }
@@ -3125,7 +3147,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=151", { updateViaCache: "none" })
+      .register("sw.js?v=152", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
