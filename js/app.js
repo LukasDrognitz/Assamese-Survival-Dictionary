@@ -1957,14 +1957,15 @@ function renderPractice() {
       const chatPanel = document.getElementById("chat-panel");
       if (!chatPanel) return;
       chatPanel.scrollTop = chatPanel.scrollHeight;
+      const lastBubble = chatPanel.querySelector(".chat-bubble:last-child");
+      if (lastBubble && typeof lastBubble.scrollIntoView === "function") {
+        lastBubble.scrollIntoView({ block: "end" });
+      }
     };
 
     scrollToLatest();
     requestAnimationFrame(scrollToLatest);
-    setTimeout(scrollToLatest, 0);
-    setTimeout(scrollToLatest, 50);
-    setTimeout(scrollToLatest, 120);
-    setTimeout(scrollToLatest, 250);
+    [0, 50, 120, 250, 400, 600].forEach((delay) => setTimeout(scrollToLatest, delay));
   }
 }
 
