@@ -1533,7 +1533,7 @@ function renderFlashDisplayModeControls() {
     : "";
 
   const modeCard = (value, title, detail, flagsHtml) => `
-    <button class="btn flash-mode-btn ${mode === value ? "accent" : "ghost"}" data-action="flash-set-display-mode" data-display-mode="${value}">
+    <button class="btn quiz-mode-btn ${mode === value ? "accent" : "ghost"}" data-action="flash-set-display-mode" data-display-mode="${value}">
       <span class="quiz-mode-title">${title}</span>
       <span class="quiz-mode-detail">${detail}</span>
       <span class="quiz-mode-flags" aria-hidden="true">${flagsHtml}</span>
@@ -1543,7 +1543,7 @@ function renderFlashDisplayModeControls() {
   const nextDisabled = mode ? "" : "disabled";
 
   return `
-    <article class="card flash-mode-card grid" style="gap:10px;">
+    <article class="card quiz-mode-card grid" style="gap:10px;">
       <h3>Flashcards Mode</h3>
       <p class="meta">Choose which side is shown first before selecting Words or Phrases.</p>
       <div class="grid quiz-mode-grid" style="gap:8px;">
@@ -3253,7 +3253,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=153", { updateViaCache: "none" })
+      .register("sw.js?v=154", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
