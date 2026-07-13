@@ -1951,6 +1951,14 @@ function renderPractice() {
       ${state.practiceTab === "conversation" ? renderConversationPanel() : ""}
     </section>
   `;
+
+  if (state.practiceTab === "conversation") {
+    requestAnimationFrame(() => {
+      const chatPanel = document.getElementById("chat-panel");
+      if (!chatPanel) return;
+      chatPanel.scrollTop = chatPanel.scrollHeight;
+    });
+  }
 }
 
 function renderAchievements() {
