@@ -1962,6 +1962,9 @@ function renderPractice() {
     scrollToLatest();
     requestAnimationFrame(scrollToLatest);
     setTimeout(scrollToLatest, 0);
+    setTimeout(scrollToLatest, 50);
+    setTimeout(scrollToLatest, 120);
+    setTimeout(scrollToLatest, 250);
   }
 }
 
