@@ -516,14 +516,16 @@ function createAppStartScreenModal() {
   container.setAttribute("aria-modal", "true");
   container.setAttribute("aria-label", "Welcome back");
   container.innerHTML = `
-    <article class="app-start-screen-shell glass">
+    <article class="app-start-screen-shell">
       <img class="app-start-screen-image" src="assets/images/App Start Screen.png" alt="Assamese Survival Dictionary welcome screen" loading="eager" decoding="async" />
-      <div class="app-start-screen-copy">
-        <p class="eyebrow">Welcome Back</p>
-        <h2>Hello, ${safeName}!</h2>
-      </div>
-      <div class="app-start-screen-action-row">
-        <button class="btn accent app-start-screen-btn" data-action="app-start-continue">It's great to be back!</button>
+      <div class="app-start-screen-overlay">
+        <div class="app-start-screen-copy">
+          <p class="eyebrow">Welcome Back</p>
+          <h2>Hello, ${safeName}!</h2>
+        </div>
+        <div class="app-start-screen-action-row">
+          <button class="btn app-start-screen-btn" data-action="app-start-continue">It's great to be back!</button>
+        </div>
       </div>
     </article>
   `;
@@ -3331,7 +3333,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=155", { updateViaCache: "none" })
+      .register("sw.js?v=156", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
