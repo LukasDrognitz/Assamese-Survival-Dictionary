@@ -941,15 +941,20 @@ body.lesson-immersive .topbar {
 }
 
 .flash-summary .teacher-avatar {
-  width: min(190px, 46vw);
+  width: min(220px, 56vw);
   height: auto;
+  margin-inline: auto;
+  display: flex;
+  justify-content: center;
 }
 
 .flash-summary .teacher-photo {
   width: auto;
   max-width: 100%;
-  height: min(190px, 46vw);
+  height: min(220px, 56vw);
   object-fit: contain;
+  display: block;
+  margin-inline: auto;
 }
 
 .flash-summary .meta {
