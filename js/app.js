@@ -255,8 +255,6 @@ const ACHIEVEMENT_CANDIDATES = [
   }
 ];
 
-const CHAT_LEVELS = ["beginner", "intermediate", "advanced"];
-
 const CONVERSATION_TOPICS = {
   greetings: {
     label: "Greetings",
@@ -368,7 +366,6 @@ const state = {
   ],
   chatSession: {
     topicId: "",
-    level: "beginner",
     turn: 0,
     introducedEntryIds: [],
     recentEntryIds: [],
@@ -1560,25 +1557,6 @@ function ensureFlashDeck() {
 }
 
 function renderConversationPanel() {
-  if (!CHAT_LEVELS.includes(state.chatSession.level)) {
-    state.chatSession.level = inferConversationLevelFromProgress();
-  }
-
-  const topicButtons = Object.entries(CONVERSATION_TOPICS)
-    .map(([id, topic]) => {
-      const active = state.chatSession.topicId === id;
-      return `<button class="chat-topic-chip ${active ? "active" : ""}" data-action="chat-topic" data-topic="${id}" aria-pressed="${active}">${topic.label}</button>`;
-    })
-    .join("");
-
-  const levelButtons = CHAT_LEVELS
-    .map((level) => {
-      const active = state.chatSession.level === level;
-      const label = level.slice(0, 1).toUpperCase() + level.slice(1);
-      return `<button class="chat-topic-chip ${active ? "active" : ""}" data-action="chat-level" data-level="${level}" aria-pressed="${active}">${label}</button>`;
-    })
-    .join("");
-
   const bubbles = state.chat
     .map(
       (msg) => `
@@ -1593,15 +1571,13 @@ function renderConversationPanel() {
   return `
     <article class="card grid">
       <h3>Conversation Practice</h3>
-      <div class="chat-topic-row">${topicButtons}</div>
-      <div class="chat-topic-row">${levelButtons}</div>
       <div class="chat-panel" id="chat-panel">${bubbles}</div>
       <div class="row">
-        <input id="chat-input" class="input" placeholder="Type in English or Assamese. Example: I don't understand" aria-label="Chat input" />
+        <input id="chat-input" class="input" placeholder="Type in English or Assamese" aria-label="Chat input" />
         <button class="btn accent" data-action="chat-send">Send</button>
         <button class="btn ghost" data-action="chat-explain-last">Explain last phrase</button>
       </div>
-      <p class="meta">Tutor style: short Assamese replies, gentle corrections, and follow-up questions.</p>
+      <p class="meta">The tutor automatically follows your topic. Use "Explain last phrase" for English explanation.</p>
     </article>
   `;
 }
@@ -1913,13 +1889,6 @@ function toggleFavoriteWord(id) {
   else list.push(id);
 }
 
-function inferConversationLevelFromProgress() {
-  const learned = state.progress.wordsLearned.length;
-  if (learned >= 80) return "advanced";
-  if (learned >= 25) return "intermediate";
-  return "beginner";
-}
-
 function normalizeChatText(text) {
   return String(text || "").trim().toLowerCase();
 }
@@ -1991,12 +1960,6 @@ function pickRotatingEntry(pool, offset = 0, avoidIds = []) {
   }
 
   return pool[base];
-}
-
-function levelEntryCount(level) {
-  if (level === "advanced") return 2;
-  if (level === "intermediate") return 2;
-  return 1;
 }
 
 function formatEntryHelp(entry) {
@@ -2071,15 +2034,6 @@ function chatbotReply(input, options = {}) {
     "explain"
   ].some((marker) => text.includes(marker));
 
-  if (!state.chatSession.level || !CHAT_LEVELS.includes(state.chatSession.level)) {
-    state.chatSession.level = inferConversationLevelFromProgress();
-  }
-
-  const requestedLevel = CHAT_LEVELS.find((level) => text === level || text.includes(`level ${level}`));
-  if (requestedLevel) {
-    state.chatSession.level = requestedLevel;
-  }
-
   const topicId = options.topicId || detectConversationTopic(input);
   state.chatSession.topicId = topicId;
 
@@ -2095,7 +2049,7 @@ function chatbotReply(input, options = {}) {
     state.chatSession.lastExplainedEntryId = String(explainEntry?.id || "");
     return {
       answer: [
-        explainEntry?.assamese || "Nomoskar",
+        "",
         formatEntryHelp(explainEntry)
       ],
       usedEntryIds: explainEntry?.id ? [String(explainEntry.id)] : []
@@ -2889,40 +2843,9 @@ async function onClick(event) {
     return;
   }
 
-  if (action === "chat-level") {
-    const nextLevel = String(actionSource.dataset.level || "").toLowerCase();
-    if (!CHAT_LEVELS.includes(nextLevel)) return;
-
-    state.chatSession.level = nextLevel;
-    const kickoff = chatbotReply("", { topicId: state.chatSession.topicId || "greetings" });
-    state.chat.push({
-      who: "bot",
-      text: kickoff.answer[0],
-      translation: ""
-    });
-    renderPractice();
-    return;
-  }
-
   if (action === "chat-explain-last") {
     const explain = chatbotReply("I don't understand", { explainOnly: true });
-    state.chat.push({ who: "bot", text: explain.answer[0], translation: explain.answer[1] });
-    renderPractice();
-    return;
-  }
-
-  if (action === "chat-topic") {
-    const topicId = actionSource.dataset.topic || "";
-    const topic = CONVERSATION_TOPICS[topicId];
-    if (!topic) return;
-
-    state.chatSession.topicId = topicId;
-    state.chatSession.turn = 0;
-    state.chatSession.introducedEntryIds = [];
-    state.chatSession.recentEntryIds = [];
-    state.chatSession.lastExplainedEntryId = "";
-    const opening = chatbotReply("", { topicId });
-    state.chat = [{ who: "bot", text: opening.answer[0], translation: "" }];
+    state.chat.push({ who: "bot", text: explain.answer[1], translation: "" });
     renderPractice();
     return;
   }
@@ -3174,7 +3097,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=149", { updateViaCache: "none" })
+      .register("sw.js?v=150", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
