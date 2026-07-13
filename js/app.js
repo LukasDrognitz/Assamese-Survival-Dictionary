@@ -362,8 +362,8 @@ const state = {
   chat: [
     {
       who: "bot",
-      text: "Nomoskar",
-      translation: "Hello! I am your Assamese tutor. Pick a topic and chat with me."
+      text: "Nomoskar!",
+      translation: ""
     }
   ],
   chatSession: {
@@ -2028,36 +2028,32 @@ function findDictionaryMatch(inputText) {
   }) || null;
 }
 
-function conversationReplyFromEntry(entry, followUpEntry, options = {}) {
-  const level = state.chatSession.level;
+function isGreetingInput(inputText) {
+  const text = normalizeChatText(inputText);
+  return ["hello", "hi", "hey", "nomoskar", "namaskar"].some((token) => text.includes(token));
+}
+
+function isNameQuestionEntry(entry) {
+  const as = normalizeChatText(entry?.assamese);
+  const en = normalizeChatText(entry?.english);
+  if (!isQuestionEntry(entry)) return false;
+  return as.includes("naam") || en.includes("name");
+}
+
+function ensureSentencePunctuation(text, fallback = "Nomoskar!") {
+  const value = String(text || "").trim();
+  if (!value) return fallback;
+  return /[.!?]$/.test(value) ? value : `${value}?`;
+}
+
+function conversationReplyFromEntry(entry, options = {}) {
   const isCorrection = Boolean(options.isCorrection);
-  const lines = [];
-  if (entry?.assamese) lines.push(entry.assamese);
-  if (followUpEntry?.assamese && followUpEntry.id !== entry?.id) lines.push(followUpEntry.assamese);
-
-  const text = lines.join(" ") || "Nomoskar";
-
-  const translationParts = [];
-  if (isCorrection) {
-    translationParts.push("Nice try. Small correction below.");
-  }
-
-  if (entry) {
-    translationParts.push(`Meaning: ${entry.english || "-"}`);
-    if (level !== "advanced") {
-      translationParts.push(`Transliteration: ${entry.pronunciation || "-"}`);
-    }
-  }
-
-  if (followUpEntry?.english) {
-    translationParts.push(`Follow-up: ${followUpEntry.english}`);
-  } else {
-    translationParts.push("Follow-up: Can you reply in Assamese using one phrase above?");
-  }
+  const text = ensureSentencePunctuation(entry?.assamese, "Nomoskar!");
+  const translation = isCorrection ? "Nice try. Small correction above." : "";
 
   return {
-    answer: [text, translationParts.join(" | ")],
-    usedEntryIds: [entry?.id, followUpEntry?.id].filter(Boolean).map((id) => String(id))
+    answer: [text, translation],
+    usedEntryIds: [entry?.id].filter(Boolean).map((id) => String(id))
   };
 }
 
@@ -2106,25 +2102,43 @@ function chatbotReply(input, options = {}) {
     };
   }
 
+  if (!text) {
+    const greetingEntry = state.dictionary.find((entry) => normalizeChatText(entry.assamese) === "nomoskar") ||
+      state.dictionary.find((entry) => normalizeChatText(entry.english) === "hello") ||
+      null;
+    return {
+      answer: [ensureSentencePunctuation(greetingEntry?.assamese || "Nomoskar!", "Nomoskar!"), ""],
+      usedEntryIds: greetingEntry?.id ? [String(greetingEntry.id)] : []
+    };
+  }
+
+  if (isGreetingInput(text)) {
+    const nameQuestion = state.dictionary.find((entry) => isNameQuestionEntry(entry)) || null;
+    if (nameQuestion) {
+      const result = conversationReplyFromEntry(nameQuestion);
+      state.chatSession.lastExplainedEntryId = String(nameQuestion.id || "");
+      state.chatSession.lastUserText = input;
+      state.chatSession.turn += 1;
+      state.chatSession.recentEntryIds = [...state.chatSession.recentEntryIds, ...result.usedEntryIds].slice(-10);
+      state.chatSession.introducedEntryIds = [...new Set([...state.chatSession.introducedEntryIds, ...result.usedEntryIds])].slice(-80);
+      return result;
+    }
+  }
+
   const correctionMatch = targetMatch && normalizeChatText(targetMatch.assamese) !== text ? targetMatch : null;
 
-  const maxNew = levelEntryCount(state.chatSession.level);
   const preferredPool = pool.filter((entry) => !introduced.has(String(entry.id)));
   const workingPool = preferredPool.length ? preferredPool : pool;
 
-  const mainEntry = correctionMatch || pickRotatingEntry(workingPool, 0, Array.from(recent));
-  const followUpPool = pool.filter((entry) => isQuestionEntry(entry));
-  const followUpEntry = pickRotatingEntry(
-    followUpPool.length ? followUpPool : pool,
-    1,
-    [mainEntry?.id]
-  );
+  const followUpPool = (pool.filter((entry) => isQuestionEntry(entry) && !recent.has(String(entry.id)))).length
+    ? pool.filter((entry) => isQuestionEntry(entry) && !recent.has(String(entry.id)))
+    : pool.filter((entry) => isQuestionEntry(entry));
 
-  const result = conversationReplyFromEntry(
-    mainEntry,
-    maxNew > 1 ? followUpEntry : null,
-    { isCorrection: Boolean(correctionMatch) }
-  );
+  const mainEntry = correctionMatch ||
+    pickRotatingEntry(followUpPool.length ? followUpPool : workingPool, 0, Array.from(recent)) ||
+    pickRotatingEntry(workingPool, 0, Array.from(recent));
+
+  const result = conversationReplyFromEntry(mainEntry, { isCorrection: Boolean(correctionMatch) });
 
   state.chatSession.lastExplainedEntryId = String(mainEntry?.id || "");
   state.chatSession.lastUserText = input;
@@ -2884,7 +2898,7 @@ async function onClick(event) {
     state.chat.push({
       who: "bot",
       text: kickoff.answer[0],
-      translation: `Level set to ${nextLevel}. ${kickoff.answer[1]}`
+      translation: ""
     });
     renderPractice();
     return;
@@ -2908,7 +2922,7 @@ async function onClick(event) {
     state.chatSession.recentEntryIds = [];
     state.chatSession.lastExplainedEntryId = "";
     const opening = chatbotReply("", { topicId });
-    state.chat = [{ who: "bot", text: opening.answer[0], translation: opening.answer[1] }];
+    state.chat = [{ who: "bot", text: opening.answer[0], translation: "" }];
     renderPractice();
     return;
   }
@@ -3160,7 +3174,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=148", { updateViaCache: "none" })
+      .register("sw.js?v=149", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
