@@ -2044,7 +2044,9 @@ function renderProfile() {
           <button class="btn accent" data-action="sync-save-config">Save Sync Settings</button>
           <button class="btn ghost" data-action="sync-test-config">Test Sync</button>
           <button class="btn ghost" data-action="sync-clear-config">Clear</button>
+          <button class="btn secondary" data-action="force-refresh-app">Force Refresh App</button>
         </div>
+        <p class="meta">Use Force Refresh when mobile still shows an older app version.</p>
       </article>
 
       <article class="card grid">
@@ -3224,6 +3226,12 @@ async function onClick(event) {
     return;
   }
 
+  if (action === "force-refresh-app") {
+    toast("Refreshing app shell...");
+    await forceRefreshAppShell();
+    return;
+  }
+
   if (action === "reset-progress") {
     const ok = window.confirm(
       "Reset all saved progress? Your custom dictionary words and dictionary edits will be kept."
@@ -3415,12 +3423,32 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=163", { updateViaCache: "none" })
+      .register("sw.js?v=164", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
       });
   }
+}
+
+async function forceRefreshAppShell() {
+  try {
+    if ("serviceWorker" in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(registrations.map((registration) => registration.unregister()));
+    }
+
+    if ("caches" in window) {
+      const cacheKeys = await caches.keys();
+      await Promise.all(cacheKeys.map((cacheKey) => caches.delete(cacheKey)));
+    }
+  } catch {
+    // Continue to reload even if cleanup partially fails.
+  }
+
+  const url = new URL(window.location.href);
+  url.searchParams.set("cb", String(Date.now()));
+  window.location.replace(url.toString());
 }
 
 function refreshStateFromStorage() {
