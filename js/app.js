@@ -31,7 +31,7 @@ import {
   resetDictionaryCache
 } from "./dictionary.js?v=20260710-45";
 import { loadLessons, renderLessonsOverview, renderLessonDetail, flattenLessonWords, resetLessonsCache } from "./lessons.js?v=20260710-55";
-import { updateSpacedRepetition, shuffleCards, renderFlashcard, renderFlashSummary } from "./flashcards.js?v=20260710-37";
+import { updateSpacedRepetition, shuffleCards, renderFlashcard, renderFlashSummary } from "./flashcards.js?v=20260713-38";
 import { buildQuizQuestions, renderQuizView } from "./quiz.js?v=20260710-33";
 import {
   NAV_ITEMS,
@@ -333,7 +333,8 @@ const state = {
     cards: [],
     index: 0,
     flipped: false,
-    setupStage: "type",
+    setupStage: "display-mode",
+    displayMode: "",
     playMode: "normal",
     categoryTypeFilter: "",
     selectedCategories: [],
@@ -1507,7 +1508,9 @@ function renderFlashTypeControls() {
         ${backButtonHtml}
         <button class="btn accent" data-action="flash-next-mode" ${nextModeDisabled}>Next <span class="flash-nav-arrow" aria-hidden="true">→</span></button>
       </div>`
-    : "";
+    : `<div class="row flash-setup-actions" style="justify-content:space-between;">
+        <button class="btn ghost" data-action="flash-back-display-mode"><span class="flash-nav-arrow" aria-hidden="true">←</span> Back</button>
+      </div>`;
 
   return `
     <article class="card grid flash-setup-card ${hasSelectedType ? "flash-categories-stage" : "flash-type-stage"}" style="gap:10px;">
@@ -1520,6 +1523,52 @@ function renderFlashTypeControls() {
         ${categoriesHtml}
       </div>
       ${actionButtonsHtml}
+    </article>
+  `;
+}
+
+function renderFlashDisplayModeControls() {
+  const mode = ["english-first", "assamese-first", "mixed"].includes(state.flash.displayMode)
+    ? state.flash.displayMode
+    : "";
+
+  const modeCard = (value, title, detail, flagsHtml) => `
+    <button class="btn flash-mode-btn ${mode === value ? "accent" : "ghost"}" data-action="flash-set-display-mode" data-display-mode="${value}">
+      <span class="quiz-mode-title">${title}</span>
+      <span class="quiz-mode-detail">${detail}</span>
+      <span class="quiz-mode-flags" aria-hidden="true">${flagsHtml}</span>
+    </button>
+  `;
+
+  const nextDisabled = mode ? "" : "disabled";
+
+  return `
+    <article class="card flash-mode-card grid" style="gap:10px;">
+      <h3>Flashcards Mode</h3>
+      <p class="meta">Choose which side is shown first before selecting Words or Phrases.</p>
+      <div class="grid quiz-mode-grid" style="gap:8px;">
+        ${modeCard(
+          "english-first",
+          "English First",
+          "See English first, then flip to Assamese.",
+          `<span class="quiz-flag-pill" title="USA flag" aria-label="USA flag"><span class="quiz-flag-symbol">🇺🇸</span><span class="quiz-flag-label">English</span></span><span class="quiz-flag-arrow">→</span><span class="quiz-flag-pill assam" title="India flag" aria-label="India flag"><span class="quiz-flag-symbol">🇮🇳</span><span class="quiz-flag-label">Assamese</span></span>`
+        )}
+        ${modeCard(
+          "assamese-first",
+          "Assamese First",
+          "See Assamese first, then flip to English.",
+          `<span class="quiz-flag-pill assam" title="India flag" aria-label="India flag"><span class="quiz-flag-symbol">🇮🇳</span><span class="quiz-flag-label">Assamese</span></span><span class="quiz-flag-arrow">→</span><span class="quiz-flag-pill" title="USA flag" aria-label="USA flag"><span class="quiz-flag-symbol">🇺🇸</span><span class="quiz-flag-label">English</span></span>`
+        )}
+        ${modeCard(
+          "mixed",
+          "Mixed",
+          "Cards alternate between Assamese-first and English-first.",
+          `<span class="quiz-flag-pill"><span class="quiz-flag-symbol">🇺🇸</span><span class="quiz-flag-label">English</span></span><span class="quiz-flag-pill assam"><span class="quiz-flag-symbol">🇮🇳</span><span class="quiz-flag-label">Assamese</span></span>`
+        )}
+      </div>
+      <div class="row" style="justify-content:flex-end;">
+        <button class="btn accent" data-action="flash-next-type" ${nextDisabled}>Next</button>
+      </div>
     </article>
   `;
 }
@@ -1679,7 +1728,9 @@ function renderPractice() {
                 easyCount: state.flash.easyCount,
                 hasHardWords: state.flash.hardWordIds.length > 0
               })
-            : state.flash.setupStage === "type"
+            : state.flash.setupStage === "display-mode"
+              ? renderFlashDisplayModeControls()
+              : state.flash.setupStage === "type"
               ? renderFlashTypeControls()
               : state.flash.setupStage === "mode"
                 ? renderFlashModeControls()
@@ -1692,7 +1743,8 @@ function renderPractice() {
                       state.flash.flipped,
                       state.flash.reviewedCount,
                       state.flash.sessionTotal,
-                      state.flash.playMode
+                      state.flash.playMode,
+                      state.flash.displayMode
                     );
                   })()}`
           : ""
@@ -2561,6 +2613,15 @@ async function onClick(event) {
       state.quiz.mode = "";
       state.quiz.setupStage = "mode";
     }
+    if (nextTab === "flashcards") {
+      state.flash.setupStage = "display-mode";
+      state.flash.displayMode = "";
+      state.flash.categoryTypeFilter = "";
+      state.flash.selectedCategories = [];
+      state.flash.cards = [];
+      state.flash.mode = "session";
+      state.flash.flipped = false;
+    }
     if (nextTab === "conversation") {
       state.chatSession.isStarted = false;
       state.chatSession.isStopped = false;
@@ -2647,6 +2708,25 @@ async function onClick(event) {
     return;
   }
 
+  if (action === "flash-next-type") {
+    if (!["english-first", "assamese-first", "mixed"].includes(state.flash.displayMode)) {
+      toast("Choose a flashcards mode first");
+      return;
+    }
+    state.flash.setupStage = "type";
+    renderPractice();
+    return;
+  }
+
+  if (action === "flash-back-display-mode") {
+    state.flash.setupStage = "display-mode";
+    state.flash.categoryTypeFilter = "";
+    state.flash.selectedCategories = [];
+    state.flash.cards = [];
+    renderPractice();
+    return;
+  }
+
   if (action === "flash-back-categories") {
     state.flash.categoryDropAnimating = false;
     state.flash.setupStage = "type";
@@ -2661,6 +2741,15 @@ async function onClick(event) {
     state.flash.selectedCategories = [];
     state.flash.cards = [];
     state.flash.setupStage = "type";
+    renderPractice();
+    return;
+  }
+
+  if (action === "flash-set-display-mode") {
+    const nextMode = actionSource.dataset.displayMode;
+    if (!["english-first", "assamese-first", "mixed"].includes(nextMode)) return;
+    state.flash.displayMode = nextMode;
+    state.flash.cards = [];
     renderPractice();
     return;
   }
@@ -2688,6 +2777,13 @@ async function onClick(event) {
   }
 
   if (action === "flash-start-session") {
+    if (!["english-first", "assamese-first", "mixed"].includes(state.flash.displayMode)) {
+      toast("Choose a flashcards mode first");
+      state.flash.setupStage = "display-mode";
+      renderPractice();
+      return;
+    }
+
     const words = selectedFlashCategoryWords();
     const deck = buildFlashDeckByMode(words, state.flash.playMode);
     if (!deck.length) {
@@ -2705,7 +2801,8 @@ async function onClick(event) {
     state.flash.index = 0;
     state.flash.flipped = false;
     state.flash.mode = "session";
-    state.flash.setupStage = "type";
+    state.flash.setupStage = "display-mode";
+    state.flash.displayMode = "";
     state.flash.categoryTypeFilter = "";
     state.flash.categoryDropAnimating = false;
     state.flash.categoryDropFromType = "words";
@@ -2755,7 +2852,8 @@ async function onClick(event) {
     state.flash.index = 0;
     state.flash.flipped = false;
     state.flash.mode = "session";
-    state.flash.setupStage = "type";
+    state.flash.setupStage = "display-mode";
+    state.flash.displayMode = "";
     state.flash.categoryTypeFilter = "";
     state.flash.categoryDropAnimating = false;
     state.flash.categoryDropFromType = "words";
@@ -3155,7 +3253,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=152", { updateViaCache: "none" })
+      .register("sw.js?v=153", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.

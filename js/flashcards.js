@@ -45,7 +45,7 @@ export function shuffleCards(cards) {
   return arr;
 }
 
-export function renderFlashcard(word, flipped, index, total, playMode = "normal") {
+export function renderFlashcard(word, flipped, index, total, playMode = "normal", displayMode = "assamese-first") {
   if (!word) {
     return `<article class="card"><p>No cards available. Learn a few words first.</p></article>`;
   }
@@ -57,6 +57,21 @@ export function renderFlashcard(word, flipped, index, total, playMode = "normal"
   };
   const modeLabel = modeLabelById[playMode] || "Normal";
 
+  const englishFirst =
+    displayMode === "english-first" ||
+    (displayMode === "mixed" && index % 2 === 1);
+
+  const frontText = englishFirst ? (word.english || "-") : (word.assamese || "-");
+  const backText = englishFirst ? (word.assamese || "-") : (word.english || "-");
+  const backHint = englishFirst ? (word.pronunciation || "") : "";
+
+  const displayLabelById = {
+    "english-first": "English First",
+    "assamese-first": "Assamese First",
+    mixed: "Mixed"
+  };
+  const displayLabel = displayLabelById[displayMode] || "Assamese First";
+
   return `
     <article class="card grid">
       <div class="row">
@@ -64,15 +79,16 @@ export function renderFlashcard(word, flipped, index, total, playMode = "normal"
         <span class="pill">${index + 1}/${total}</span>
       </div>
       <p class="meta">Mode: ${modeLabel}</p>
+      <p class="meta">Display: ${displayLabel}</p>
       <div class="flip">
         <section class="flash-card ${flipped ? "flipped" : ""}" id="flash-card">
           <div class="flash-face front">
-            <h2>${word.assamese}</h2>
+            <h2>${frontText}</h2>
             <p class="meta">Tap to flip</p>
           </div>
           <div class="flash-face back">
-            <h2>${word.english}</h2>
-            <p>${word.pronunciation || ""}</p>
+            <h2>${backText}</h2>
+            <p>${backHint}</p>
           </div>
         </section>
       </div>
