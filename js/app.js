@@ -1563,7 +1563,7 @@ function renderConversationPanel() {
     return `
       <article class="card grid" style="justify-items:center; text-align:center; gap:12px;">
         <h3>Conversation Practice</h3>
-        <img src="assets/images/Come back soon.png" alt="Tutor in a flower garden" style="width:min(260px, 68vw); height:auto;" />
+        <img src="assets/images/Come back soon.png" alt="Tutor in a flower garden" style="display:block; margin:0 auto; width:min(170px, 45vw); height:auto;" />
         <p style="max-width:560px;">See you soon! I'll be relaxing in my mom's garden while I wait for you. The chrysanthemums are in bloom and smell amazing!</p>
         <button class="btn accent" data-action="chat-start">Start Again</button>
       </article>
@@ -1596,9 +1596,11 @@ function renderConversationPanel() {
     <article class="card grid">
       <h3>Conversation Practice</h3>
       <div class="chat-panel" id="chat-panel">${bubbles}</div>
-      <div class="row">
-        <input id="chat-input" class="input" placeholder="Type in English or Assamese" aria-label="Chat input" />
+      <div class="row" style="align-items:stretch; flex-wrap:nowrap; gap:8px;">
+        <input id="chat-input" class="input" style="flex:1; min-width:0;" placeholder="Type in English or Assamese" aria-label="Chat input" />
         <button class="btn accent" data-action="chat-send">Send</button>
+      </div>
+      <div class="row" style="justify-content:flex-end; flex-wrap:wrap; gap:8px;">
         <button class="btn ghost" data-action="chat-explain-last">Explain last phrase</button>
         <button class="btn ghost" data-action="chat-stop">Stop Conversation</button>
       </div>
@@ -2068,9 +2070,15 @@ function chatbotReply(input, options = {}) {
 
   const targetMatch = findDictionaryMatch(input);
   const lastExplainedEntry = state.dictionary.find((entry) => String(entry.id) === String(state.chatSession.lastExplainedEntryId));
+  const lastBotAssameseText = [...state.chat]
+    .reverse()
+    .find((message) => message.who === "bot" && String(message.text || "").trim())?.text || "";
+  const lastBotEntry = findDictionaryMatch(lastBotAssameseText);
 
   if (shouldExplain) {
-    const explainEntry = targetMatch || lastExplainedEntry || pickRotatingEntry(pool, 0);
+    const explainEntry = options.explainOnly
+      ? lastExplainedEntry || lastBotEntry || pickRotatingEntry(pool, 0)
+      : targetMatch || lastExplainedEntry || lastBotEntry || pickRotatingEntry(pool, 0);
     state.chatSession.lastExplainedEntryId = String(explainEntry?.id || "");
     return {
       answer: [
