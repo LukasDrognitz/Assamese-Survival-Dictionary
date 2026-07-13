@@ -1,10 +1,10 @@
-const CACHE_NAME = "assamese-survival-dictionary-v156";
+const CACHE_NAME = "assamese-survival-dictionary-v157";
 
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./css/style.css?v=20260713-73",
-  "./js/app.js?v=20260713-144",
+  "./css/style.css?v=20260713-74",
+  "./js/app.js?v=20260713-145",
   "./js/dictionary.js?v=20260710-45",
   "./js/lessons.js?v=20260710-55",
   "./js/flashcards.js?v=20260713-38",
