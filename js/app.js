@@ -18,7 +18,7 @@ import {
   testSyncConnection,
   syncStateFromServer,
   startAutoSync
-} from "./storage.js?v=20260710-37";
+} from "./storage.js?v=20260713-38";
 import {
   loadDictionary,
   filterDictionary,
@@ -299,6 +299,8 @@ const CONVERSATION_TOPICS = {
 };
 
 const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
+const LOVE_MILESTONE_STEP_XP = 2110;
+const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
 
 const state = {
   view: "home",
@@ -399,7 +401,9 @@ const state = {
   achievementQueue: [],
   achievementCelebrationActive: false,
   levelUpQueue: [],
-  levelUpCelebrationActive: false
+  levelUpCelebrationActive: false,
+  loveMilestoneQueue: [],
+  loveMilestoneCelebrationActive: false
 };
 
 const dom = {
@@ -741,6 +745,72 @@ function createLevelUpCelebrationModal() {
   document.body.appendChild(container);
 }
 
+function createLoveMilestoneCelebrationModal() {
+  if (document.getElementById("love-milestone-celebration")) return;
+
+  const container = document.createElement("section");
+  container.id = "love-milestone-celebration";
+  container.className = "love-milestone-celebration hidden";
+  container.setAttribute("role", "dialog");
+  container.setAttribute("aria-modal", "true");
+  container.setAttribute("aria-live", "polite");
+  container.setAttribute("aria-label", "Special milestone reached");
+  container.innerHTML = `
+    <article class="love-milestone-card glass">
+      <p class="eyebrow">Special Milestone</p>
+      <h2 id="love-milestone-title">You reached 2110 XP!</h2>
+      <img class="love-milestone-image" src="assets/images/Kiss.png" alt="Celebration image" loading="lazy" />
+      <p class="meta love-milestone-message" id="love-milestone-message">${LOVE_MILESTONE_MESSAGE}</p>
+      <button class="btn accent" data-action="love-milestone-continue">Continue</button>
+    </article>
+  `;
+  document.body.appendChild(container);
+}
+
+function queueLoveMilestones(previousXp, nextXp) {
+  if (!Number.isFinite(previousXp) || !Number.isFinite(nextXp) || nextXp <= previousXp) return;
+
+  const seenXp = Math.max(0, Number(state.progress.loveMilestoneXpSeen) || 0);
+  const startMultiple = Math.floor(previousXp / LOVE_MILESTONE_STEP_XP) + 1;
+  const endMultiple = Math.floor(nextXp / LOVE_MILESTONE_STEP_XP);
+  if (endMultiple < startMultiple) return;
+
+  for (let multiple = startMultiple; multiple <= endMultiple; multiple += 1) {
+    const milestoneXp = multiple * LOVE_MILESTONE_STEP_XP;
+    if (milestoneXp <= seenXp) continue;
+    state.loveMilestoneQueue.push({ xp: milestoneXp });
+  }
+}
+
+function showNextLoveMilestoneCelebration() {
+  if (state.loveMilestoneCelebrationActive) return;
+  if (state.levelUpCelebrationActive || state.achievementCelebrationActive) return;
+
+  const payload = state.loveMilestoneQueue.shift();
+  if (!payload) return;
+
+  const dialog = document.getElementById("love-milestone-celebration");
+  const title = document.getElementById("love-milestone-title");
+  const message = document.getElementById("love-milestone-message");
+  if (!dialog || !title || !message) return;
+
+  title.textContent = `You reached ${payload.xp} XP!`;
+  message.textContent = LOVE_MILESTONE_MESSAGE;
+  dialog.classList.remove("hidden");
+  document.body.classList.add("love-milestone-open");
+  state.loveMilestoneCelebrationActive = true;
+  state.progress.loveMilestoneXpSeen = Math.max(Number(state.progress.loveMilestoneXpSeen) || 0, payload.xp);
+}
+
+function closeLoveMilestoneCelebration() {
+  const dialog = document.getElementById("love-milestone-celebration");
+  if (!dialog) return;
+
+  dialog.classList.add("hidden");
+  document.body.classList.remove("love-milestone-open");
+  state.loveMilestoneCelebrationActive = false;
+}
+
 function showNextLevelUpCelebration() {
   if (state.levelUpCelebrationActive) return;
   const payload = state.levelUpQueue.shift();
@@ -780,6 +850,7 @@ function closeLevelUpCelebration() {
   dialog.classList.remove("animate");
   document.body.classList.remove("level-up-open");
   state.levelUpCelebrationActive = false;
+  showNextLoveMilestoneCelebration();
 }
 
 function getProfileNavButton() {
@@ -836,6 +907,7 @@ function closeAchievementCelebration() {
   dialog.classList.remove("flying");
   document.body.classList.remove("achievement-open");
   state.achievementCelebrationActive = false;
+  showNextLoveMilestoneCelebration();
 }
 
 function animateAchievementToProfile() {
@@ -998,9 +1070,11 @@ function finishOnboarding() {
 }
 
 function xpGain(amount, reason) {
+  const previousXp = Math.max(0, Number(state.progress.xp) || 0);
   const previousLevel = levelMetaFromXp(state.progress.xp).level;
   state.progress.xp += amount;
   state.progress.dailyGoal.gainedXp += amount;
+  const currentXp = Math.max(0, Number(state.progress.xp) || 0);
   const currentLevel = levelMetaFromXp(state.progress.xp).level;
 
   if (currentLevel > previousLevel) {
@@ -1016,6 +1090,9 @@ function xpGain(amount, reason) {
     animateHeaderLevelBadge(previousLevel, currentLevel);
     showNextLevelUpCelebration();
   }
+
+  queueLoveMilestones(previousXp, currentXp);
+  showNextLoveMilestoneCelebration();
 
   addActivity(`+${amount} XP: ${reason}`);
   if (state.settings.animations) toast(`+${amount} XP`);
@@ -2477,6 +2554,13 @@ async function onClick(event) {
     return;
   }
 
+  if (action === "love-milestone-continue") {
+    closeLoveMilestoneCelebration();
+    persist();
+    showNextLoveMilestoneCelebration();
+    return;
+  }
+
   if (action === "profile-avatar") {
     const avatar = actionSource.dataset.avatar || state.settings.avatar;
     const currentLevel = levelMetaFromXp(state.progress.xp).level;
@@ -3331,7 +3415,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=160", { updateViaCache: "none" })
+      .register("sw.js?v=161", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
@@ -3365,6 +3449,7 @@ async function init() {
   createDictionaryDeleteModal();
   createAchievementCelebrationModal();
   createLevelUpCelebrationModal();
+  createLoveMilestoneCelebrationModal();
   syncAchievements(false);
   applyTheme();
   updateHeaderControls();

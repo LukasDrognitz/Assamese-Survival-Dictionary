@@ -39,7 +39,8 @@ const DEFAULT_PROGRESS = {
   },
   spacedRepetition: {},
   achievements: [],
-  activity: []
+  activity: [],
+  loveMilestoneXpSeen: 0
 };
 
 const DEFAULT_SETTINGS = {
@@ -341,6 +342,7 @@ export function startAutoSync(onRemoteUpdate) {
 export function getProgress() {
   const progress = { ...DEFAULT_PROGRESS, ...read(KEYS.progress, DEFAULT_PROGRESS) };
   progress.dailyGoal = { ...DEFAULT_PROGRESS.dailyGoal, ...(progress.dailyGoal || {}) };
+  progress.loveMilestoneXpSeen = Math.max(0, Number(progress.loveMilestoneXpSeen) || 0);
 
   if (typeof progress.dailyGoal.targetXp !== "number" || Number.isNaN(progress.dailyGoal.targetXp)) {
     const legacyTargetWords = Number(progress.dailyGoal.targetWords || 0);

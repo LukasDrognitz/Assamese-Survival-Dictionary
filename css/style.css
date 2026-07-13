@@ -1550,6 +1550,11 @@ body.level-up-open .sidebar {
   pointer-events: none;
 }
 
+body.love-milestone-open .mobile-nav,
+body.love-milestone-open .sidebar {
+  pointer-events: none;
+}
+
 .onboarding {
   position: fixed;
   inset: 0;
@@ -1757,6 +1762,38 @@ body.level-up-open .sidebar {
   text-align: center;
   gap: 12px;
   box-shadow: 0 22px 44px rgba(0, 0, 0, 0.22);
+}
+
+.love-milestone-celebration {
+  position: fixed;
+  inset: 0;
+  z-index: 44;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(10, 14, 24, 0.45);
+}
+
+.love-milestone-card {
+  width: min(560px, 100%);
+  border-radius: 22px;
+  padding: 22px;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 12px;
+  box-shadow: 0 22px 44px rgba(0, 0, 0, 0.22);
+}
+
+.love-milestone-image {
+  width: min(240px, 56vw);
+  max-height: min(360px, 52vh);
+  height: auto;
+  object-fit: contain;
+}
+
+.love-milestone-message {
+  max-width: 36ch;
 }
 
 .level-up-meter {
