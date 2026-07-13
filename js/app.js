@@ -255,89 +255,48 @@ const ACHIEVEMENT_CANDIDATES = [
   }
 ];
 
+const CHAT_LEVELS = ["beginner", "intermediate", "advanced"];
+
 const CONVERSATION_TOPICS = {
-  introductions: {
-    label: "Introductions",
-    opening: {
-      as: "Nomoskar! Let us practice introductions. How are you doing?",
-      en: "Hello! Let us practice introductions. How are you doing?"
-    },
-    prompts: [
-      {
-        as: "Bhal! Where are you coming from?",
-        en: "Great! Where are you coming from?"
-      },
-      {
-        as: "Nice to meet you. What is your name?",
-        en: "Nice to meet you. What is your name?"
-      },
-      {
-        as: "Excellent. What do you do?",
-        en: "Excellent. What do you do?"
-      }
-    ],
-    expected: [
-      ["fine", "good", "great", "ok", "okay", "bhal"],
-      ["from", "i am from", "come from"],
-      ["name", "i am", "my name", "call me"],
-      ["work", "job", "student", "engineer", "teacher", "business"]
-    ],
-    closing: {
-      as: "Great introduction practice. Ask me a question or pick another topic.",
-      en: "Great introduction practice. Ask me a question or pick another topic."
-    }
+  greetings: {
+    label: "Greetings",
+    categoryHints: ["greetings", "introduction", "introductions", "questions", "conversations"],
+    wordHints: ["hello", "hi", "name", "how are", "good morning", "good evening", "nomoskar"]
   },
-  daily: {
-    label: "Daily Life",
-    opening: {
-      as: "Let us talk about daily life. How is your day going?",
-      en: "Let us talk about daily life. How is your day going?"
-    },
-    prompts: [
-      {
-        as: "Good. What did you eat today?",
-        en: "Good. What did you eat today?"
-      },
-      {
-        as: "Nice. What are your plans for tomorrow?",
-        en: "Nice. What are your plans for tomorrow?"
-      }
-    ],
-    expected: [
-      ["good", "fine", "busy", "tired", "great", "bhal"],
-      ["ate", "eat", "rice", "tea", "food", "lunch", "dinner", "breakfast"],
-      ["tomorrow", "plan", "will", "going to"]
-    ],
-    closing: {
-      as: "Great daily-life practice. We can continue or switch topic.",
-      en: "Great daily-life practice. We can continue or switch topic."
-    }
+  family: {
+    label: "Family",
+    categoryHints: ["family", "introduction", "introductions", "conversations"],
+    wordHints: ["family", "mother", "father", "brother", "sister", "home"]
+  },
+  food: {
+    label: "Food",
+    categoryHints: ["food & drinks", "food", "conversations"],
+    wordHints: ["food", "eat", "rice", "tea", "water", "drink", "hungry"]
   },
   travel: {
     label: "Travel",
-    opening: {
-      as: "Let us practice travel conversation. Where do you want to go?",
-      en: "Let us practice travel conversation. Where do you want to go?"
-    },
-    prompts: [
-      {
-        as: "Nice destination. How will you travel there?",
-        en: "Nice destination. How will you travel there?"
-      },
-      {
-        as: "Great. Who will travel with you?",
-        en: "Great. Who will travel with you?"
-      }
-    ],
-    expected: [
-      ["go", "visit", "trip", "travel", "to", "want"],
-      ["train", "bus", "car", "flight", "plane", "walk"],
-      ["with", "friend", "family", "alone", "colleague"]
-    ],
-    closing: {
-      as: "Good travel practice. Ask one more question or choose another topic.",
-      en: "Good travel practice. Ask one more question or choose another topic."
-    }
+    categoryHints: ["questions", "conversations", "introduction", "introductions", "time"],
+    wordHints: ["where", "go", "come", "from", "bus", "train", "road", "travel"]
+  },
+  work: {
+    label: "Work",
+    categoryHints: ["work", "work & study", "conversations", "time"],
+    wordHints: ["work", "office", "job", "study", "student", "teacher", "business"]
+  },
+  hobbies: {
+    label: "Hobbies",
+    categoryHints: ["actions", "conversations", "time"],
+    wordHints: ["play", "read", "sing", "dance", "music", "like", "love"]
+  },
+  shopping: {
+    label: "Shopping",
+    categoryHints: ["numbers", "questions", "conversations", "food & drinks"],
+    wordHints: ["price", "how much", "buy", "sell", "market", "shop", "money"]
+  },
+  culture: {
+    label: "Culture",
+    categoryHints: ["conversations", "greetings", "family", "love"],
+    wordHints: ["festival", "bihu", "assam", "temple", "traditional", "culture"]
   }
 };
 
@@ -403,13 +362,18 @@ const state = {
   chat: [
     {
       who: "bot",
-      text: "Nomoskar! Pick a topic below and let us have a guided conversation.",
-      translation: "Hello! Pick a topic below and let us have a guided conversation."
+      text: "Nomoskar",
+      translation: "Hello! I am your Assamese tutor. Pick a topic and chat with me."
     }
   ],
   chatSession: {
     topicId: "",
-    step: 0
+    level: "beginner",
+    turn: 0,
+    introducedEntryIds: [],
+    recentEntryIds: [],
+    lastExplainedEntryId: "",
+    lastUserText: ""
   },
   progress: getProgress(),
   settings: getSettings(),
@@ -1596,10 +1560,22 @@ function ensureFlashDeck() {
 }
 
 function renderConversationPanel() {
+  if (!CHAT_LEVELS.includes(state.chatSession.level)) {
+    state.chatSession.level = inferConversationLevelFromProgress();
+  }
+
   const topicButtons = Object.entries(CONVERSATION_TOPICS)
     .map(([id, topic]) => {
       const active = state.chatSession.topicId === id;
       return `<button class="chat-topic-chip ${active ? "active" : ""}" data-action="chat-topic" data-topic="${id}" aria-pressed="${active}">${topic.label}</button>`;
+    })
+    .join("");
+
+  const levelButtons = CHAT_LEVELS
+    .map((level) => {
+      const active = state.chatSession.level === level;
+      const label = level.slice(0, 1).toUpperCase() + level.slice(1);
+      return `<button class="chat-topic-chip ${active ? "active" : ""}" data-action="chat-level" data-level="${level}" aria-pressed="${active}">${label}</button>`;
     })
     .join("");
 
@@ -1618,11 +1594,14 @@ function renderConversationPanel() {
     <article class="card grid">
       <h3>Conversation Practice</h3>
       <div class="chat-topic-row">${topicButtons}</div>
+      <div class="chat-topic-row">${levelButtons}</div>
       <div class="chat-panel" id="chat-panel">${bubbles}</div>
       <div class="row">
-        <input id="chat-input" class="input" placeholder="Type: Hello / How are you?" aria-label="Chat input" />
+        <input id="chat-input" class="input" placeholder="Type in English or Assamese. Example: I don't understand" aria-label="Chat input" />
         <button class="btn accent" data-action="chat-send">Send</button>
+        <button class="btn ghost" data-action="chat-explain-last">Explain last phrase</button>
       </div>
+      <p class="meta">Tutor style: short Assamese replies, gentle corrections, and follow-up questions.</p>
     </article>
   `;
 }
@@ -1934,80 +1913,226 @@ function toggleFavoriteWord(id) {
   else list.push(id);
 }
 
-function chatbotReply(input) {
-  const text = input.trim().toLowerCase();
+function inferConversationLevelFromProgress() {
+  const learned = state.progress.wordsLearned.length;
+  if (learned >= 80) return "advanced";
+  if (learned >= 25) return "intermediate";
+  return "beginner";
+}
 
-  const matchesExpectedStep = (topic, step, userText) => {
-    const expected = topic?.expected?.[step] || [];
-    if (!expected.length) return true;
-    return expected.some((hint) => userText.includes(hint));
+function normalizeChatText(text) {
+  return String(text || "").trim().toLowerCase();
+}
+
+function isQuestionEntry(entry) {
+  const as = String(entry?.assamese || "").trim();
+  const en = String(entry?.english || "").trim();
+  return as.includes("?") || en.includes("?");
+}
+
+function entrySearchText(entry) {
+  return [entry?.english, entry?.assamese, entry?.category, entry?.example, entry?.exampleEnglish]
+    .map((value) => normalizeChatText(value))
+    .join(" ");
+}
+
+function detectConversationTopic(inputText) {
+  const text = normalizeChatText(inputText);
+  if (!text) return state.chatSession.topicId || "greetings";
+
+  const scored = Object.entries(CONVERSATION_TOPICS)
+    .map(([topicId, topic]) => {
+      const score = (topic.wordHints || []).reduce((sum, hint) => {
+        return sum + (text.includes(normalizeChatText(hint)) ? 1 : 0);
+      }, 0);
+      return { topicId, score };
+    })
+    .sort((a, b) => b.score - a.score);
+
+  if ((scored[0]?.score || 0) > 0) return scored[0].topicId;
+  return state.chatSession.topicId || "greetings";
+}
+
+function topicEntryPool(topicId) {
+  const topic = CONVERSATION_TOPICS[topicId] || CONVERSATION_TOPICS.greetings;
+  const categoryHints = (topic.categoryHints || []).map((value) => normalizeChatText(value));
+  const wordHints = (topic.wordHints || []).map((value) => normalizeChatText(value));
+
+  const pool = state.dictionary.filter((entry) => {
+    const category = normalizeChatText(entry.category);
+    const text = entrySearchText(entry);
+
+    const categoryMatch = categoryHints.some((hint) => category.includes(hint));
+    const wordMatch = wordHints.some((hint) => text.includes(hint));
+    return categoryMatch || wordMatch;
+  });
+
+  if (pool.length >= 4) return pool;
+
+  const fallback = state.dictionary.filter((entry) => {
+    const category = normalizeChatText(entry.category);
+    return ["conversations", "questions", "greetings", "introduction", "introductions"].some((hint) => category.includes(hint));
+  });
+
+  return fallback.length ? fallback : state.dictionary;
+}
+
+function pickRotatingEntry(pool, offset = 0, avoidIds = []) {
+  if (!pool.length) return null;
+  const avoid = new Set((avoidIds || []).map((id) => String(id)));
+  const base = (state.chatSession.turn + offset) % pool.length;
+
+  for (let step = 0; step < pool.length; step += 1) {
+    const idx = (base + step) % pool.length;
+    const candidate = pool[idx];
+    if (!avoid.size || !avoid.has(String(candidate.id))) {
+      return candidate;
+    }
+  }
+
+  return pool[base];
+}
+
+function levelEntryCount(level) {
+  if (level === "advanced") return 2;
+  if (level === "intermediate") return 2;
+  return 1;
+}
+
+function formatEntryHelp(entry) {
+  if (!entry) return "I will explain the next phrase with English meaning, transliteration, and one example.";
+
+  const transliteration = String(entry.pronunciation || "-").trim() || "-";
+  const exampleAs = String(entry.example || entry.assamese || "-").trim() || "-";
+  const exampleEn = String(entry.exampleEnglish || "").trim();
+  const exampleLine = exampleEn ? `${exampleAs} (${exampleEn})` : exampleAs;
+
+  return `Meaning: ${entry.english || "-"} | Transliteration: ${transliteration} | Example: ${exampleLine}`;
+}
+
+function findDictionaryMatch(inputText) {
+  const text = normalizeChatText(inputText);
+  if (!text) return null;
+
+  const exact = state.dictionary.find((entry) => {
+    const as = normalizeChatText(entry.assamese);
+    const en = normalizeChatText(entry.english);
+    return text === as || text === en;
+  });
+  if (exact) return exact;
+
+  return state.dictionary.find((entry) => {
+    const as = normalizeChatText(entry.assamese);
+    const en = normalizeChatText(entry.english);
+    return (as && text.includes(as)) || (en && text.includes(en));
+  }) || null;
+}
+
+function conversationReplyFromEntry(entry, followUpEntry, options = {}) {
+  const level = state.chatSession.level;
+  const isCorrection = Boolean(options.isCorrection);
+  const lines = [];
+  if (entry?.assamese) lines.push(entry.assamese);
+  if (followUpEntry?.assamese && followUpEntry.id !== entry?.id) lines.push(followUpEntry.assamese);
+
+  const text = lines.join(" ") || "Nomoskar";
+
+  const translationParts = [];
+  if (isCorrection) {
+    translationParts.push("Nice try. Small correction below.");
+  }
+
+  if (entry) {
+    translationParts.push(`Meaning: ${entry.english || "-"}`);
+    if (level !== "advanced") {
+      translationParts.push(`Transliteration: ${entry.pronunciation || "-"}`);
+    }
+  }
+
+  if (followUpEntry?.english) {
+    translationParts.push(`Follow-up: ${followUpEntry.english}`);
+  } else {
+    translationParts.push("Follow-up: Can you reply in Assamese using one phrase above?");
+  }
+
+  return {
+    answer: [text, translationParts.join(" | ")],
+    usedEntryIds: [entry?.id, followUpEntry?.id].filter(Boolean).map((id) => String(id))
   };
+}
 
-  const reciprocalReplies = [
-    {
-      keys: ["how are you", "ki khobor"],
-      answer: ["Mur bhal! Tumar?", "I am fine! And you?"]
-    },
-    {
-      keys: ["where are you from", "where do you come from", "coming from"],
-      answer: ["Moi Guwahati pora ahisu.", "I am from Guwahati."]
-    },
-    {
-      keys: ["your name", "what is your name", "who are you"],
-      answer: ["Mur naam Axomia Bot.", "My name is Axomia Bot."]
-    },
-    {
-      keys: ["thank", "dhonnobad"],
-      answer: ["Apunak dhonnobad!", "Thank you too!"]
-    }
-  ];
+function chatbotReply(input, options = {}) {
+  const text = normalizeChatText(input);
+  const shouldExplain = options.explainOnly || [
+    "don't understand",
+    "do not understand",
+    "not understand",
+    "meaning",
+    "what does",
+    "translate",
+    "transliteration",
+    "pronunciation",
+    "explain"
+  ].some((marker) => text.includes(marker));
 
-  const reciprocal = reciprocalReplies.find((item) => item.keys.some((key) => text.includes(key)));
-  const topic = CONVERSATION_TOPICS[state.chatSession.topicId] || null;
+  if (!state.chatSession.level || !CHAT_LEVELS.includes(state.chatSession.level)) {
+    state.chatSession.level = inferConversationLevelFromProgress();
+  }
 
-  if (topic) {
-    const pieces = [];
-    const translations = [];
-    const currentStep = state.chatSession.step;
+  const requestedLevel = CHAT_LEVELS.find((level) => text === level || text.includes(`level ${level}`));
+  if (requestedLevel) {
+    state.chatSession.level = requestedLevel;
+  }
 
-    if (reciprocal) {
-      pieces.push(reciprocal.answer[0]);
-      translations.push(reciprocal.answer[1]);
-    }
+  const topicId = options.topicId || detectConversationTopic(input);
+  state.chatSession.topicId = topicId;
 
-    if (currentStep < topic.prompts.length) {
-      const expectedOk = matchesExpectedStep(topic, currentStep, text);
+  const pool = topicEntryPool(topicId);
+  const introduced = new Set((state.chatSession.introducedEntryIds || []).map((id) => String(id)));
+  const recent = new Set((state.chatSession.recentEntryIds || []).map((id) => String(id)));
 
-      if (!expectedOk) {
-        const repeatedPrompt = currentStep === 0 ? topic.opening : topic.prompts[currentStep - 1];
-        pieces.push(`Let us stay with this step: ${repeatedPrompt.as}`);
-        translations.push(`Let us stay with this step: ${repeatedPrompt.en}`);
-      } else {
-        const nextPrompt = topic.prompts[currentStep];
-        state.chatSession.step += 1;
-        pieces.push(nextPrompt.as);
-        translations.push(nextPrompt.en);
-      }
-    } else {
-      pieces.push(topic.closing.as);
-      translations.push(topic.closing.en);
-    }
+  const targetMatch = findDictionaryMatch(input);
+  const lastExplainedEntry = state.dictionary.find((entry) => String(entry.id) === String(state.chatSession.lastExplainedEntryId));
 
+  if (shouldExplain) {
+    const explainEntry = targetMatch || lastExplainedEntry || pickRotatingEntry(pool, 0);
+    state.chatSession.lastExplainedEntryId = String(explainEntry?.id || "");
     return {
-      answer: [pieces.join(" "), translations.join(" ")]
+      answer: [
+        explainEntry?.assamese || "Nomoskar",
+        formatEntryHelp(explainEntry)
+      ],
+      usedEntryIds: explainEntry?.id ? [String(explainEntry.id)] : []
     };
   }
 
-  const patterns = [
-    { keys: ["hello", "hi", "nomoskar"], answer: ["Nomoskar!", "Hello!"] },
-    { keys: ["how are you", "ki khobor"], answer: ["Mur bhal! Tumar?", "I am fine! And you?"] },
-    { keys: ["thank", "dhonnobad"], answer: ["Apunak dhonnobad!", "Thank you too!"] },
-    { keys: ["hungry"], answer: ["Moi bhukat lagise.", "I am hungry."] },
-    { keys: ["thirsty"], answer: ["Moi piasa lagise.", "I am thirsty."] }
-  ];
+  const correctionMatch = targetMatch && normalizeChatText(targetMatch.assamese) !== text ? targetMatch : null;
 
-  const found = patterns.find((item) => item.keys.some((key) => text.includes(key)));
-  return found || { answer: ["Pick a topic and we can do a guided chat.", "Pick a topic and we can do a guided chat."] };
+  const maxNew = levelEntryCount(state.chatSession.level);
+  const preferredPool = pool.filter((entry) => !introduced.has(String(entry.id)));
+  const workingPool = preferredPool.length ? preferredPool : pool;
+
+  const mainEntry = correctionMatch || pickRotatingEntry(workingPool, 0, Array.from(recent));
+  const followUpPool = pool.filter((entry) => isQuestionEntry(entry));
+  const followUpEntry = pickRotatingEntry(
+    followUpPool.length ? followUpPool : pool,
+    1,
+    [mainEntry?.id]
+  );
+
+  const result = conversationReplyFromEntry(
+    mainEntry,
+    maxNew > 1 ? followUpEntry : null,
+    { isCorrection: Boolean(correctionMatch) }
+  );
+
+  state.chatSession.lastExplainedEntryId = String(mainEntry?.id || "");
+  state.chatSession.lastUserText = input;
+  state.chatSession.turn += 1;
+  state.chatSession.recentEntryIds = [...state.chatSession.recentEntryIds, ...result.usedEntryIds].slice(-10);
+  state.chatSession.introducedEntryIds = [...new Set([...state.chatSession.introducedEntryIds, ...result.usedEntryIds])].slice(-80);
+
+  return result;
 }
 
 function addRecentWord(wordId) {
@@ -2750,20 +2875,40 @@ async function onClick(event) {
     return;
   }
 
+  if (action === "chat-level") {
+    const nextLevel = String(actionSource.dataset.level || "").toLowerCase();
+    if (!CHAT_LEVELS.includes(nextLevel)) return;
+
+    state.chatSession.level = nextLevel;
+    const kickoff = chatbotReply("", { topicId: state.chatSession.topicId || "greetings" });
+    state.chat.push({
+      who: "bot",
+      text: kickoff.answer[0],
+      translation: `Level set to ${nextLevel}. ${kickoff.answer[1]}`
+    });
+    renderPractice();
+    return;
+  }
+
+  if (action === "chat-explain-last") {
+    const explain = chatbotReply("I don't understand", { explainOnly: true });
+    state.chat.push({ who: "bot", text: explain.answer[0], translation: explain.answer[1] });
+    renderPractice();
+    return;
+  }
+
   if (action === "chat-topic") {
     const topicId = actionSource.dataset.topic || "";
     const topic = CONVERSATION_TOPICS[topicId];
     if (!topic) return;
 
     state.chatSession.topicId = topicId;
-    state.chatSession.step = 0;
-    state.chat = [
-      {
-        who: "bot",
-        text: topic.opening.as,
-        translation: topic.opening.en
-      }
-    ];
+    state.chatSession.turn = 0;
+    state.chatSession.introducedEntryIds = [];
+    state.chatSession.recentEntryIds = [];
+    state.chatSession.lastExplainedEntryId = "";
+    const opening = chatbotReply("", { topicId });
+    state.chat = [{ who: "bot", text: opening.answer[0], translation: opening.answer[1] }];
     renderPractice();
     return;
   }
@@ -2976,6 +3121,14 @@ function bindGlobalEvents() {
   document.addEventListener("click", onClick);
   document.addEventListener("input", onInput);
   document.addEventListener("change", onInput);
+  document.addEventListener("keydown", (event) => {
+    const target = event.target;
+    if (target?.id !== "chat-input") return;
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    const sendBtn = document.querySelector('[data-action="chat-send"]');
+    sendBtn?.click();
+  });
 
   dom.themeToggle.addEventListener("click", () => {
     state.settings.theme = state.settings.theme === "dark" ? "light" : "dark";
@@ -3007,7 +3160,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=147", { updateViaCache: "none" })
+      .register("sw.js?v=148", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
