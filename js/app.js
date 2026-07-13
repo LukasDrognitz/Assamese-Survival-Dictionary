@@ -1953,11 +1953,15 @@ function renderPractice() {
   `;
 
   if (state.practiceTab === "conversation") {
-    requestAnimationFrame(() => {
+    const scrollToLatest = () => {
       const chatPanel = document.getElementById("chat-panel");
       if (!chatPanel) return;
       chatPanel.scrollTop = chatPanel.scrollHeight;
-    });
+    };
+
+    scrollToLatest();
+    requestAnimationFrame(scrollToLatest);
+    setTimeout(scrollToLatest, 0);
   }
 }
 
