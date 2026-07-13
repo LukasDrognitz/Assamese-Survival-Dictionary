@@ -302,6 +302,8 @@ const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
 const LOVE_MILESTONE_STEP_XP = 2110;
 const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
 
+let chatPinIntervalId = null;
+
 const state = {
   view: "home",
   practiceTab: "flashcards",
@@ -1952,20 +1954,36 @@ function renderPractice() {
     </section>
   `;
 
-  if (state.practiceTab === "conversation") {
-    const scrollToLatest = () => {
-      const chatPanel = document.getElementById("chat-panel");
-      if (!chatPanel) return;
-      chatPanel.scrollTop = chatPanel.scrollHeight;
-      const lastBubble = chatPanel.querySelector(".chat-bubble:last-child");
-      if (lastBubble && typeof lastBubble.scrollIntoView === "function") {
-        lastBubble.scrollIntoView({ block: "end" });
-      }
-    };
+  const pinConversationToLatest = () => {
+    const chatPanel = document.getElementById("chat-panel");
+    if (!chatPanel) return;
+    chatPanel.style.overflowAnchor = "none";
+    chatPanel.scrollTop = chatPanel.scrollHeight;
+    const lastBubble = chatPanel.querySelector(".chat-bubble:last-child");
+    if (lastBubble && typeof lastBubble.scrollIntoView === "function") {
+      lastBubble.scrollIntoView({ block: "end" });
+    }
+  };
 
-    scrollToLatest();
-    requestAnimationFrame(scrollToLatest);
-    [0, 50, 120, 250, 400, 600].forEach((delay) => setTimeout(scrollToLatest, delay));
+  if (chatPinIntervalId) {
+    clearInterval(chatPinIntervalId);
+    chatPinIntervalId = null;
+  }
+
+  if (state.practiceTab === "conversation") {
+    pinConversationToLatest();
+    requestAnimationFrame(pinConversationToLatest);
+    [0, 50, 120, 250, 400, 600, 900].forEach((delay) => setTimeout(pinConversationToLatest, delay));
+
+    const startedAt = Date.now();
+    chatPinIntervalId = setInterval(() => {
+      if (Date.now() - startedAt > 3000 || state.practiceTab !== "conversation") {
+        clearInterval(chatPinIntervalId);
+        chatPinIntervalId = null;
+        return;
+      }
+      pinConversationToLatest();
+    }, 100);
   }
 }
 
