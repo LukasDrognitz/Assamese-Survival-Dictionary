@@ -366,6 +366,7 @@ const state = {
   ],
   chatSession: {
     topicId: "",
+    isStarted: false,
     turn: 0,
     introducedEntryIds: [],
     recentEntryIds: [],
@@ -1557,6 +1558,17 @@ function ensureFlashDeck() {
 }
 
 function renderConversationPanel() {
+  if (!state.chatSession.isStarted) {
+    return `
+      <article class="card grid" style="justify-items:center; text-align:center; gap:12px;">
+        <h3>Conversation Practice</h3>
+        <img src="assets/images/Tutor.png" alt="Conversation tutor" style="width:min(280px, 70vw); height:auto;" />
+        <p style="max-width:540px;">👋 Hey there! Think you're ready? Hit Start and let's have a conversation. Let's see what you already know!</p>
+        <button class="btn accent" data-action="chat-start">Start</button>
+      </article>
+    `;
+  }
+
   const bubbles = state.chat
     .map(
       (msg) => `
@@ -2528,7 +2540,23 @@ async function onClick(event) {
       state.quiz.mode = "";
       state.quiz.setupStage = "mode";
     }
+    if (nextTab === "conversation") {
+      state.chatSession.isStarted = false;
+    }
     state.practiceTab = nextTab;
+    renderPractice();
+    return;
+  }
+
+  if (action === "chat-start") {
+    state.chatSession.isStarted = true;
+    state.chatSession.topicId = "";
+    state.chatSession.turn = 0;
+    state.chatSession.introducedEntryIds = [];
+    state.chatSession.recentEntryIds = [];
+    state.chatSession.lastExplainedEntryId = "";
+    state.chatSession.lastUserText = "";
+    state.chat = [{ who: "bot", text: "Nomoskar!", translation: "" }];
     renderPractice();
     return;
   }
@@ -3097,7 +3125,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=150", { updateViaCache: "none" })
+      .register("sw.js?v=151", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
