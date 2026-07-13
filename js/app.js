@@ -298,6 +298,8 @@ const CONVERSATION_TOPICS = {
   }
 };
 
+const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
+
 const state = {
   view: "home",
   practiceTab: "flashcards",
@@ -390,6 +392,9 @@ const state = {
     avatar: "🦜",
     dailyXpTarget: 120,
     preferredTheme: "light"
+  },
+  startScreen: {
+    isOpen: false
   },
   achievementQueue: [],
   achievementCelebrationActive: false,
@@ -496,6 +501,74 @@ function createOnboardingModal() {
     <div class="onboarding-shell glass" id="onboarding-shell"></div>
   `;
   document.body.appendChild(container);
+}
+
+function createAppStartScreenModal() {
+  if (document.getElementById("app-start-screen")) return;
+
+  const cleanName = (state.settings.profileName || "Learner").trim() || "Learner";
+  const safeName = escapeHtmlAttr(cleanName);
+
+  const container = document.createElement("section");
+  container.id = "app-start-screen";
+  container.className = "app-start-screen hidden";
+  container.setAttribute("role", "dialog");
+  container.setAttribute("aria-modal", "true");
+  container.setAttribute("aria-label", "Welcome back");
+  container.innerHTML = `
+    <article class="app-start-screen-shell glass">
+      <img class="app-start-screen-image" src="assets/images/App Start Screen.png" alt="Assamese Survival Dictionary welcome screen" loading="eager" decoding="async" />
+      <div class="app-start-screen-copy">
+        <p class="eyebrow">Welcome Back</p>
+        <h2>Hello, ${safeName}!</h2>
+      </div>
+      <div class="app-start-screen-action-row">
+        <button class="btn accent app-start-screen-btn" data-action="app-start-continue">It's great to be back!</button>
+      </div>
+    </article>
+  `;
+
+  document.body.appendChild(container);
+}
+
+function shouldShowAppStartScreen() {
+  if (!state.settings.onboardingCompleted) return false;
+
+  try {
+    return sessionStorage.getItem(START_SCREEN_SESSION_KEY) !== "1";
+  } catch {
+    return true;
+  }
+}
+
+function openAppStartScreen() {
+  const modal = document.getElementById("app-start-screen");
+  if (!modal) return;
+
+  const nameNode = modal.querySelector(".app-start-screen-copy h2");
+  if (nameNode) {
+    const cleanName = (state.settings.profileName || "Learner").trim() || "Learner";
+    nameNode.textContent = `Hello, ${cleanName}!`;
+  }
+
+  state.startScreen.isOpen = true;
+  modal.classList.remove("hidden");
+  document.body.classList.add("lock-scroll");
+}
+
+function closeAppStartScreen() {
+  const modal = document.getElementById("app-start-screen");
+  if (!modal) return;
+
+  state.startScreen.isOpen = false;
+  modal.classList.add("hidden");
+  document.body.classList.remove("lock-scroll");
+
+  try {
+    sessionStorage.setItem(START_SCREEN_SESSION_KEY, "1");
+  } catch {
+    // Continue without session persistence if browser storage is blocked.
+  }
 }
 
 function createDictionaryDeleteModal() {
@@ -2388,6 +2461,11 @@ async function onClick(event) {
     return;
   }
 
+  if (action === "app-start-continue") {
+    closeAppStartScreen();
+    return;
+  }
+
   if (action === "unlock-achievement") {
     animateAchievementToProfile();
     return;
@@ -3253,7 +3331,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=154", { updateViaCache: "none" })
+      .register("sw.js?v=155", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
@@ -3282,6 +3360,7 @@ async function init() {
   if (!state.settings.onboardingCompleted) {
     state.view = "home";
   }
+  createAppStartScreenModal();
   createOnboardingModal();
   createDictionaryDeleteModal();
   createAchievementCelebrationModal();
@@ -3304,6 +3383,8 @@ async function init() {
   initServiceWorker();
   if (!state.settings.onboardingCompleted) {
     openOnboarding();
+  } else if (shouldShowAppStartScreen()) {
+    openAppStartScreen();
   }
   persist();
 }

@@ -1542,6 +1542,71 @@ body.level-up-open .sidebar {
   background: rgba(10, 14, 24, 0.45);
 }
 
+.app-start-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: grid;
+  place-items: center;
+  padding: 10px;
+  background: rgba(8, 12, 22, 0.56);
+}
+
+.app-start-screen-shell {
+  width: min(480px, 100%);
+  height: min(96vh, 860px);
+  border-radius: 24px;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: 1fr auto auto;
+  gap: 0;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+}
+
+.app-start-screen-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.app-start-screen-copy {
+  padding: 14px 16px 8px;
+  display: grid;
+  gap: 4px;
+  text-align: center;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9));
+  color: #102034;
+}
+
+[data-theme="dark"] .app-start-screen-copy {
+  background: linear-gradient(180deg, rgba(17, 26, 43, 0.96), rgba(17, 26, 43, 0.92));
+  color: #f0f4ff;
+}
+
+.app-start-screen-copy h2 {
+  font-size: clamp(1.3rem, 4.6vw, 1.8rem);
+  line-height: 1.18;
+}
+
+.app-start-screen-action-row {
+  padding: 8px 16px 18px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.98));
+}
+
+[data-theme="dark"] .app-start-screen-action-row {
+  background: linear-gradient(180deg, rgba(17, 26, 43, 0.9), rgba(17, 26, 43, 0.98));
+}
+
+.app-start-screen-btn {
+  width: 100%;
+  min-height: 54px;
+  font-size: 1.02rem;
+}
+
 .onboarding-shell {
   width: min(560px, 100%);
   border-radius: 22px;
