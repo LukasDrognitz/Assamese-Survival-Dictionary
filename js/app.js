@@ -1789,7 +1789,6 @@ function renderConversationPanel() {
       (msg) => `
       <div class="chat-bubble ${msg.who}">
         <p>${msg.text}</p>
-        ${msg.translation ? `<p class="meta">${msg.translation}</p>` : ""}
       </div>
     `
     )
@@ -1801,7 +1800,6 @@ function renderConversationPanel() {
     .map((entry) => `
       <button class="btn ghost" data-action="chat-answer-option" data-entry-id="${entry.id}" style="text-align:left; display:block; width:100%;">
         <strong>${entry.assamese}</strong>
-        <span class="meta" style="display:block;">${entry.english || ""}</span>
       </button>
     `)
     .join("");
@@ -1812,7 +1810,6 @@ function renderConversationPanel() {
     .map((entry) => `
       <button class="btn ghost" data-action="chat-ask-option" data-entry-id="${entry.id}" style="text-align:left; display:block; width:100%;">
         <strong>${entry.assamese}</strong>
-        <span class="meta" style="display:block;">${entry.english || ""}</span>
       </button>
     `)
     .join("");
@@ -1839,7 +1836,7 @@ function renderConversationPanel() {
       <div class="row" style="justify-content:flex-end; flex-wrap:wrap; gap:8px;">
         <button class="btn ghost" data-action="chat-stop">Stop Conversation</button>
       </div>
-      <p class="meta">Each Assamese line shows its English meaning underneath.</p>
+      <p class="meta">Only Assamese phrases are shown in this mode.</p>
     </article>
   `;
 }
@@ -3402,7 +3399,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=166", { updateViaCache: "none" })
+      .register("sw.js?v=167", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
