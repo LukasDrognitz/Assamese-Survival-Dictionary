@@ -935,6 +935,15 @@ body.lesson-immersive .topbar {
   text-align: center;
 }
 
+.flash-summary .teacher-panel {
+  width: 100%;
+  justify-items: center;
+}
+
+.flash-summary .teacher-avatar {
+  width: min(190px, 46vw);
+}
+
 .flash-summary .meta {
   text-align: center;
 }
