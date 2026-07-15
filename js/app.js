@@ -359,7 +359,7 @@ const CONVERSATION_TOPICS = {
 const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
 const LOVE_MILESTONE_STEP_XP = 2110;
 const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
-const APP_BUILD_VERSION = "20260715-175";
+const APP_BUILD_VERSION = "20260715-176";
 const CHEST_OPEN_ANIMATION_MS = 1050;
 
 function customDictionaryEntryCount() {
@@ -2782,6 +2782,9 @@ function recordLessonWritingResult(item, isCorrect) {
 }
 
 function startLessonLearningSession(lesson) {
+  if (!state.lessonLearning || typeof state.lessonLearning !== "object") {
+    state.lessonLearning = { session: null };
+  }
   state.lessonLearning.session = createLessonLearningSession(lesson);
   state.activeLessonIndex = 0;
 }
@@ -4124,7 +4127,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=187", { updateViaCache: "none" })
+      .register("sw.js?v=188", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.

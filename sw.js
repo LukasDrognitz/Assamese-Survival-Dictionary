@@ -1,10 +1,10 @@
-const CACHE_NAME = "assamese-survival-dictionary-v187";
+const CACHE_NAME = "assamese-survival-dictionary-v188";
 
 const APP_SHELL = [
   "./",
   "./index.html",
   "./css/style.css?v=20260715-94",
-  "./js/app.js?v=20260715-175",
+  "./js/app.js?v=20260715-176",
   "./js/dictionary.js?v=20260710-45",
   "./js/lessons.js?v=20260715-07",
   "./js/flashcards.js?v=20260713-38",
@@ -78,6 +78,24 @@ self.addEventListener("fetch", (event) => {
           return response;
         })
         .catch(() => caches.match("./index.html"))
+    );
+    return;
+  }
+
+  const isCodeAsset = /\.(js|css)$/i.test(requestUrl.pathname);
+  if (isCodeAsset) {
+    event.respondWith(
+      fetch(event.request, { cache: "no-store" })
+        .then((response) => {
+          if (!response || response.status !== 200 || response.type === "opaque") {
+            return response;
+          }
+
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          return response;
+        })
+        .catch(() => caches.match(event.request))
     );
     return;
   }
