@@ -181,8 +181,8 @@ body.hide-topbar .topbar {
 .welcome-avatar {
   position: relative;
   display: inline-flex;
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   border-radius: 999px;
   align-items: center;
   justify-content: center;

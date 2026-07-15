@@ -92,7 +92,7 @@ const LEGACY_AVATAR_MAP = {
 };
 
 const AVATAR_META_BY_ID = Object.fromEntries(AVATAR_REWARDS.map((item) => [item.value, item]));
-const AVATAR_IMAGE_VERSION = "20260715-181";
+const AVATAR_IMAGE_VERSION = "20260715-182";
 const USER_AVATAR_OPTIONS = {
   peacock: {
     label: "Pavo the Peacock",
@@ -380,7 +380,7 @@ const CONVERSATION_TOPICS = {
 const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
 const LOVE_MILESTONE_STEP_XP = 2110;
 const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
-const APP_BUILD_VERSION = "20260715-182";
+const APP_BUILD_VERSION = "20260715-183";
 const CHEST_OPEN_ANIMATION_MS = 1050;
 
 function customDictionaryEntryCount() {
@@ -4095,7 +4095,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=194", { updateViaCache: "none" })
+      .register("sw.js?v=195", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
