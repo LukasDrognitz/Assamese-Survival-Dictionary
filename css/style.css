@@ -2950,6 +2950,33 @@ body.love-milestone-open .sidebar {
   gap: 10px;
 }
 
+.avatar-sheet-layout {
+  display: grid;
+  gap: 12px;
+}
+
+.avatar-sheet-controls {
+  border: 1px solid rgba(104, 113, 136, 0.24);
+  border-radius: 14px;
+  padding: 10px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+}
+
+.avatar-sheet-preview {
+  width: min(380px, 86vw);
+  margin: 0 auto;
+  border: 1px solid rgba(104, 113, 136, 0.24);
+  border-radius: 18px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--surface) 95%, transparent);
+}
+
+.avatar-sheet-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
 .avatar-character-profile {
   border: 1px solid rgba(104, 113, 136, 0.22);
   border-radius: 12px;
@@ -2964,8 +2991,8 @@ body.love-milestone-open .sidebar {
 }
 
 .avatar-preview-canvas {
-  width: min(220px, 70vw);
-  min-height: 176px;
+  width: min(380px, 86vw);
+  min-height: 380px;
   border: 1px solid rgba(104, 113, 136, 0.24);
   border-radius: 18px;
   background: color-mix(in srgb, var(--surface) 94%, transparent);
@@ -2985,6 +3012,17 @@ body.love-milestone-open .sidebar {
 
 .avatar-preview-canvas.skin-theme-cool {
   background: linear-gradient(145deg, rgba(181, 242, 255, 0.95), rgba(124, 168, 255, 0.86));
+}
+
+@media (min-width: 780px) {
+  .avatar-sheet-layout {
+    grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .avatar-sheet-preview {
+    width: min(430px, 100%);
+  }
 }
 
 .avatar-animal {

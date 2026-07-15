@@ -19,7 +19,7 @@ import {
   testSyncConnection,
   syncStateFromServer,
   startAutoSync
-} from "./storage.js?v=20260715-40";
+} from "./storage.js?v=20260715-41";
 import {
   loadDictionary,
   filterDictionary,
@@ -91,58 +91,28 @@ const LEGACY_AVATAR_MAP = {
 
 const AVATAR_META_BY_ID = Object.fromEntries(AVATAR_REWARDS.map((item) => [item.value, item]));
 
-const AVATAR_CHARACTER_PROFILES = {
-  tiger: {
-    title: "Tara the Tiger",
-    personality: "Friendly explorer",
-    defaultOutfit: "Adventurer jacket and boots"
-  },
-  elephant: {
-    title: "Eli the Elephant",
-    personality: "Gentle mentor",
-    defaultOutfit: "Travel vest and satchel"
-  },
-  peacock: {
-    title: "Pavo the Peacock",
-    personality: "Fashion-forward",
-    defaultOutfit: "Modern kurta and sneakers"
-  },
-  rhino: {
-    title: "Rani the Rhino",
-    personality: "Team captain",
-    defaultOutfit: "Utility jacket"
-  },
-  "sloth-bear": {
-    title: "Balu the Sloth Bear",
-    personality: "Wise and relaxed mentor",
-    defaultOutfit: "Cozy hoodie"
-  },
-  nilgai: {
-    title: "Nila the Nilgai",
-    personality: "Scholar",
-    defaultOutfit: "Academic jacket"
-  },
-  fox: {
-    title: "Kanu the Indian Fox",
-    personality: "Quick learner",
-    defaultOutfit: "Explorer hoodie"
-  },
-  langur: {
-    title: "Langur the Monkey",
-    personality: "Curious adventurer",
-    defaultOutfit: "Travel shirt and shorts"
-  }
+const AVATAR_SHEET_DEFAULTS = {
+  eyewear: "none",
+  outfit: "classic",
+  headwear: "none"
 };
 
-const AVATAR_PORTRAIT_ASSETS = {
-  tiger: "assets/images/avatars/tiger.svg",
-  elephant: "assets/images/avatars/elephant.svg",
-  peacock: "assets/images/avatars/peacock.svg",
-  rhino: "assets/images/avatars/rhino.svg",
-  "sloth-bear": "assets/images/avatars/sloth-bear.svg",
-  nilgai: "assets/images/avatars/nilgai.svg",
-  fox: "assets/images/avatars/fox.svg",
-  langur: "assets/images/avatars/langur.svg"
+const AVATAR_SHEET_OPTIONS = {
+  eyewear: [
+    { value: "none", label: "No Glasses" },
+    { value: "glasses", label: "Classic Glasses" },
+    { value: "sunglasses", label: "Sunglasses" }
+  ],
+  outfit: [
+    { value: "classic", label: "Classic Outfit" },
+    { value: "kurta", label: "Traditional Kurta" },
+    { value: "hoodie", label: "Cozy Hoodie" }
+  ],
+  headwear: [
+    { value: "none", label: "No Headwear" },
+    { value: "cap", label: "Explorer Cap" },
+    { value: "crown", label: "Royal Crown" }
+  ]
 };
 
 const ASSAM_DID_YOU_KNOW_FACTS = [
@@ -389,54 +359,17 @@ const CONVERSATION_TOPICS = {
 const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
 const LOVE_MILESTONE_STEP_XP = 2110;
 const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
-const APP_BUILD_VERSION = "20260715-171";
-const XP_TO_RUPEE_RATE = 5;
+const APP_BUILD_VERSION = "20260715-172";
 const CHEST_OPEN_ANIMATION_MS = 1050;
 
 function customDictionaryEntryCount() {
   return getCustomWords().length;
 }
 
-const AVATAR_SHOP_ITEMS = [
-  { id: "skin-classic", slot: "skin", label: "Earth Fur", previewClass: "fur-earth", price: 0, rarity: "common" },
-  { id: "skin-sun", slot: "skin", label: "Sun Fur", previewClass: "fur-sun", price: 220, rarity: "rare" },
-  { id: "skin-cool", slot: "skin", label: "Moon Fur", previewClass: "fur-moon", price: 280, rarity: "epic" },
-  { id: "cap-basic", slot: "headwear", label: "Basic Cap", previewClass: "wear-cap-basic", price: 80, rarity: "common" },
-  { id: "cap-crown", slot: "headwear", label: "Royal Crown", previewClass: "wear-crown-gold", price: 420, rarity: "epic" },
-  { id: "shirt-blue", slot: "top", label: "Blue Kurta", previewClass: "wear-top-blue", price: 120, rarity: "common" },
-  { id: "shirt-green", slot: "top", label: "Green Kurta", previewClass: "wear-top-green", price: 140, rarity: "common" },
-  { id: "hoodie-cozy", slot: "top", label: "Cozy Hoodie", previewClass: "wear-top-hoodie", price: 180, rarity: "rare" },
-  { id: "pants-jeans", slot: "bottom", label: "Indigo Pants", previewClass: "wear-bottom-indigo", price: 140, rarity: "common" },
-  { id: "pants-track", slot: "bottom", label: "Track Pants", previewClass: "wear-bottom-track", price: 160, rarity: "rare" },
-  { id: "dress-red", slot: "dress", label: "Red Mekhela", previewClass: "wear-dress-red", price: 260, rarity: "rare" },
-  { id: "dress-floral", slot: "dress", label: "Floral Mekhela", previewClass: "wear-dress-floral", price: 320, rarity: "epic" },
-  { id: "glasses-basic", slot: "eyewear", label: "Classic Glasses", previewClass: "wear-eyewear-basic", price: 170, rarity: "common" },
-  { id: "glasses-star", slot: "eyewear", label: "Star Glasses", previewClass: "wear-eyewear-star", price: 240, rarity: "rare" },
-  { id: "bag-travel", slot: "backpack", label: "Travel Backpack", previewClass: "wear-backpack-travel", price: 220, rarity: "rare" },
-  { id: "bag-tech", slot: "backpack", label: "Tech Messenger", previewClass: "wear-backpack-tech", price: 260, rarity: "epic" },
-  { id: "badge-team", slot: "badge", label: "Team Captain Badge", previewClass: "wear-badge-team", price: 150, rarity: "common" },
-  { id: "badge-scholar", slot: "badge", label: "Scholar Badge", previewClass: "wear-badge-scholar", price: 180, rarity: "rare" },
-  { id: "tail-ribbon", slot: "tailAccessory", label: "Tail Ribbon", previewClass: "wear-tail-ribbon", price: 140, rarity: "common" },
-  { id: "tail-ring", slot: "tailAccessory", label: "Tail Ring", previewClass: "wear-tail-ring", price: 200, rarity: "rare" },
-  { id: "face-smile", slot: "expression", label: "Bright Smile", previewClass: "expr-smile", price: 90, rarity: "common" },
-  { id: "face-wink", slot: "expression", label: "Confident Wink", previewClass: "expr-wink", price: 130, rarity: "rare" },
-  { id: "pose-hero", slot: "pose", label: "Hero Pose", previewClass: "pose-hero", price: 110, rarity: "common" },
-  { id: "pose-wave", slot: "pose", label: "Wave Pose", previewClass: "pose-wave", price: 150, rarity: "rare" }
-];
-
-const AVATAR_SHOP_ITEM_BY_ID = Object.fromEntries(AVATAR_SHOP_ITEMS.map((item) => [item.id, item]));
-const AVATAR_SHOP_FREE_ITEM_IDS = AVATAR_SHOP_ITEMS.filter((item) => item.price === 0).map((item) => item.id);
-
 const CHEST_RUPEE_TIERS = [
   { rarity: "common", weight: 62, min: 80, max: 140 },
   { rarity: "rare", weight: 30, min: 141, max: 230 },
   { rarity: "epic", weight: 8, min: 231, max: 320 }
-];
-
-const CHEST_ITEM_RARITY_WEIGHTS = [
-  { rarity: "common", weight: 64 },
-  { rarity: "rare", weight: 28 },
-  { rarity: "epic", weight: 8 }
 ];
 
 function pickWeighted(items) {
@@ -457,52 +390,33 @@ function rollChestRupeeReward() {
   return { rarity: tier.rarity, value };
 }
 
-function rollChestBonusItem(ownedSet) {
-  const unowned = AVATAR_SHOP_ITEMS.filter((item) => item.price > 0 && !ownedSet.has(item.id));
-  if (!unowned.length) return null;
 
-  const rarityPick = pickWeighted(CHEST_ITEM_RARITY_WEIGHTS);
-  if (!rarityPick) return null;
-
-  const pool = unowned.filter((item) => item.rarity === rarityPick.rarity);
-  const finalPool = pool.length ? pool : unowned;
-  return finalPool[Math.floor(Math.random() * finalPool.length)] || null;
+function avatarStyleAllowedValue(slot, value) {
+  const options = AVATAR_SHEET_OPTIONS[slot] || [];
+  const fallback = AVATAR_SHEET_DEFAULTS[slot];
+  return options.some((item) => item.value === value) ? value : fallback;
 }
 
-function avatarSkinThemeClass(itemId) {
-  const theme = String(itemId || "skin-classic").replace(/^skin-/, "") || "classic";
-  return `skin-theme-${theme}`;
+function normalizeAvatarSheetSelection(selection) {
+  return {
+    eyewear: avatarStyleAllowedValue("eyewear", String(selection?.eyewear || "")),
+    outfit: avatarStyleAllowedValue("outfit", String(selection?.outfit || "")),
+    headwear: avatarStyleAllowedValue("headwear", String(selection?.headwear || ""))
+  };
 }
 
-function normalizeAvatarEconomyProgress() {
-  state.progress.rupees = Math.max(0, Number(state.progress.rupees) || 0);
-  state.progress.lastChestDate = String(state.progress.lastChestDate || "").trim();
-  state.progress.lastChestPromptDate = String(state.progress.lastChestPromptDate || "").trim();
-
-  const owned = Array.isArray(state.progress.ownedAvatarItems)
-    ? state.progress.ownedAvatarItems.map((id) => String(id))
-    : [];
-  const ownedSet = new Set(owned.filter((id) => Boolean(AVATAR_SHOP_ITEM_BY_ID[id])));
-  AVATAR_SHOP_FREE_ITEM_IDS.forEach((id) => ownedSet.add(id));
-  state.progress.ownedAvatarItems = Array.from(ownedSet);
-
-  const equipped = state.progress.equippedAvatarItems && typeof state.progress.equippedAvatarItems === "object"
-    ? { ...state.progress.equippedAvatarItems }
+function ensureAvatarSheetSelections() {
+  const stored = state.progress.avatarSheetSelections && typeof state.progress.avatarSheetSelections === "object"
+    ? { ...state.progress.avatarSheetSelections }
     : {};
 
-  const slots = ["skin", "headwear", "top", "bottom", "dress", "eyewear", "backpack", "badge", "tailAccessory", "expression", "pose"];
-  slots.forEach((slot) => {
-    const current = String(equipped[slot] || "").trim();
-    if (!current || !AVATAR_SHOP_ITEM_BY_ID[current]) {
-      equipped[slot] = slot === "skin" ? "skin-classic" : "";
-      return;
-    }
-    if (!ownedSet.has(current)) {
-      equipped[slot] = slot === "skin" ? "skin-classic" : "";
-    }
+  AVATAR_REWARDS.forEach((item) => {
+    const key = String(item.value || "");
+    stored[key] = normalizeAvatarSheetSelection(stored[key] || AVATAR_SHEET_DEFAULTS);
   });
 
-  state.progress.equippedAvatarItems = equipped;
+  state.progress.avatarSheetSelections = stored;
+  return stored;
 }
 
 let chatPinIntervalId = null;
@@ -616,8 +530,7 @@ const state = {
   chestResultDialog: {
     isOpen: false,
     rarity: "common",
-    rupees: 0,
-    itemId: ""
+    rupees: 0
   },
   dailyChestDialog: {
     isOpen: false
@@ -654,15 +567,34 @@ function avatarDisplayName(avatarId) {
   return avatarMeta(avatarId)?.label || "Animal Avatar";
 }
 
-function avatarPortraitSrc(avatarId) {
+function avatarSheetSelectionFor(avatarId) {
   const safeId = avatarMeta(avatarId).value;
-  return AVATAR_PORTRAIT_ASSETS[safeId] || AVATAR_PORTRAIT_ASSETS.tiger;
+  const selections = ensureAvatarSheetSelections();
+  const current = selections[safeId] || AVATAR_SHEET_DEFAULTS;
+  return normalizeAvatarSheetSelection(current);
+}
+
+function setAvatarSheetSelection(avatarId, patch) {
+  const safeId = avatarMeta(avatarId).value;
+  const selections = ensureAvatarSheetSelections();
+  const merged = {
+    ...avatarSheetSelectionFor(safeId),
+    ...(patch || {})
+  };
+  selections[safeId] = normalizeAvatarSheetSelection(merged);
+  state.progress.avatarSheetSelections = selections;
+}
+
+function avatarSheetImagePath(avatarId, selection) {
+  const safeId = avatarMeta(avatarId).value;
+  const normalized = normalizeAvatarSheetSelection(selection || AVATAR_SHEET_DEFAULTS);
+  return `assets/images/avatar-sheets/${safeId}/${safeId}-${normalized.eyewear}-${normalized.outfit}-${normalized.headwear}.png`;
 }
 
 function renderAnimalBadge(avatarId, variant = "mini") {
   const safeId = avatarMeta(avatarId).value;
   const safeVariant = ["mini", "chip"].includes(variant) ? variant : "mini";
-  const src = avatarPortraitSrc(safeId);
+  const src = avatarSheetImagePath(safeId, avatarSheetSelectionFor(safeId));
   const label = avatarDisplayName(safeId);
   return `
     <span class="animal-badge-image ${safeVariant} animal-${safeId}" aria-hidden="true">
@@ -1037,7 +969,7 @@ function createChestResultModal() {
       </div>
       <p class="eyebrow" id="chest-result-rarity">COMMON CHEST</p>
       <h2 id="chest-result-rupees">+0 Rupees</h2>
-      <p class="meta" id="chest-result-item">No bonus item this time.</p>
+      <p class="meta" id="chest-result-item">Collect your daily coins and come back tomorrow.</p>
       <button class="btn accent" data-action="chest-result-continue">Continue</button>
     </article>
   `;
@@ -1062,7 +994,7 @@ function createDailyChestModal() {
         <span class="chest-lid"></span>
       </div>
       <h2>Your Treasure Chest Is Ready</h2>
-      <p class="meta">Open once per day to collect Rupees and a chance at bonus items.</p>
+      <p class="meta">Open once per day to collect Rupees.</p>
       <div class="row" style="justify-content:center; gap:10px; flex-wrap:wrap;">
         <button class="btn accent" data-action="daily-chest-open">Open Chest</button>
         <button class="btn ghost" data-action="daily-chest-later">Maybe Later</button>
@@ -1094,7 +1026,6 @@ function maybeShowDailyChestPrompt() {
   if (!state.settings.onboardingCompleted) return;
   if (state.startScreen.isOpen || state.onboarding.isOpen || state.dailyChestDialog.isOpen) return;
 
-  normalizeAvatarEconomyProgress();
   const today = todayIso();
   if (state.progress.lastChestDate === today) return;
   if (state.progress.lastChestPromptDate === today) return;
@@ -1111,20 +1042,8 @@ function claimDailyChestReward() {
     return false;
   }
 
-  normalizeAvatarEconomyProgress();
-  const ownedSet = new Set(state.progress.ownedAvatarItems || []);
   const rupeeDrop = rollChestRupeeReward();
   const reward = rupeeDrop.value;
-
-  let bonusItemId = "";
-  if (Math.random() < 0.42) {
-    const bonusItem = rollChestBonusItem(ownedSet);
-    if (bonusItem) {
-      ownedSet.add(bonusItem.id);
-      state.progress.ownedAvatarItems = Array.from(ownedSet);
-      bonusItemId = bonusItem.id;
-    }
-  }
 
   state.progress.lastChestDate = today;
   state.progress.lastChestPromptDate = today;
@@ -1133,8 +1052,7 @@ function claimDailyChestReward() {
   renderProfile();
   openChestResultModal({
     rarity: rupeeDrop.rarity,
-    rupees: reward,
-    itemId: bonusItemId
+    rupees: reward
   });
   return true;
 }
@@ -1149,14 +1067,10 @@ function openChestResultModal(payload) {
 
   const rarity = String(payload?.rarity || "common").toLowerCase();
   const rupees = Math.max(0, Number(payload?.rupees) || 0);
-  const itemId = String(payload?.itemId || "");
-  const item = AVATAR_SHOP_ITEM_BY_ID[itemId];
-
   state.chestResultDialog = {
     isOpen: true,
     rarity,
-    rupees,
-    itemId: item?.id || ""
+    rupees
   };
 
   dialog.classList.remove("common", "rare", "epic");
@@ -1168,9 +1082,7 @@ function openChestResultModal(payload) {
 
   rarityNode.textContent = `${rarity.toUpperCase()} CHEST`;
   rupeeNode.textContent = `+${rupees} Rupees`;
-  itemNode.textContent = item
-    ? `Bonus item unlocked: ${item.label}`
-    : "No bonus item this time. Come back tomorrow for another chest.";
+  itemNode.textContent = "No bonus item pool is active. Come back tomorrow for another chest.";
 
   dialog.classList.remove("hidden");
   document.body.classList.add("lock-scroll");
@@ -1192,8 +1104,7 @@ function closeChestResultModal() {
   state.chestResultDialog = {
     isOpen: false,
     rarity: "common",
-    rupees: 0,
-    itemId: ""
+    rupees: 0
   };
 }
 
@@ -2463,86 +2374,54 @@ function renderAchievements() {
 }
 
 function renderAvatarStudio() {
-  const equipped = state.progress.equippedAvatarItems || {};
-  const ownedSet = new Set(state.progress.ownedAvatarItems || []);
-  const skinThemeClass = avatarSkinThemeClass(equipped.skin);
   const activeAvatarMeta = avatarMeta(state.settings.avatar);
-  const characterProfile = AVATAR_CHARACTER_PROFILES[activeAvatarMeta.value] || null;
-  const skinItem = AVATAR_SHOP_ITEM_BY_ID[String(equipped.skin || "skin-classic")];
-  const furClass = skinItem?.previewClass || "fur-earth";
-  const expressionItem = AVATAR_SHOP_ITEM_BY_ID[String(equipped.expression || "")];
-  const poseItem = AVATAR_SHOP_ITEM_BY_ID[String(equipped.pose || "")];
-  const expressionClass = expressionItem?.previewClass || "";
-  const poseClass = poseItem?.previewClass || "";
+  const currentLevel = levelMetaFromXp(state.progress.xp).level;
+  const selection = avatarSheetSelectionFor(activeAvatarMeta.value);
+  const sheetPath = avatarSheetImagePath(activeAvatarMeta.value, selection);
 
-  const layers = ["headwear", "top", "bottom", "dress", "eyewear", "backpack", "badge", "tailAccessory"]
-    .map((slot) => {
-      const itemId = String(equipped[slot] || "");
-      const item = AVATAR_SHOP_ITEM_BY_ID[itemId];
-      if (!item) return "";
-      return `<span class="avatar-wear avatar-wear-${slot} ${item.previewClass}" aria-hidden="true"></span>`;
-    })
-    .join("");
-
-  const chips = AVATAR_SHOP_ITEMS.map((item) => {
-    const owned = ownedSet.has(item.id);
-    const isEquipped = String(equipped[item.slot] || "") === item.id;
-    const action = owned ? "avatar-equip-item" : "avatar-buy-item";
-    const actionLabel = owned ? (isEquipped ? "Unequip" : "Equip") : `Buy Rs ${item.price}`;
-    return `
-      <article class="avatar-shop-item ${owned ? "owned" : "locked"}">
-        <p class="avatar-shop-icon" aria-hidden="true"><span class="avatar-item-preview ${item.previewClass}"></span></p>
-        <h4>${item.label}</h4>
-        <p class="avatar-rarity ${item.rarity}">${String(item.rarity || "common").toUpperCase()}</p>
-        <p class="meta">${item.slot}</p>
-        <button class="btn ${owned ? "ghost" : "accent"} small" data-action="${action}" data-item-id="${item.id}">${actionLabel}</button>
-      </article>
-    `;
+  const avatarOptions = AVATAR_REWARDS.map((item) => {
+    const unlocked = isAvatarUnlocked(item.value, currentLevel) || item.value === activeAvatarMeta.value;
+    return `<option value="${item.value}" ${item.value === activeAvatarMeta.value ? "selected" : ""} ${unlocked ? "" : "disabled"}>${item.label}${unlocked ? "" : ` (Unlock L${item.unlockLevel})`}</option>`;
   }).join("");
 
-  const openedToday = state.progress.lastChestDate === todayIso();
+  const dropdown = (slot, label) => {
+    const options = AVATAR_SHEET_OPTIONS[slot]
+      .map((entry) => `<option value="${entry.value}" ${selection[slot] === entry.value ? "selected" : ""}>${entry.label}</option>`)
+      .join("");
+    return `
+      <label class="meta" for="avatar-${slot}-select">${label}</label>
+      <select id="avatar-${slot}-select" class="input" aria-label="${label}">
+        ${options}
+      </select>
+    `;
+  };
+
   return `
     <article class="card grid" style="gap:12px;">
-      <div class="row" style="flex-wrap:wrap; justify-content:space-between; align-items:center;">
+      <div class="row" style="flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px;">
         <h3>Avatar Studio</h3>
-        <span class="pill">Wallet: Rs ${Math.max(0, Number(state.progress.rupees) || 0)}</span>
+        <span class="pill">Character Sheets</span>
       </div>
-      <div class="avatar-studio-preview">
-        <div class="avatar-preview-canvas ${skinThemeClass}" aria-label="Avatar preview">
-          <div class="avatar-animal avatar-portrait animal-${activeAvatarMeta.value} ${furClass} ${expressionClass} ${poseClass}" role="img" aria-label="${activeAvatarMeta.label} avatar preview">
-            <img class="avatar-portrait-art" src="${avatarPortraitSrc(activeAvatarMeta.value)}" alt="${activeAvatarMeta.label}" loading="eager" decoding="async" />
-            ${layers}
-          </div>
+      <div class="avatar-sheet-layout">
+        <div class="avatar-sheet-controls grid" style="gap:8px;">
+          <label class="meta" for="avatar-character-select">Character</label>
+          <select id="avatar-character-select" class="input" aria-label="Character">
+            ${avatarOptions}
+          </select>
+          ${dropdown("eyewear", "Eyewear")}
+          ${dropdown("outfit", "Outfit")}
+          ${dropdown("headwear", "Headwear")}
         </div>
-        <p class="meta">Preview: ${activeAvatarMeta.label}. Customize in real time with clothing, glasses, hats, backpacks, tail accessories, badges, facial expressions, and poses.</p>
-        <article class="avatar-character-profile">
-          <h4>${characterProfile?.title || activeAvatarMeta.label}</h4>
-          <p class="meta">Personality: ${characterProfile?.personality || "Adventurer"}</p>
-          <p class="meta">Default outfit: ${characterProfile?.defaultOutfit || "Classic explorer"}</p>
-          <p class="meta">Style: upright anthropomorphic avatar with full-body customization.</p>
-        </article>
+        <figure class="avatar-sheet-preview" aria-label="Character preview">
+          <img class="avatar-sheet-image" src="${sheetPath}" alt="${activeAvatarMeta.label} customized character" loading="eager" decoding="async" />
+        </figure>
       </div>
-      <div class="row" style="flex-wrap:wrap; justify-content:space-between; align-items:center;">
-        <p class="meta">Daily treasure chest: ${openedToday ? "Opened today" : "Ready to open"}</p>
-        <button class="btn accent" data-action="avatar-open-chest" ${openedToday ? "disabled" : ""}>Open Chest</button>
-      </div>
-      <p class="meta">Chest rarity rates: Common 62%, Rare 30%, Epic 8%.</p>
-      <article class="avatar-xp-exchange">
-        <h4>Need more Rupees?</h4>
-        <p class="meta">Exchange XP to coins at a rate of ${XP_TO_RUPEE_RATE} XP = Rs 1.</p>
-        <div class="row" style="flex-wrap:wrap; gap:8px; justify-content:flex-start;">
-          <button class="btn ghost small" data-action="avatar-exchange-xp" data-xp-cost="100">100 XP → Rs 20</button>
-          <button class="btn ghost small" data-action="avatar-exchange-xp" data-xp-cost="250">250 XP → Rs 50</button>
-          <button class="btn ghost small" data-action="avatar-exchange-xp" data-xp-cost="500">500 XP → Rs 100</button>
-        </div>
-      </article>
-      <div class="avatar-shop-grid">${chips}</div>
+      <p class="meta">Select a character, then customize with dropdown menus. The preview image switches to a matching PNG sheet instantly.</p>
     </article>
   `;
 }
 
 function renderProfile() {
-  normalizeAvatarEconomyProgress();
   syncAchievements(false);
   const panel = document.getElementById("view-profile");
   const accuracy = state.progress.quizAttempts
@@ -2554,14 +2433,6 @@ function renderProfile() {
   const syncEndpoint = escapeHtmlAttr(state.settings.syncEndpoint || "");
   const syncToken = escapeHtmlAttr(state.settings.syncToken || "");
   const activeAvatar = normalizeAvatarId(state.settings.avatar);
-  const avatarChips = AVATAR_REWARDS.map((item) => {
-    const isCurrent = activeAvatar === item.value;
-    const unlocked = isAvatarUnlocked(item.value, currentLevel) || isCurrent;
-    const lockNote = unlocked ? "" : `<span class="avatar-lock">L${item.unlockLevel}</span>`;
-    const lockTitle = unlocked ? "" : `title="Unlocks at Level ${item.unlockLevel}"`;
-
-    return `<button class="avatar-chip ${isCurrent ? "selected" : ""} ${unlocked ? "" : "locked"}" data-action="profile-avatar" data-avatar="${item.value}" aria-label="Set avatar ${item.label}" ${lockTitle}>${renderAnimalBadge(item.value, "chip")}<span class="avatar-chip-name">${item.label}</span>${lockNote}</button>`;
-  }).join("");
 
   panel.innerHTML = `
     <section class="grid" style="gap:14px">
@@ -2575,12 +2446,9 @@ function renderProfile() {
 
       <article class="card grid">
         <h3>Avatar Customization</h3>
-        <p class="meta">Update your display name and unlock new avatars as you level up.</p>
+        <p class="meta">Update your display name. Character and visual customization are managed in Avatar Studio below.</p>
         <label for="profile-name" class="meta">Display name</label>
         <input id="profile-name" class="input" value="${state.settings.profileName}" maxlength="30" aria-label="Display name" />
-        <div class="avatar-grid">
-          ${avatarChips}
-        </div>
       </article>
 
       ${renderAvatarStudio()}
@@ -3201,113 +3069,8 @@ async function onClick(event) {
     return;
   }
 
-  if (action === "profile-avatar") {
-    const avatar = normalizeAvatarId(actionSource.dataset.avatar || state.settings.avatar);
-    const currentLevel = levelMetaFromXp(state.progress.xp).level;
-
-    if (!isAvatarUnlocked(avatar, currentLevel)) {
-      toast(`Unlock this avatar at Level ${avatarUnlockLevel(avatar)}`);
-      return;
-    }
-
-    state.settings.avatar = avatar;
-    updateHeaderControls();
-    persist();
-    renderProfile();
-    return;
-  }
-
-  if (action === "avatar-open-chest") {
-    claimDailyChestReward();
-    return;
-  }
-
-  if (action === "avatar-exchange-xp") {
-    const xpCost = Math.max(0, Number(actionSource.dataset.xpCost) || 0);
-    if (!xpCost) return;
-
-    const currentXp = Math.max(0, Number(state.progress.xp) || 0);
-    if (currentXp < xpCost) {
-      toast("Not enough XP");
-      return;
-    }
-
-    const rupees = Math.floor(xpCost / XP_TO_RUPEE_RATE);
-    if (rupees <= 0) {
-      toast("Exchange amount too small");
-      return;
-    }
-
-    state.progress.xp = currentXp - xpCost;
-    state.progress.rupees = Math.max(0, Number(state.progress.rupees) || 0) + rupees;
-    persist();
-    updateHeaderControls();
-    renderProfile();
-    toast(`Exchanged ${xpCost} XP for Rs ${rupees}`);
-    return;
-  }
-
   if (action === "chest-result-continue") {
     closeChestResultModal();
-    return;
-  }
-
-  if (action === "avatar-buy-item") {
-    const itemId = String(actionSource.dataset.itemId || "");
-    const item = AVATAR_SHOP_ITEM_BY_ID[itemId];
-    if (!item) return;
-
-    normalizeAvatarEconomyProgress();
-    const owned = new Set(state.progress.ownedAvatarItems || []);
-    if (owned.has(item.id)) {
-      toast("Item already owned");
-      return;
-    }
-
-    const wallet = Math.max(0, Number(state.progress.rupees) || 0);
-    if (wallet < item.price) {
-      toast("Not enough rupees");
-      return;
-    }
-
-    state.progress.rupees = wallet - item.price;
-    owned.add(item.id);
-    state.progress.ownedAvatarItems = Array.from(owned);
-    persist();
-    renderProfile();
-    toast(`Bought ${item.label}`);
-    return;
-  }
-
-  if (action === "avatar-equip-item") {
-    const itemId = String(actionSource.dataset.itemId || "");
-    const item = AVATAR_SHOP_ITEM_BY_ID[itemId];
-    if (!item) return;
-
-    normalizeAvatarEconomyProgress();
-    const owned = new Set(state.progress.ownedAvatarItems || []);
-    if (!owned.has(item.id)) {
-      toast("Buy this item first");
-      return;
-    }
-
-    const equipped = state.progress.equippedAvatarItems || {};
-    if (String(equipped[item.slot] || "") === item.id) {
-      equipped[item.slot] = item.slot === "skin" ? "skin-classic" : "";
-    } else {
-      equipped[item.slot] = item.id;
-      if (item.slot === "dress") {
-        equipped.top = "";
-        equipped.bottom = "";
-      }
-      if (item.slot === "top" || item.slot === "bottom") {
-        equipped.dress = "";
-      }
-    }
-
-    state.progress.equippedAvatarItems = equipped;
-    persist();
-    renderProfile();
     return;
   }
 
@@ -4161,6 +3924,43 @@ function onInput(event) {
     }
   }
 
+  if (target.id === "avatar-character-select") {
+    const requestedAvatar = normalizeAvatarId(target.value || state.settings.avatar);
+    const currentLevel = levelMetaFromXp(state.progress.xp).level;
+    if (!isAvatarUnlocked(requestedAvatar, currentLevel)) {
+      toast(`Unlock this avatar at Level ${avatarUnlockLevel(requestedAvatar)}`);
+      target.value = state.settings.avatar;
+      return;
+    }
+
+    state.settings.avatar = requestedAvatar;
+    ensureAvatarSheetSelections();
+    updateHeaderControls();
+    persist();
+    if (state.view === "profile") {
+      renderProfile();
+    }
+  }
+
+  if (target.id === "avatar-eyewear-select" || target.id === "avatar-outfit-select" || target.id === "avatar-headwear-select") {
+    const currentAvatar = normalizeAvatarId(state.settings.avatar);
+    if (target.id === "avatar-eyewear-select") {
+      setAvatarSheetSelection(currentAvatar, { eyewear: target.value });
+    }
+    if (target.id === "avatar-outfit-select") {
+      setAvatarSheetSelection(currentAvatar, { outfit: target.value });
+    }
+    if (target.id === "avatar-headwear-select") {
+      setAvatarSheetSelection(currentAvatar, { headwear: target.value });
+    }
+
+    updateHeaderControls();
+    persist();
+    if (state.view === "profile") {
+      renderProfile();
+    }
+  }
+
   if (target.id === "profile-sync-endpoint") {
     state.settings.syncEndpoint = String(target.value || "").trim();
   }
@@ -4288,7 +4088,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=183", { updateViaCache: "none" })
+      .register("sw.js?v=184", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
@@ -4344,7 +4144,7 @@ function refreshStateFromStorage() {
     saveFavorites(state.favorites);
   }
   normalizeSettings();
-  normalizeAvatarEconomyProgress();
+  ensureAvatarSheetSelections();
 }
 
 async function init() {

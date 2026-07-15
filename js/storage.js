@@ -29,8 +29,7 @@ const DEFAULT_PROGRESS = {
   rupees: 0,
   lastChestDate: "",
   lastChestPromptDate: "",
-  ownedAvatarItems: [],
-  equippedAvatarItems: {},
+  avatarSheetSelections: {},
   dailyGoal: {
     targetXp: 120,
     gainedXp: 0,
@@ -364,11 +363,8 @@ export function getProgress() {
   progress.rupees = Math.max(0, Number(progress.rupees) || 0);
   progress.lastChestDate = String(progress.lastChestDate || "").trim();
   progress.lastChestPromptDate = String(progress.lastChestPromptDate || "").trim();
-  progress.ownedAvatarItems = Array.isArray(progress.ownedAvatarItems)
-    ? progress.ownedAvatarItems.map((id) => String(id || "")).filter(Boolean)
-    : [];
-  progress.equippedAvatarItems = progress.equippedAvatarItems && typeof progress.equippedAvatarItems === "object"
-    ? { ...progress.equippedAvatarItems }
+  progress.avatarSheetSelections = progress.avatarSheetSelections && typeof progress.avatarSheetSelections === "object"
+    ? { ...progress.avatarSheetSelections }
     : {};
 
   if (typeof progress.dailyGoal.targetXp !== "number" || Number.isNaN(progress.dailyGoal.targetXp)) {
