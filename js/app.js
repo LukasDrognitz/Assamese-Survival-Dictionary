@@ -87,12 +87,13 @@ const LEGACY_AVATAR_MAP = {
   "river-dolphin": "langur",
   "monkey": "monkey",
   "bear": "bear",
+  "rhino": "rhino",
   "tortoise": "nilgai",
   "snow-leopard": "fox"
 };
 
 const AVATAR_META_BY_ID = Object.fromEntries(AVATAR_REWARDS.map((item) => [item.value, item]));
-const AVATAR_IMAGE_VERSION = "20260715-182";
+const AVATAR_IMAGE_VERSION = "20260715-184";
 const USER_AVATAR_OPTIONS = {
   peacock: {
     label: "Pavo the Peacock",
@@ -108,6 +109,11 @@ const USER_AVATAR_OPTIONS = {
     label: "Balu the Bear",
     avatarImage: `assets/images/avatars/Bear.png?v=${AVATAR_IMAGE_VERSION}`,
     profileImage: `assets/images/avatars/Bear_Profile.png?v=${AVATAR_IMAGE_VERSION}`
+  },
+  rhino: {
+    label: "Rani the Rhino",
+    avatarImage: `assets/images/avatars/rani_rhino_one_horn_full_body.png?v=${AVATAR_IMAGE_VERSION}`,
+    profileImage: `assets/images/avatars/Rhino.png?v=${AVATAR_IMAGE_VERSION}`
   }
 };
 const DEFAULT_USER_AVATAR = "peacock";
@@ -380,7 +386,7 @@ const CONVERSATION_TOPICS = {
 const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
 const LOVE_MILESTONE_STEP_XP = 2110;
 const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
-const APP_BUILD_VERSION = "20260715-183";
+const APP_BUILD_VERSION = "20260715-184";
 const CHEST_OPEN_ANIMATION_MS = 1050;
 
 function customDictionaryEntryCount() {
@@ -2442,6 +2448,7 @@ function renderProfile() {
           <option value="peacock" ${activeAvatar === "peacock" ? "selected" : ""}>Pavo the Peacock</option>
           <option value="monkey" ${activeAvatar === "monkey" ? "selected" : ""}>Milo the Monkey</option>
           <option value="bear" ${activeAvatar === "bear" ? "selected" : ""}>Balu the Bear</option>
+          <option value="rhino" ${activeAvatar === "rhino" ? "selected" : ""}>Rani the Rhino</option>
         </select>
       </article>
 
@@ -4095,7 +4102,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=195", { updateViaCache: "none" })
+      .register("sw.js?v=196", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
