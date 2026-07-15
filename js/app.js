@@ -43,7 +43,7 @@ import {
   selectLessonMatchingCard,
   startLessonWritingStage,
   submitLessonWritingAnswer
-} from "./lessons.js?v=20260715-01";
+} from "./lessons.js?v=20260715-02";
 import { updateSpacedRepetition, shuffleCards, renderFlashcard, renderFlashSummary } from "./flashcards.js?v=20260713-38";
 import { buildQuizQuestions, renderQuizView } from "./quiz.js?v=20260710-33";
 import {
@@ -3648,7 +3648,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=170", { updateViaCache: "none" })
+      .register("sw.js?v=171", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
