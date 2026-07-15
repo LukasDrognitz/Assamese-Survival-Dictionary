@@ -331,7 +331,7 @@ const CONVERSATION_TOPICS = {
 const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
 const LOVE_MILESTONE_STEP_XP = 2110;
 const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
-const APP_BUILD_VERSION = "20260715-163";
+const APP_BUILD_VERSION = "20260715-164";
 
 function customDictionaryEntryCount() {
   return getCustomWords().length;
@@ -584,6 +584,8 @@ function renderAnimalBadge(avatarId, variant = "mini") {
   const safeVariant = ["mini", "chip"].includes(variant) ? variant : "mini";
   return `
     <span class="animal-badge ${safeVariant} animal-${safeId}" aria-hidden="true">
+      <span class="animal-badge-mark left"></span>
+      <span class="animal-badge-mark right"></span>
       <span class="animal-badge-ear left"></span>
       <span class="animal-badge-ear right"></span>
       <span class="animal-badge-head"></span>
@@ -593,6 +595,13 @@ function renderAnimalBadge(avatarId, variant = "mini") {
       <span class="animal-badge-horn"></span>
       <span class="animal-badge-trunk"></span>
       <span class="animal-badge-crest"></span>
+      <span class="animal-badge-beak"></span>
+      <span class="animal-badge-antler left"></span>
+      <span class="animal-badge-antler right"></span>
+      <span class="animal-badge-tusk left"></span>
+      <span class="animal-badge-tusk right"></span>
+      <span class="animal-badge-whisker left"></span>
+      <span class="animal-badge-whisker right"></span>
     </span>
   `;
 }
@@ -2320,6 +2329,8 @@ function renderAvatarStudio() {
       <div class="avatar-studio-preview">
         <div class="avatar-preview-canvas ${skinThemeClass}" aria-label="Avatar preview">
           <div class="avatar-animal animal-${activeAvatarMeta.value} ${furClass}" role="img" aria-label="${activeAvatarMeta.label} avatar preview">
+            <span class="avatar-mark left"></span>
+            <span class="avatar-mark right"></span>
             <span class="avatar-tail"></span>
             <span class="avatar-body"></span>
             <span class="avatar-leg left"></span>
@@ -2333,6 +2344,14 @@ function renderAvatarStudio() {
             <span class="avatar-horn"></span>
             <span class="avatar-trunk"></span>
             <span class="avatar-crest"></span>
+            <span class="avatar-beak"></span>
+            <span class="avatar-antler left"></span>
+            <span class="avatar-antler right"></span>
+            <span class="avatar-tusk left"></span>
+            <span class="avatar-tusk right"></span>
+            <span class="avatar-whisker left"></span>
+            <span class="avatar-whisker right"></span>
+            <span class="avatar-shell"></span>
             ${layers}
           </div>
         </div>
@@ -4087,7 +4106,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=175", { updateViaCache: "none" })
+      .register("sw.js?v=176", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
