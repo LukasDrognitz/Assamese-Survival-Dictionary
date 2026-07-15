@@ -380,7 +380,7 @@ const CONVERSATION_TOPICS = {
 const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
 const LOVE_MILESTONE_STEP_XP = 2110;
 const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
-const APP_BUILD_VERSION = "20260715-181";
+const APP_BUILD_VERSION = "20260715-182";
 const CHEST_OPEN_ANIMATION_MS = 1050;
 
 function customDictionaryEntryCount() {
@@ -2448,7 +2448,7 @@ function renderProfile() {
       <article class="card grid" style="gap:12px;">
         <h3>Avatar</h3>
         <figure class="profile-avatar-frame" aria-label="Avatar preview">
-          <img class="profile-avatar-image" src="${activeAvatarOption.avatarImage}" alt="${activeAvatarOption.label} avatar" loading="eager" decoding="async" />
+          <img class="profile-avatar-image avatar-image-${activeAvatar}" src="${activeAvatarOption.avatarImage}" alt="${activeAvatarOption.label} avatar" loading="eager" decoding="async" />
         </figure>
       </article>
 
@@ -4095,7 +4095,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=193", { updateViaCache: "none" })
+      .register("sw.js?v=194", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
