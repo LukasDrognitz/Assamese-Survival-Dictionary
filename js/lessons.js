@@ -395,7 +395,8 @@ export function selectLessonMatchingCard(session, side, cardId) {
 
   matching.wrongPair = {
     leftId: left.id,
-    rightId: right.id
+    rightId: right.id,
+    token: Date.now() + Math.random()
   };
   matching.selectedLeftId = "";
   matching.selectedRightId = "";
@@ -409,6 +410,7 @@ export function selectLessonMatchingCard(session, side, cardId) {
     resolved: true,
     correct: false,
     wordIds: [left.wordId, right.wordId],
+    wrongPair: matching.wrongPair,
     completed: false
   };
 }
@@ -551,8 +553,10 @@ function renderLessonMatchingDetail(lesson, session) {
   return `
     <article class="card lesson-detail-card lesson-learning-card">
       ${renderLessonSessionHeader(session, `${lesson.icon} ${lesson.title} · Step 2: Match`)}
+      <div class="lesson-match-description">
+        <p class="meta">Cards stay available until you find the correct pair.</p>
+      </div>
       <div class="row lesson-match-meta" style="flex-wrap: wrap;">
-        <p class="meta">Tap one card from each column to build a pair.</p>
         <span class="pill lesson-match-counter">${matchedCount}/${totalPairs} pairs</span>
       </div>
       <div class="lesson-match-grid">
@@ -563,7 +567,8 @@ function renderLessonMatchingDetail(lesson, session) {
         <p class="lesson-match-feedback-line">${matching.feedback.text}</p>
         ${completed
     ? '<button class="btn accent lesson-match-continue" data-action="lesson-match-continue">Continue</button>'
-    : '<p class="meta lesson-match-helper">Cards stay available until you find the correct pair.</p>'}
+    : ''}
+        <button class="btn ghost" data-action="lesson-back">Back to lessons</button>
       </footer>
     </article>
   `;
@@ -596,6 +601,9 @@ function renderLessonWritingDetail(lesson, session) {
       <div class="grid" style="gap:8px;">
         <input id="lesson-writing-input" class="input" autocomplete="off" autocapitalize="off" placeholder="Type English answer" ${payload ? "" : "disabled"} />
         <button class="btn accent" data-action="lesson-writing-submit" ${payload ? "" : "disabled"}>Check answer</button>
+      </div>
+      <div class="row" style="flex-wrap:wrap;">
+        <button class="btn ghost" data-action="lesson-back">Back to lessons</button>
       </div>
       <footer class="lesson-learning-feedback ${writing.feedback.tone || "neutral"}">${writing.feedback.text}</footer>
     </article>
@@ -690,8 +698,6 @@ export function renderLessonDetail(lesson, index, progress, isFavorite, learning
 
   const item = lesson.items[index] || lesson.items[0];
   const pct = Math.round(((index + 1) / lesson.items.length) * 100);
-  const reviewed = learningSession?.reviewedIds?.includes(String(item.id));
-  const buttonLabel = reviewed ? "Reviewed" : "Mark as reviewed";
 
   return `
     <article class="card lesson-detail-card">
@@ -709,7 +715,6 @@ export function renderLessonDetail(lesson, index, progress, isFavorite, learning
       <div class="row" style="margin-top:28px; flex-wrap: wrap;">
         <button class="btn ghost" data-action="lesson-prev">Previous</button>
         <button class="btn ghost" data-action="lesson-next">Next</button>
-        <button class="btn secondary" data-action="mark-learned" data-word="${item.id}">${buttonLabel}</button>
       </div>
     </article>
   `;

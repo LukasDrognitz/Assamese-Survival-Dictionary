@@ -11,6 +11,7 @@ import {
   saveSearchHistory,
   getRecentWords,
   saveRecentWords,
+  getCustomWords,
   exportDataBundle,
   importDataBundle,
   resetAllData,
@@ -183,25 +184,25 @@ const ASSAM_DID_YOU_KNOW_FACTS = [
 
 const ACHIEVEMENT_CANDIDATES = [
   {
-    id: "first-word",
-    label: "First Word",
+    id: "dictionary-starter",
+    label: "Dictionary Starter",
     icon: "🔤",
-    description: "Learn your first Assamese word.",
-    check: () => state.progress.wordsLearned.length >= 1
+    description: "Add your first word or phrase to Dictionary.",
+    check: () => customDictionaryEntryCount() >= 1
   },
   {
-    id: "word-collector",
-    label: "Word Collector",
+    id: "dictionary-builder",
+    label: "Dictionary Builder",
     icon: "📘",
-    description: "Learn 25 Assamese words.",
-    check: () => state.progress.wordsLearned.length >= 25
+    description: "Add 10 words or phrases to Dictionary.",
+    check: () => customDictionaryEntryCount() >= 10
   },
   {
-    id: "word-explorer",
-    label: "Word Explorer",
+    id: "dictionary-master",
+    label: "Dictionary Master",
     icon: "🧭",
-    description: "Learn 100 Assamese words.",
-    check: () => state.progress.wordsLearned.length >= 100
+    description: "Add 100 words or phrases to Dictionary.",
+    check: () => customDictionaryEntryCount() >= 100
   },
   {
     id: "lesson-starter",
@@ -225,11 +226,11 @@ const ACHIEVEMENT_CANDIDATES = [
     check: () => state.progress.quizAttempts >= 1
   },
   {
-    id: "quiz-ace",
-    label: "Quiz Ace",
+    id: "quiz-master",
+    label: "Quiz Master",
     icon: "🎯",
-    description: "Reach at least 80% quiz accuracy with 10+ attempts.",
-    check: () => state.progress.quizAttempts >= 10 && (state.progress.quizCorrect / Math.max(1, state.progress.quizAttempts)) >= 0.8
+    description: "Complete 100 quizzes.",
+    check: () => Number(state.progress.quizzesCompleted || 0) >= 100
   },
   {
     id: "xp-rookie",
@@ -316,6 +317,106 @@ const LOVE_MILESTONE_STEP_XP = 2110;
 const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
 const APP_BUILD_VERSION = "20260715-161";
 
+function customDictionaryEntryCount() {
+  return getCustomWords().length;
+}
+
+const AVATAR_SHOP_ITEMS = [
+  { id: "skin-classic", slot: "skin", label: "Classic Skin", icon: "🙂", price: 0, rarity: "common" },
+  { id: "skin-sun", slot: "skin", label: "Sun Skin", icon: "😄", price: 220, rarity: "rare" },
+  { id: "skin-cool", slot: "skin", label: "Cool Skin", icon: "😎", price: 280, rarity: "epic" },
+  { id: "cap-basic", slot: "headwear", label: "Basic Cap", icon: "🧢", price: 80, rarity: "common" },
+  { id: "cap-crown", slot: "headwear", label: "Gold Crown", icon: "👑", price: 420, rarity: "epic" },
+  { id: "shirt-blue", slot: "top", label: "Blue T-Shirt", icon: "👕", price: 120, rarity: "common" },
+  { id: "shirt-green", slot: "top", label: "Green T-Shirt", icon: "👕", price: 140, rarity: "common" },
+  { id: "pants-jeans", slot: "bottom", label: "Jeans", icon: "👖", price: 140, rarity: "common" },
+  { id: "pants-track", slot: "bottom", label: "Track Pants", icon: "👖", price: 160, rarity: "rare" },
+  { id: "dress-red", slot: "dress", label: "Red Dress", icon: "👗", price: 260, rarity: "rare" },
+  { id: "dress-floral", slot: "dress", label: "Floral Dress", icon: "👗", price: 320, rarity: "epic" },
+  { id: "glasses-basic", slot: "eyewear", label: "Sunglasses", icon: "🕶️", price: 170, rarity: "common" },
+  { id: "glasses-star", slot: "eyewear", label: "Star Sunglasses", icon: "🕶️", price: 240, rarity: "rare" }
+];
+
+const AVATAR_SHOP_ITEM_BY_ID = Object.fromEntries(AVATAR_SHOP_ITEMS.map((item) => [item.id, item]));
+const AVATAR_SHOP_FREE_ITEM_IDS = AVATAR_SHOP_ITEMS.filter((item) => item.price === 0).map((item) => item.id);
+
+const CHEST_RUPEE_TIERS = [
+  { rarity: "common", weight: 62, min: 80, max: 140 },
+  { rarity: "rare", weight: 30, min: 141, max: 230 },
+  { rarity: "epic", weight: 8, min: 231, max: 320 }
+];
+
+const CHEST_ITEM_RARITY_WEIGHTS = [
+  { rarity: "common", weight: 64 },
+  { rarity: "rare", weight: 28 },
+  { rarity: "epic", weight: 8 }
+];
+
+function pickWeighted(items) {
+  const total = items.reduce((sum, item) => sum + Math.max(0, Number(item.weight) || 0), 0);
+  if (total <= 0) return null;
+
+  let roll = Math.random() * total;
+  for (const item of items) {
+    roll -= Math.max(0, Number(item.weight) || 0);
+    if (roll <= 0) return item;
+  }
+  return items[items.length - 1] || null;
+}
+
+function rollChestRupeeReward() {
+  const tier = pickWeighted(CHEST_RUPEE_TIERS) || CHEST_RUPEE_TIERS[0];
+  const value = tier.min + Math.floor(Math.random() * (tier.max - tier.min + 1));
+  return { rarity: tier.rarity, value };
+}
+
+function rollChestBonusItem(ownedSet) {
+  const unowned = AVATAR_SHOP_ITEMS.filter((item) => item.price > 0 && !ownedSet.has(item.id));
+  if (!unowned.length) return null;
+
+  const rarityPick = pickWeighted(CHEST_ITEM_RARITY_WEIGHTS);
+  if (!rarityPick) return null;
+
+  const pool = unowned.filter((item) => item.rarity === rarityPick.rarity);
+  const finalPool = pool.length ? pool : unowned;
+  return finalPool[Math.floor(Math.random() * finalPool.length)] || null;
+}
+
+function avatarSkinThemeClass(itemId) {
+  const theme = String(itemId || "skin-classic").replace(/^skin-/, "") || "classic";
+  return `skin-theme-${theme}`;
+}
+
+function normalizeAvatarEconomyProgress() {
+  state.progress.rupees = Math.max(0, Number(state.progress.rupees) || 0);
+  state.progress.lastChestDate = String(state.progress.lastChestDate || "").trim();
+
+  const owned = Array.isArray(state.progress.ownedAvatarItems)
+    ? state.progress.ownedAvatarItems.map((id) => String(id))
+    : [];
+  const ownedSet = new Set(owned.filter((id) => Boolean(AVATAR_SHOP_ITEM_BY_ID[id])));
+  AVATAR_SHOP_FREE_ITEM_IDS.forEach((id) => ownedSet.add(id));
+  state.progress.ownedAvatarItems = Array.from(ownedSet);
+
+  const equipped = state.progress.equippedAvatarItems && typeof state.progress.equippedAvatarItems === "object"
+    ? { ...state.progress.equippedAvatarItems }
+    : {};
+
+  const slots = ["skin", "headwear", "top", "bottom", "dress", "eyewear"];
+  slots.forEach((slot) => {
+    const current = String(equipped[slot] || "").trim();
+    if (!current || !AVATAR_SHOP_ITEM_BY_ID[current]) {
+      equipped[slot] = slot === "skin" ? "skin-classic" : "";
+      return;
+    }
+    if (!ownedSet.has(current)) {
+      equipped[slot] = slot === "skin" ? "skin-classic" : "";
+    }
+  });
+
+  state.progress.equippedAvatarItems = equipped;
+}
+
 let chatPinIntervalId = null;
 
 const state = {
@@ -366,9 +467,6 @@ const state = {
     hardWordIds: [],
     categoryDropAnimating: false,
     categoryDropFromType: "words"
-  },
-  lessonLearning: {
-    session: null
   },
   quiz: {
     questions: [],
@@ -426,7 +524,13 @@ const state = {
   levelUpQueue: [],
   levelUpCelebrationActive: false,
   loveMilestoneQueue: [],
-  loveMilestoneCelebrationActive: false
+  loveMilestoneCelebrationActive: false,
+  chestResultDialog: {
+    isOpen: false,
+    rarity: "common",
+    rupees: 0,
+    itemId: ""
+  }
 };
 
 const dom = {
@@ -788,6 +892,74 @@ function createLoveMilestoneCelebrationModal() {
     </article>
   `;
   document.body.appendChild(container);
+}
+
+function createChestResultModal() {
+  if (document.getElementById("chest-result-celebration")) return;
+
+  const container = document.createElement("section");
+  container.id = "chest-result-celebration";
+  container.className = "chest-result-celebration hidden";
+  container.setAttribute("role", "dialog");
+  container.setAttribute("aria-modal", "true");
+  container.setAttribute("aria-live", "polite");
+  container.setAttribute("aria-label", "Treasure chest reward");
+  container.innerHTML = `
+    <article class="chest-result-card glass">
+      <p class="eyebrow" id="chest-result-rarity">COMMON CHEST</p>
+      <h2 id="chest-result-rupees">+0 Rupees</h2>
+      <p class="meta" id="chest-result-item">No bonus item this time.</p>
+      <button class="btn accent" data-action="chest-result-continue">Continue</button>
+    </article>
+  `;
+  document.body.appendChild(container);
+}
+
+function openChestResultModal(payload) {
+  const dialog = document.getElementById("chest-result-celebration");
+  const rarityNode = document.getElementById("chest-result-rarity");
+  const rupeeNode = document.getElementById("chest-result-rupees");
+  const itemNode = document.getElementById("chest-result-item");
+  if (!dialog || !rarityNode || !rupeeNode || !itemNode) return;
+
+  const rarity = String(payload?.rarity || "common").toLowerCase();
+  const rupees = Math.max(0, Number(payload?.rupees) || 0);
+  const itemId = String(payload?.itemId || "");
+  const item = AVATAR_SHOP_ITEM_BY_ID[itemId];
+
+  state.chestResultDialog = {
+    isOpen: true,
+    rarity,
+    rupees,
+    itemId: item?.id || ""
+  };
+
+  dialog.classList.remove("common", "rare", "epic");
+  dialog.classList.add(rarity === "rare" || rarity === "epic" ? rarity : "common");
+
+  rarityNode.textContent = `${rarity.toUpperCase()} CHEST`;
+  rupeeNode.textContent = `+${rupees} Rupees`;
+  itemNode.textContent = item
+    ? `Bonus item unlocked: ${item.icon} ${item.label}`
+    : "No bonus item this time. Come back tomorrow for another chest.";
+
+  dialog.classList.remove("hidden");
+  document.body.classList.add("lock-scroll");
+}
+
+function closeChestResultModal() {
+  const dialog = document.getElementById("chest-result-celebration");
+  if (!dialog) return;
+
+  dialog.classList.add("hidden");
+  dialog.classList.remove("common", "rare", "epic");
+  document.body.classList.remove("lock-scroll");
+  state.chestResultDialog = {
+    isOpen: false,
+    rarity: "common",
+    rupees: 0,
+    itemId: ""
+  };
 }
 
 function queueLoveMilestones(previousXp, nextXp) {
@@ -2010,15 +2182,15 @@ function renderAchievements() {
   const tiers = [
     {
       title: "Beginner",
-      ids: ["first-word", "lesson-starter", "quiz-starter", "xp-rookie"]
+      ids: ["dictionary-starter", "lesson-starter", "quiz-starter", "xp-rookie"]
     },
     {
       title: "Intermediate",
-      ids: ["word-collector", "lesson-climber", "word-explorer", "level-5-learner"]
+      ids: ["dictionary-builder", "lesson-climber", "dictionary-master", "level-5-learner"]
     },
     {
       title: "Advanced",
-      ids: ["quiz-ace", "xp-pro", "streak-hero", "level-10-learner"]
+      ids: ["quiz-master", "xp-pro", "streak-hero", "level-10-learner"]
     }
   ];
 
@@ -2052,7 +2224,60 @@ function renderAchievements() {
     .join("");
 }
 
+function renderAvatarStudio() {
+  const equipped = state.progress.equippedAvatarItems || {};
+  const ownedSet = new Set(state.progress.ownedAvatarItems || []);
+  const skinThemeClass = avatarSkinThemeClass(equipped.skin);
+
+  const layers = ["skin", "headwear", "top", "bottom", "dress", "eyewear"]
+    .map((slot) => {
+      const itemId = String(equipped[slot] || "");
+      const item = AVATAR_SHOP_ITEM_BY_ID[itemId];
+      if (!item) return "";
+      return `<span class="avatar-layer avatar-layer-${slot}">${item.icon}</span>`;
+    })
+    .join("");
+
+  const chips = AVATAR_SHOP_ITEMS.map((item) => {
+    const owned = ownedSet.has(item.id);
+    const isEquipped = String(equipped[item.slot] || "") === item.id;
+    const action = owned ? "avatar-equip-item" : "avatar-buy-item";
+    const actionLabel = owned ? (isEquipped ? "Equipped" : "Equip") : `Buy Rs ${item.price}`;
+    const disabled = owned && isEquipped ? "disabled" : "";
+    return `
+      <article class="avatar-shop-item ${owned ? "owned" : "locked"}">
+        <p class="avatar-shop-icon" aria-hidden="true">${item.icon}</p>
+        <h4>${item.label}</h4>
+        <p class="avatar-rarity ${item.rarity}">${String(item.rarity || "common").toUpperCase()}</p>
+        <p class="meta">${item.slot}</p>
+        <button class="btn ${owned ? "ghost" : "accent"} small" data-action="${action}" data-item-id="${item.id}" ${disabled}>${actionLabel}</button>
+      </article>
+    `;
+  }).join("");
+
+  const openedToday = state.progress.lastChestDate === todayIso();
+  return `
+    <article class="card grid" style="gap:12px;">
+      <div class="row" style="flex-wrap:wrap; justify-content:space-between; align-items:center;">
+        <h3>Avatar Studio</h3>
+        <span class="pill">Wallet: Rs ${Math.max(0, Number(state.progress.rupees) || 0)}</span>
+      </div>
+      <div class="avatar-studio-preview">
+        <div class="avatar-preview-canvas ${skinThemeClass}" aria-label="Avatar preview">${layers}</div>
+        <p class="meta">Customize your avatar with skins, caps, tops, pants, dresses, and sunglasses.</p>
+      </div>
+      <div class="row" style="flex-wrap:wrap; justify-content:space-between; align-items:center;">
+        <p class="meta">Daily treasure chest: ${openedToday ? "Opened today" : "Ready to open"}</p>
+        <button class="btn accent" data-action="avatar-open-chest" ${openedToday ? "disabled" : ""}>Open Chest</button>
+      </div>
+      <p class="meta">Chest rarity rates: Common 62%, Rare 30%, Epic 8%.</p>
+      <div class="avatar-shop-grid">${chips}</div>
+    </article>
+  `;
+}
+
 function renderProfile() {
+  normalizeAvatarEconomyProgress();
   syncAchievements(false);
   const panel = document.getElementById("view-profile");
   const accuracy = state.progress.quizAttempts
@@ -2092,6 +2317,8 @@ function renderProfile() {
         </div>
       </article>
 
+      ${renderAvatarStudio()}
+
       <article class="card grid auto">
         <div class="stat"><span class="label">Level Progress</span><span class="value">${nextLevelCopy}</span></div>
         <div class="stat"><span class="label">Lessons completed</span><span class="value">${state.progress.lessonsCompleted.length}</span></div>
@@ -2109,8 +2336,8 @@ function renderProfile() {
         <h3>XP Rewards</h3>
         <p class="meta">How XP is earned in each activity.</p>
         <ul class="xp-rules-list" aria-label="XP reward rules">
-          <li><span>Learn a new word</span><strong>+12 XP</strong></li>
-          <li><span>Complete a lesson</span><strong>+30 XP</strong></li>
+          <li><span>Complete a lesson</span><strong>+40 XP</strong></li>
+          <li><span>Restart a lesson</span><strong>+10 XP</strong></li>
           <li><span>Flashcard review</span><strong>+4 XP</strong></li>
           <li><span>Correct quiz answer</span><strong>+8 XP</strong></li>
           <li><span>Finish a quiz</span><strong>+20 XP</strong></li>
@@ -2468,7 +2695,7 @@ function finishLessonLearningSession(lesson) {
     state.progress.lessonsCompleted.push(lesson.id);
     pruneCompletedLessonFavorites();
     state.progress.dailyGoal.lessonsDone += 1;
-    xpGain(30, `Completed lesson ${lesson.title}`);
+    xpGain(40, `Completed lesson ${lesson.title}`);
     if (state.settings.animations) drawConfetti();
   }
 }
@@ -2712,6 +2939,104 @@ async function onClick(event) {
     return;
   }
 
+  if (action === "avatar-open-chest") {
+    const today = todayIso();
+    if (state.progress.lastChestDate === today) {
+      toast("Treasure chest already opened today");
+      return;
+    }
+
+    normalizeAvatarEconomyProgress();
+    const ownedSet = new Set(state.progress.ownedAvatarItems || []);
+    const rupeeDrop = rollChestRupeeReward();
+    const reward = rupeeDrop.value;
+
+    let bonusItemId = "";
+    if (Math.random() < 0.42) {
+      const bonusItem = rollChestBonusItem(ownedSet);
+      if (bonusItem) {
+        ownedSet.add(bonusItem.id);
+        state.progress.ownedAvatarItems = Array.from(ownedSet);
+        bonusItemId = bonusItem.id;
+      }
+    }
+
+    state.progress.lastChestDate = today;
+    state.progress.rupees = Math.max(0, Number(state.progress.rupees) || 0) + reward;
+    persist();
+    renderProfile();
+    openChestResultModal({
+      rarity: rupeeDrop.rarity,
+      rupees: reward,
+      itemId: bonusItemId
+    });
+    return;
+  }
+
+  if (action === "chest-result-continue") {
+    closeChestResultModal();
+    return;
+  }
+
+  if (action === "avatar-buy-item") {
+    const itemId = String(actionSource.dataset.itemId || "");
+    const item = AVATAR_SHOP_ITEM_BY_ID[itemId];
+    if (!item) return;
+
+    normalizeAvatarEconomyProgress();
+    const owned = new Set(state.progress.ownedAvatarItems || []);
+    if (owned.has(item.id)) {
+      toast("Item already owned");
+      return;
+    }
+
+    const wallet = Math.max(0, Number(state.progress.rupees) || 0);
+    if (wallet < item.price) {
+      toast("Not enough rupees");
+      return;
+    }
+
+    state.progress.rupees = wallet - item.price;
+    owned.add(item.id);
+    state.progress.ownedAvatarItems = Array.from(owned);
+    persist();
+    renderProfile();
+    toast(`Bought ${item.label}`);
+    return;
+  }
+
+  if (action === "avatar-equip-item") {
+    const itemId = String(actionSource.dataset.itemId || "");
+    const item = AVATAR_SHOP_ITEM_BY_ID[itemId];
+    if (!item) return;
+
+    normalizeAvatarEconomyProgress();
+    const owned = new Set(state.progress.ownedAvatarItems || []);
+    if (!owned.has(item.id)) {
+      toast("Buy this item first");
+      return;
+    }
+
+    const equipped = state.progress.equippedAvatarItems || {};
+    if (String(equipped[item.slot] || "") === item.id) {
+      equipped[item.slot] = item.slot === "skin" ? "skin-classic" : "";
+    } else {
+      equipped[item.slot] = item.id;
+      if (item.slot === "dress") {
+        equipped.top = "";
+        equipped.bottom = "";
+      }
+      if (item.slot === "top" || item.slot === "bottom") {
+        equipped.dress = "";
+      }
+    }
+
+    state.progress.equippedAvatarItems = equipped;
+    persist();
+    renderProfile();
+    return;
+  }
+
   if (action === "quick-open") {
     const targetView = actionSource.dataset.target;
     if (["home", "lessons", "dictionary", "practice", "profile"].includes(targetView)) {
@@ -2760,6 +3085,7 @@ async function onClick(event) {
     state.lessonsScreen = "detail";
     const lesson = state.lessons.find((item) => item.id === state.activeLessonId);
     if (lesson) {
+      xpGain(10, `Restarted lesson ${lesson.title}`);
       startLessonLearningSession(lesson);
     }
     renderLessons();
@@ -2810,8 +3136,31 @@ async function onClick(event) {
     if (state.lessonLearning.session?.stage && state.lessonLearning.session.stage !== "review") return;
     const lesson = state.lessons.find((item) => item.id === state.activeLessonId);
     if (!lesson) return;
+
+    if (!state.lessonLearning.session) {
+      startLessonLearningSession(lesson);
+    }
+
+    const session = state.lessonLearning.session;
+    if (!session || session.stage !== "review") return;
+
+    const currentItem = lesson.items[state.activeLessonIndex] || lesson.items[0];
+    if (!currentItem) return;
+
+    markLessonWordReviewed(currentItem);
+    markLessonReviewComplete(session, currentItem.id);
+
+    if (lessonReviewComplete(session)) {
+      startLessonMatchingStage(session);
+      persist();
+      renderLessons();
+      return;
+    }
+
     state.activeLessonIndex = Math.min(lesson.items.length - 1, state.activeLessonIndex + 1);
+    persist();
     renderLessons();
+    renderHome();
     return;
   }
 
@@ -2860,6 +3209,7 @@ async function onClick(event) {
     const cardId = actionSource.dataset.cardId;
     const result = selectLessonMatchingCard(session, side, cardId);
     if (!result?.changed) return;
+    const wrongPairToken = !result.correct ? result?.wrongPair?.token : null;
 
     if (result.resolved) {
       (result.wordIds || []).forEach((id) => {
@@ -2881,6 +3231,20 @@ async function onClick(event) {
 
     persist();
     renderLessons();
+
+    if (wrongPairToken) {
+      window.setTimeout(() => {
+        const latestSession = state.lessonLearning.session;
+        if (!latestSession || latestSession.stage !== "matching" || !latestSession.matching) return;
+        if (latestSession.matching.wrongPair?.token !== wrongPairToken) return;
+
+        latestSession.matching.wrongPair = null;
+        if (state.view === "lessons" && state.lessonsScreen === "detail") {
+          renderLessons();
+        }
+      }, 650);
+    }
+
     return;
   }
 
@@ -3326,6 +3690,7 @@ async function onClick(event) {
       const isPerfect = state.quiz.score === total;
 
       state.progress.dailyGoal.quizDone += 1;
+      state.progress.quizzesCompleted = Math.max(0, Number(state.progress.quizzesCompleted) || 0) + 1;
       xpGain(20, "Finished quiz");
       state.quiz.showSummary = true;
       if (isPerfect) {
@@ -3705,6 +4070,7 @@ function refreshStateFromStorage() {
     saveFavorites(state.favorites);
   }
   normalizeSettings();
+  normalizeAvatarEconomyProgress();
 }
 
 async function init() {
@@ -3722,6 +4088,7 @@ async function init() {
   createAchievementCelebrationModal();
   createLevelUpCelebrationModal();
   createLoveMilestoneCelebrationModal();
+  createChestResultModal();
   syncAchievements(false);
   applyTheme();
   updateHeaderControls();

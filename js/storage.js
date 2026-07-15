@@ -25,6 +25,11 @@ const DEFAULT_PROGRESS = {
   lessonsCompleted: [],
   quizAttempts: 0,
   quizCorrect: 0,
+  quizzesCompleted: 0,
+  rupees: 0,
+  lastChestDate: "",
+  ownedAvatarItems: [],
+  equippedAvatarItems: {},
   dailyGoal: {
     targetXp: 120,
     gainedXp: 0,
@@ -354,6 +359,15 @@ export function getProgress() {
   }
   delete progress.flashWordProgress;
   progress.loveMilestoneXpSeen = Math.max(0, Number(progress.loveMilestoneXpSeen) || 0);
+  progress.quizzesCompleted = Math.max(0, Number(progress.quizzesCompleted) || 0);
+  progress.rupees = Math.max(0, Number(progress.rupees) || 0);
+  progress.lastChestDate = String(progress.lastChestDate || "").trim();
+  progress.ownedAvatarItems = Array.isArray(progress.ownedAvatarItems)
+    ? progress.ownedAvatarItems.map((id) => String(id || "")).filter(Boolean)
+    : [];
+  progress.equippedAvatarItems = progress.equippedAvatarItems && typeof progress.equippedAvatarItems === "object"
+    ? { ...progress.equippedAvatarItems }
+    : {};
 
   if (typeof progress.dailyGoal.targetXp !== "number" || Number.isNaN(progress.dailyGoal.targetXp)) {
     const legacyTargetWords = Number(progress.dailyGoal.targetWords || 0);

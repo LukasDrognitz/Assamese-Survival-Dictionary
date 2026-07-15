@@ -1422,33 +1422,51 @@ body.lesson-immersive .topbar {
 .lesson-learning-card {
   min-height: 640px;
   gap: 12px;
-  background: linear-gradient(180deg, #f6fbff 0%, #eff7ff 100%);
-  color: #102331;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--surface) 94%, #ffffff 6%) 0%,
+    color-mix(in srgb, var(--surface) 98%, var(--bg) 2%) 100%
+  );
+  color: var(--text);
+  border: 1px solid color-mix(in srgb, var(--primary) 18%, rgba(104, 113, 136, 0.3));
 }
 
 .lesson-learning-card .meta {
-  color: #375063;
+  color: var(--muted);
 }
 
 .lesson-learning-card .lesson-learning-progress {
   height: 16px;
   border-radius: 999px;
-  background: #dce8f2;
-  border-color: #c1d2df;
+  background: color-mix(in srgb, var(--surface) 70%, rgba(104, 113, 136, 0.35));
+  border-color: rgba(104, 113, 136, 0.24);
 }
 
 .lesson-learning-card .lesson-learning-progress-bar {
-  background: linear-gradient(90deg, #18d7de, #2fdca7 50%, #3a95f7);
+  background: linear-gradient(120deg, var(--primary), var(--accent));
 }
 
 .lesson-match-meta {
   align-items: center;
 }
 
+.lesson-match-description {
+  border: 1px solid rgba(104, 113, 136, 0.26);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  padding: 10px 12px;
+  display: grid;
+  gap: 4px;
+}
+
+.lesson-match-description .meta {
+  margin: 0;
+}
+
 .lesson-match-counter {
-  background: #e8f3ff;
-  color: #17578a;
-  border: 1px solid #b7d6ef;
+  background: color-mix(in srgb, var(--surface) 86%, rgba(104, 113, 136, 0.15));
+  color: var(--text);
+  border: 1px solid rgba(104, 113, 136, 0.28);
 }
 
 .lesson-match-grid {
@@ -1462,9 +1480,9 @@ body.lesson-immersive .topbar {
 .lesson-match-card {
   min-height: 82px;
   border-radius: 20px;
-  border: 2px solid #bdd3e3;
-  background: #ffffff;
-  color: #163247;
+  border: 2px solid color-mix(in srgb, var(--primary) 24%, rgba(104, 113, 136, 0.35));
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  color: var(--text);
   font-size: 1.15rem;
   font-weight: 700;
   letter-spacing: 0.01em;
@@ -1473,13 +1491,13 @@ body.lesson-immersive .topbar {
 
 .lesson-match-card:hover {
   transform: translateY(-2px);
-  border-color: #7eb5d9;
+  border-color: color-mix(in srgb, var(--accent) 46%, var(--primary));
 }
 
 .lesson-match-card.selected {
-  border-color: #16b4f0;
-  box-shadow: 0 0 0 2px rgba(22, 180, 240, 0.22) inset;
-  color: #124f78;
+  border-color: color-mix(in srgb, var(--accent) 72%, var(--primary));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 26%, transparent) inset;
+  color: color-mix(in srgb, var(--text) 82%, var(--accent));
 }
 
 .lesson-match-card.matched {
@@ -1500,8 +1518,8 @@ body.lesson-immersive .topbar {
 .lesson-match-footer {
   margin-top: auto;
   border-radius: 18px;
-  border: 1px solid #c8d9e8;
-  background: #ffffff;
+  border: 1px solid rgba(104, 113, 136, 0.26);
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
   padding: 14px;
   display: grid;
   gap: 10px;
@@ -1533,7 +1551,7 @@ body.lesson-immersive .topbar {
 }
 
 .lesson-match-footer.neutral .lesson-match-feedback-line {
-  color: #14344d;
+  color: var(--text);
 }
 
 .lesson-match-helper {
@@ -2096,6 +2114,40 @@ body.love-milestone-open .sidebar {
   max-width: 36ch;
 }
 
+.chest-result-celebration {
+  position: fixed;
+  inset: 0;
+  z-index: 45;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(10, 14, 24, 0.45);
+}
+
+.chest-result-card {
+  width: min(520px, 100%);
+  border-radius: 22px;
+  padding: 22px;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 12px;
+  box-shadow: 0 22px 44px rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(104, 113, 136, 0.26);
+}
+
+.chest-result-celebration.common .chest-result-card {
+  background: linear-gradient(145deg, color-mix(in srgb, var(--surface) 94%, transparent), color-mix(in srgb, var(--surface) 82%, var(--bg)));
+}
+
+.chest-result-celebration.rare .chest-result-card {
+  background: linear-gradient(145deg, rgba(198, 226, 255, 0.96), rgba(167, 197, 255, 0.9));
+}
+
+.chest-result-celebration.epic .chest-result-card {
+  background: linear-gradient(145deg, rgba(229, 210, 255, 0.96), rgba(198, 160, 255, 0.92));
+}
+
 .level-up-meter {
   position: relative;
   width: 112px;
@@ -2224,6 +2276,124 @@ body.love-milestone-open .sidebar {
   padding: 2px 5px;
   color: #ffffff;
   background: rgba(26, 31, 46, 0.72);
+}
+
+.avatar-studio-preview {
+  display: grid;
+  gap: 10px;
+}
+
+.avatar-preview-canvas {
+  width: min(220px, 70vw);
+  min-height: 148px;
+  border: 1px solid rgba(104, 113, 136, 0.24);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  display: grid;
+  place-items: center;
+  position: relative;
+  margin: 0 auto;
+}
+
+.avatar-preview-canvas.skin-theme-classic {
+  background: linear-gradient(145deg, color-mix(in srgb, var(--surface) 92%, transparent), color-mix(in srgb, var(--surface) 80%, var(--bg)));
+}
+
+.avatar-preview-canvas.skin-theme-sun {
+  background: linear-gradient(145deg, rgba(255, 237, 177, 0.95), rgba(255, 199, 92, 0.86));
+}
+
+.avatar-preview-canvas.skin-theme-cool {
+  background: linear-gradient(145deg, rgba(181, 242, 255, 0.95), rgba(124, 168, 255, 0.86));
+}
+
+.avatar-layer {
+  position: absolute;
+  line-height: 1;
+}
+
+.avatar-layer-skin {
+  font-size: 4rem;
+  top: 34px;
+}
+
+.avatar-layer-headwear {
+  font-size: 2.2rem;
+  top: 8px;
+}
+
+.avatar-layer-eyewear {
+  font-size: 1.8rem;
+  top: 52px;
+}
+
+.avatar-layer-top,
+.avatar-layer-dress {
+  font-size: 2.4rem;
+  top: 86px;
+}
+
+.avatar-layer-bottom {
+  font-size: 1.8rem;
+  top: 118px;
+}
+
+.avatar-shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+  gap: 10px;
+}
+
+.avatar-shop-item {
+  border: 1px solid rgba(104, 113, 136, 0.22);
+  border-radius: 14px;
+  padding: 10px;
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+}
+
+.avatar-shop-item h4,
+.avatar-shop-item p {
+  margin: 0;
+}
+
+.avatar-rarity {
+  display: inline-block;
+  width: fit-content;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  border-radius: 999px;
+  padding: 2px 7px;
+}
+
+.avatar-rarity.common {
+  background: rgba(104, 113, 136, 0.16);
+  color: color-mix(in srgb, var(--text) 80%, #6b758c);
+}
+
+.avatar-rarity.rare {
+  background: rgba(63, 129, 232, 0.18);
+  color: #2157b5;
+}
+
+.avatar-rarity.epic {
+  background: rgba(162, 86, 235, 0.2);
+  color: #7e36c2;
+}
+
+.avatar-shop-icon {
+  font-size: 1.7rem;
+}
+
+.avatar-shop-item.owned {
+  border-color: color-mix(in srgb, var(--primary) 45%, var(--accent));
+}
+
+.avatar-shop-item.locked {
+  opacity: 0.92;
 }
 
 @keyframes shimmer {
