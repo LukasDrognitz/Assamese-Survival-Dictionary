@@ -28,6 +28,7 @@ const DEFAULT_PROGRESS = {
   quizzesCompleted: 0,
   rupees: 0,
   lastChestDate: "",
+  lastChestPromptDate: "",
   ownedAvatarItems: [],
   equippedAvatarItems: {},
   dailyGoal: {
@@ -362,6 +363,7 @@ export function getProgress() {
   progress.quizzesCompleted = Math.max(0, Number(progress.quizzesCompleted) || 0);
   progress.rupees = Math.max(0, Number(progress.rupees) || 0);
   progress.lastChestDate = String(progress.lastChestDate || "").trim();
+  progress.lastChestPromptDate = String(progress.lastChestPromptDate || "").trim();
   progress.ownedAvatarItems = Array.isArray(progress.ownedAvatarItems)
     ? progress.ownedAvatarItems.map((id) => String(id || "")).filter(Boolean)
     : [];

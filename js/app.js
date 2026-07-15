@@ -58,34 +58,81 @@ import {
 } from "./ui.js?v=20260710-32";
 
 const AVATAR_REWARDS = [
-  { value: "rhino", label: "One-horned Rhino", unlockLevel: 1 },
-  { value: "tiger", label: "Bengal Tiger", unlockLevel: 1 },
-  { value: "deer", label: "Swamp Deer", unlockLevel: 2 },
-  { value: "hoolock", label: "Hoolock Gibbon", unlockLevel: 3 },
-  { value: "hornbill", label: "Great Hornbill", unlockLevel: 4 },
-  { value: "elephant", label: "Indian Elephant", unlockLevel: 5 },
-  { value: "buffalo", label: "Wild Water Buffalo", unlockLevel: 6 },
-  { value: "peacock", label: "Indian Peacock", unlockLevel: 7 },
-  { value: "river-dolphin", label: "River Dolphin", unlockLevel: 8 },
-  { value: "tortoise", label: "Indian Tortoise", unlockLevel: 9 },
-  { value: "snow-leopard", label: "Snow Leopard", unlockLevel: 10 }
+  { value: "tiger", label: "Tara the Tiger", unlockLevel: 1 },
+  { value: "elephant", label: "Eli the Elephant", unlockLevel: 1 },
+  { value: "peacock", label: "Pavo the Peacock", unlockLevel: 2 },
+  { value: "rhino", label: "Rani the Rhino", unlockLevel: 3 },
+  { value: "sloth-bear", label: "Balu the Sloth Bear", unlockLevel: 4 },
+  { value: "nilgai", label: "Nila the Nilgai", unlockLevel: 5 },
+  { value: "fox", label: "Kanu the Indian Fox", unlockLevel: 6 },
+  { value: "langur", label: "Langur the Monkey", unlockLevel: 7 }
 ];
 
 const LEGACY_AVATAR_MAP = {
-  "🦜": "hornbill",
+  "🦜": "langur",
   "🐯": "tiger",
-  "🦊": "deer",
-  "🐼": "hoolock",
-  "🦉": "hornbill",
+  "🦊": "fox",
+  "🐼": "sloth-bear",
+  "🦉": "langur",
   "🐘": "elephant",
-  "🐢": "tortoise",
+  "🐢": "nilgai",
   "🦋": "peacock",
-  "🐬": "river-dolphin",
-  "🐙": "buffalo",
-  "🦄": "rhino"
+  "🐬": "langur",
+  "🐙": "rhino",
+  "🦄": "rhino",
+  "deer": "nilgai",
+  "hoolock": "langur",
+  "hornbill": "langur",
+  "buffalo": "rhino",
+  "river-dolphin": "langur",
+  "tortoise": "nilgai",
+  "snow-leopard": "fox"
 };
 
 const AVATAR_META_BY_ID = Object.fromEntries(AVATAR_REWARDS.map((item) => [item.value, item]));
+
+const AVATAR_CHARACTER_PROFILES = {
+  tiger: {
+    title: "Tara the Tiger",
+    personality: "Friendly explorer",
+    defaultOutfit: "Adventurer jacket and boots"
+  },
+  elephant: {
+    title: "Eli the Elephant",
+    personality: "Gentle mentor",
+    defaultOutfit: "Travel vest and satchel"
+  },
+  peacock: {
+    title: "Pavo the Peacock",
+    personality: "Fashion-forward",
+    defaultOutfit: "Modern kurta and sneakers"
+  },
+  rhino: {
+    title: "Rani the Rhino",
+    personality: "Team captain",
+    defaultOutfit: "Utility jacket"
+  },
+  "sloth-bear": {
+    title: "Balu the Sloth Bear",
+    personality: "Wise and relaxed mentor",
+    defaultOutfit: "Cozy hoodie"
+  },
+  nilgai: {
+    title: "Nila the Nilgai",
+    personality: "Scholar",
+    defaultOutfit: "Academic jacket"
+  },
+  fox: {
+    title: "Kanu the Indian Fox",
+    personality: "Quick learner",
+    defaultOutfit: "Explorer hoodie"
+  },
+  langur: {
+    title: "Langur the Monkey",
+    personality: "Curious adventurer",
+    defaultOutfit: "Travel shirt and shorts"
+  }
+};
 
 const ASSAM_DID_YOU_KNOW_FACTS = [
   {
@@ -331,7 +378,9 @@ const CONVERSATION_TOPICS = {
 const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
 const LOVE_MILESTONE_STEP_XP = 2110;
 const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
-const APP_BUILD_VERSION = "20260715-167";
+const APP_BUILD_VERSION = "20260715-168";
+const XP_TO_RUPEE_RATE = 5;
+const CHEST_OPEN_ANIMATION_MS = 1050;
 
 function customDictionaryEntryCount() {
   return getCustomWords().length;
@@ -345,12 +394,23 @@ const AVATAR_SHOP_ITEMS = [
   { id: "cap-crown", slot: "headwear", label: "Royal Crown", previewClass: "wear-crown-gold", price: 420, rarity: "epic" },
   { id: "shirt-blue", slot: "top", label: "Blue Kurta", previewClass: "wear-top-blue", price: 120, rarity: "common" },
   { id: "shirt-green", slot: "top", label: "Green Kurta", previewClass: "wear-top-green", price: 140, rarity: "common" },
+  { id: "hoodie-cozy", slot: "top", label: "Cozy Hoodie", previewClass: "wear-top-hoodie", price: 180, rarity: "rare" },
   { id: "pants-jeans", slot: "bottom", label: "Indigo Pants", previewClass: "wear-bottom-indigo", price: 140, rarity: "common" },
   { id: "pants-track", slot: "bottom", label: "Track Pants", previewClass: "wear-bottom-track", price: 160, rarity: "rare" },
   { id: "dress-red", slot: "dress", label: "Red Mekhela", previewClass: "wear-dress-red", price: 260, rarity: "rare" },
   { id: "dress-floral", slot: "dress", label: "Floral Mekhela", previewClass: "wear-dress-floral", price: 320, rarity: "epic" },
   { id: "glasses-basic", slot: "eyewear", label: "Classic Glasses", previewClass: "wear-eyewear-basic", price: 170, rarity: "common" },
-  { id: "glasses-star", slot: "eyewear", label: "Star Glasses", previewClass: "wear-eyewear-star", price: 240, rarity: "rare" }
+  { id: "glasses-star", slot: "eyewear", label: "Star Glasses", previewClass: "wear-eyewear-star", price: 240, rarity: "rare" },
+  { id: "bag-travel", slot: "backpack", label: "Travel Backpack", previewClass: "wear-backpack-travel", price: 220, rarity: "rare" },
+  { id: "bag-tech", slot: "backpack", label: "Tech Messenger", previewClass: "wear-backpack-tech", price: 260, rarity: "epic" },
+  { id: "badge-team", slot: "badge", label: "Team Captain Badge", previewClass: "wear-badge-team", price: 150, rarity: "common" },
+  { id: "badge-scholar", slot: "badge", label: "Scholar Badge", previewClass: "wear-badge-scholar", price: 180, rarity: "rare" },
+  { id: "tail-ribbon", slot: "tailAccessory", label: "Tail Ribbon", previewClass: "wear-tail-ribbon", price: 140, rarity: "common" },
+  { id: "tail-ring", slot: "tailAccessory", label: "Tail Ring", previewClass: "wear-tail-ring", price: 200, rarity: "rare" },
+  { id: "face-smile", slot: "expression", label: "Bright Smile", previewClass: "expr-smile", price: 90, rarity: "common" },
+  { id: "face-wink", slot: "expression", label: "Confident Wink", previewClass: "expr-wink", price: 130, rarity: "rare" },
+  { id: "pose-hero", slot: "pose", label: "Hero Pose", previewClass: "pose-hero", price: 110, rarity: "common" },
+  { id: "pose-wave", slot: "pose", label: "Wave Pose", previewClass: "pose-wave", price: 150, rarity: "rare" }
 ];
 
 const AVATAR_SHOP_ITEM_BY_ID = Object.fromEntries(AVATAR_SHOP_ITEMS.map((item) => [item.id, item]));
@@ -406,6 +466,7 @@ function avatarSkinThemeClass(itemId) {
 function normalizeAvatarEconomyProgress() {
   state.progress.rupees = Math.max(0, Number(state.progress.rupees) || 0);
   state.progress.lastChestDate = String(state.progress.lastChestDate || "").trim();
+  state.progress.lastChestPromptDate = String(state.progress.lastChestPromptDate || "").trim();
 
   const owned = Array.isArray(state.progress.ownedAvatarItems)
     ? state.progress.ownedAvatarItems.map((id) => String(id))
@@ -418,7 +479,7 @@ function normalizeAvatarEconomyProgress() {
     ? { ...state.progress.equippedAvatarItems }
     : {};
 
-  const slots = ["skin", "headwear", "top", "bottom", "dress", "eyewear"];
+  const slots = ["skin", "headwear", "top", "bottom", "dress", "eyewear", "backpack", "badge", "tailAccessory", "expression", "pose"];
   slots.forEach((slot) => {
     const current = String(equipped[slot] || "").trim();
     if (!current || !AVATAR_SHOP_ITEM_BY_ID[current]) {
@@ -546,6 +607,9 @@ const state = {
     rarity: "common",
     rupees: 0,
     itemId: ""
+  },
+  dailyChestDialog: {
+    isOpen: false
   }
 };
 
@@ -968,6 +1032,11 @@ function createChestResultModal() {
   container.setAttribute("aria-label", "Treasure chest reward");
   container.innerHTML = `
     <article class="chest-result-card glass">
+      <div class="chest-visual" id="chest-result-visual" aria-hidden="true">
+        <span class="chest-base"></span>
+        <span class="chest-lid"></span>
+        <span class="chest-burst"></span>
+      </div>
       <p class="eyebrow" id="chest-result-rarity">COMMON CHEST</p>
       <h2 id="chest-result-rupees">+0 Rupees</h2>
       <p class="meta" id="chest-result-item">No bonus item this time.</p>
@@ -977,12 +1046,108 @@ function createChestResultModal() {
   document.body.appendChild(container);
 }
 
+function createDailyChestModal() {
+  if (document.getElementById("daily-chest-modal")) return;
+
+  const container = document.createElement("section");
+  container.id = "daily-chest-modal";
+  container.className = "daily-chest-modal hidden";
+  container.setAttribute("role", "dialog");
+  container.setAttribute("aria-modal", "true");
+  container.setAttribute("aria-live", "polite");
+  container.setAttribute("aria-label", "Daily treasure chest");
+  container.innerHTML = `
+    <article class="daily-chest-card glass">
+      <p class="eyebrow">Daily Reward</p>
+      <div class="daily-chest-hero" aria-hidden="true">
+        <span class="chest-base"></span>
+        <span class="chest-lid"></span>
+      </div>
+      <h2>Your Treasure Chest Is Ready</h2>
+      <p class="meta">Open once per day to collect Rupees and a chance at bonus items.</p>
+      <div class="row" style="justify-content:center; gap:10px; flex-wrap:wrap;">
+        <button class="btn accent" data-action="daily-chest-open">Open Chest</button>
+        <button class="btn ghost" data-action="daily-chest-later">Maybe Later</button>
+      </div>
+    </article>
+  `;
+  document.body.appendChild(container);
+}
+
+function openDailyChestModal() {
+  const modal = document.getElementById("daily-chest-modal");
+  if (!modal) return;
+
+  state.dailyChestDialog.isOpen = true;
+  modal.classList.remove("hidden");
+  document.body.classList.add("lock-scroll");
+}
+
+function closeDailyChestModal() {
+  const modal = document.getElementById("daily-chest-modal");
+  if (!modal) return;
+
+  state.dailyChestDialog.isOpen = false;
+  modal.classList.add("hidden");
+  document.body.classList.remove("lock-scroll");
+}
+
+function maybeShowDailyChestPrompt() {
+  if (!state.settings.onboardingCompleted) return;
+  if (state.startScreen.isOpen || state.onboarding.isOpen || state.dailyChestDialog.isOpen) return;
+
+  normalizeAvatarEconomyProgress();
+  const today = todayIso();
+  if (state.progress.lastChestDate === today) return;
+  if (state.progress.lastChestPromptDate === today) return;
+
+  state.progress.lastChestPromptDate = today;
+  persist();
+  openDailyChestModal();
+}
+
+function claimDailyChestReward() {
+  const today = todayIso();
+  if (state.progress.lastChestDate === today) {
+    toast("Treasure chest already opened today");
+    return false;
+  }
+
+  normalizeAvatarEconomyProgress();
+  const ownedSet = new Set(state.progress.ownedAvatarItems || []);
+  const rupeeDrop = rollChestRupeeReward();
+  const reward = rupeeDrop.value;
+
+  let bonusItemId = "";
+  if (Math.random() < 0.42) {
+    const bonusItem = rollChestBonusItem(ownedSet);
+    if (bonusItem) {
+      ownedSet.add(bonusItem.id);
+      state.progress.ownedAvatarItems = Array.from(ownedSet);
+      bonusItemId = bonusItem.id;
+    }
+  }
+
+  state.progress.lastChestDate = today;
+  state.progress.lastChestPromptDate = today;
+  state.progress.rupees = Math.max(0, Number(state.progress.rupees) || 0) + reward;
+  persist();
+  renderProfile();
+  openChestResultModal({
+    rarity: rupeeDrop.rarity,
+    rupees: reward,
+    itemId: bonusItemId
+  });
+  return true;
+}
+
 function openChestResultModal(payload) {
   const dialog = document.getElementById("chest-result-celebration");
   const rarityNode = document.getElementById("chest-result-rarity");
   const rupeeNode = document.getElementById("chest-result-rupees");
   const itemNode = document.getElementById("chest-result-item");
-  if (!dialog || !rarityNode || !rupeeNode || !itemNode) return;
+  const chestVisual = document.getElementById("chest-result-visual");
+  if (!dialog || !rarityNode || !rupeeNode || !itemNode || !chestVisual) return;
 
   const rarity = String(payload?.rarity || "common").toLowerCase();
   const rupees = Math.max(0, Number(payload?.rupees) || 0);
@@ -998,6 +1163,10 @@ function openChestResultModal(payload) {
 
   dialog.classList.remove("common", "rare", "epic");
   dialog.classList.add(rarity === "rare" || rarity === "epic" ? rarity : "common");
+  dialog.classList.add("opening");
+  chestVisual.classList.remove("open");
+  void chestVisual.offsetWidth;
+  chestVisual.classList.add("open");
 
   rarityNode.textContent = `${rarity.toUpperCase()} CHEST`;
   rupeeNode.textContent = `+${rupees} Rupees`;
@@ -1007,14 +1176,20 @@ function openChestResultModal(payload) {
 
   dialog.classList.remove("hidden");
   document.body.classList.add("lock-scroll");
+
+  window.setTimeout(() => {
+    dialog.classList.remove("opening");
+  }, CHEST_OPEN_ANIMATION_MS);
 }
 
 function closeChestResultModal() {
   const dialog = document.getElementById("chest-result-celebration");
+  const chestVisual = document.getElementById("chest-result-visual");
   if (!dialog) return;
 
   dialog.classList.add("hidden");
-  dialog.classList.remove("common", "rare", "epic");
+  dialog.classList.remove("common", "rare", "epic", "opening");
+  chestVisual?.classList.remove("open");
   document.body.classList.remove("lock-scroll");
   state.chestResultDialog = {
     isOpen: false,
@@ -1326,6 +1501,7 @@ function finishOnboarding() {
   closeOnboarding();
   renderCurrentView();
   toast(`Welcome, ${cleanName}!`);
+  maybeShowDailyChestPrompt();
 }
 
 function xpGain(amount, reason) {
@@ -2293,10 +2469,15 @@ function renderAvatarStudio() {
   const ownedSet = new Set(state.progress.ownedAvatarItems || []);
   const skinThemeClass = avatarSkinThemeClass(equipped.skin);
   const activeAvatarMeta = avatarMeta(state.settings.avatar);
+  const characterProfile = AVATAR_CHARACTER_PROFILES[activeAvatarMeta.value] || null;
   const skinItem = AVATAR_SHOP_ITEM_BY_ID[String(equipped.skin || "skin-classic")];
   const furClass = skinItem?.previewClass || "fur-earth";
+  const expressionItem = AVATAR_SHOP_ITEM_BY_ID[String(equipped.expression || "")];
+  const poseItem = AVATAR_SHOP_ITEM_BY_ID[String(equipped.pose || "")];
+  const expressionClass = expressionItem?.previewClass || "";
+  const poseClass = poseItem?.previewClass || "";
 
-  const layers = ["headwear", "top", "bottom", "dress", "eyewear"]
+  const layers = ["headwear", "top", "bottom", "dress", "eyewear", "backpack", "badge", "tailAccessory"]
     .map((slot) => {
       const itemId = String(equipped[slot] || "");
       const item = AVATAR_SHOP_ITEM_BY_ID[itemId];
@@ -2330,13 +2511,15 @@ function renderAvatarStudio() {
       </div>
       <div class="avatar-studio-preview">
         <div class="avatar-preview-canvas ${skinThemeClass}" aria-label="Avatar preview">
-          <div class="avatar-animal animal-${activeAvatarMeta.value} ${furClass}" role="img" aria-label="${activeAvatarMeta.label} avatar preview">
+          <div class="avatar-animal animal-${activeAvatarMeta.value} ${furClass} ${expressionClass} ${poseClass}" role="img" aria-label="${activeAvatarMeta.label} avatar preview">
             <span class="avatar-mark left"></span>
             <span class="avatar-mark right"></span>
             <span class="avatar-brow left"></span>
             <span class="avatar-brow right"></span>
             <span class="avatar-tail"></span>
             <span class="avatar-body"></span>
+            <span class="avatar-arm left"></span>
+            <span class="avatar-arm right"></span>
             <span class="avatar-belly"></span>
             <span class="avatar-leg left"></span>
             <span class="avatar-leg right"></span>
@@ -2363,13 +2546,28 @@ function renderAvatarStudio() {
             ${layers}
           </div>
         </div>
-        <p class="meta">Preview: ${activeAvatarMeta.label}. Customize in real time with caps, pants, glasses, and more.</p>
+        <p class="meta">Preview: ${activeAvatarMeta.label}. Customize in real time with clothing, glasses, hats, backpacks, tail accessories, badges, facial expressions, and poses.</p>
+        <article class="avatar-character-profile">
+          <h4>${characterProfile?.title || activeAvatarMeta.label}</h4>
+          <p class="meta">Personality: ${characterProfile?.personality || "Adventurer"}</p>
+          <p class="meta">Default outfit: ${characterProfile?.defaultOutfit || "Classic explorer"}</p>
+          <p class="meta">Style: upright anthropomorphic avatar with full-body customization.</p>
+        </article>
       </div>
       <div class="row" style="flex-wrap:wrap; justify-content:space-between; align-items:center;">
         <p class="meta">Daily treasure chest: ${openedToday ? "Opened today" : "Ready to open"}</p>
         <button class="btn accent" data-action="avatar-open-chest" ${openedToday ? "disabled" : ""}>Open Chest</button>
       </div>
       <p class="meta">Chest rarity rates: Common 62%, Rare 30%, Epic 8%.</p>
+      <article class="avatar-xp-exchange">
+        <h4>Need more Rupees?</h4>
+        <p class="meta">Exchange XP to coins at a rate of ${XP_TO_RUPEE_RATE} XP = Rs 1.</p>
+        <div class="row" style="flex-wrap:wrap; gap:8px; justify-content:flex-start;">
+          <button class="btn ghost small" data-action="avatar-exchange-xp" data-xp-cost="100">100 XP → Rs 20</button>
+          <button class="btn ghost small" data-action="avatar-exchange-xp" data-xp-cost="250">250 XP → Rs 50</button>
+          <button class="btn ghost small" data-action="avatar-exchange-xp" data-xp-cost="500">500 XP → Rs 100</button>
+        </div>
+      </article>
       <div class="avatar-shop-grid">${chips}</div>
     </article>
   `;
@@ -3002,6 +3200,18 @@ async function onClick(event) {
 
   if (action === "app-start-continue") {
     closeAppStartScreen();
+    maybeShowDailyChestPrompt();
+    return;
+  }
+
+  if (action === "daily-chest-open") {
+    closeDailyChestModal();
+    claimDailyChestReward();
+    return;
+  }
+
+  if (action === "daily-chest-later") {
+    closeDailyChestModal();
     return;
   }
 
@@ -3040,36 +3250,32 @@ async function onClick(event) {
   }
 
   if (action === "avatar-open-chest") {
-    const today = todayIso();
-    if (state.progress.lastChestDate === today) {
-      toast("Treasure chest already opened today");
+    claimDailyChestReward();
+    return;
+  }
+
+  if (action === "avatar-exchange-xp") {
+    const xpCost = Math.max(0, Number(actionSource.dataset.xpCost) || 0);
+    if (!xpCost) return;
+
+    const currentXp = Math.max(0, Number(state.progress.xp) || 0);
+    if (currentXp < xpCost) {
+      toast("Not enough XP");
       return;
     }
 
-    normalizeAvatarEconomyProgress();
-    const ownedSet = new Set(state.progress.ownedAvatarItems || []);
-    const rupeeDrop = rollChestRupeeReward();
-    const reward = rupeeDrop.value;
-
-    let bonusItemId = "";
-    if (Math.random() < 0.42) {
-      const bonusItem = rollChestBonusItem(ownedSet);
-      if (bonusItem) {
-        ownedSet.add(bonusItem.id);
-        state.progress.ownedAvatarItems = Array.from(ownedSet);
-        bonusItemId = bonusItem.id;
-      }
+    const rupees = Math.floor(xpCost / XP_TO_RUPEE_RATE);
+    if (rupees <= 0) {
+      toast("Exchange amount too small");
+      return;
     }
 
-    state.progress.lastChestDate = today;
-    state.progress.rupees = Math.max(0, Number(state.progress.rupees) || 0) + reward;
+    state.progress.xp = currentXp - xpCost;
+    state.progress.rupees = Math.max(0, Number(state.progress.rupees) || 0) + rupees;
     persist();
+    updateHeaderControls();
     renderProfile();
-    openChestResultModal({
-      rarity: rupeeDrop.rarity,
-      rupees: reward,
-      itemId: bonusItemId
-    });
+    toast(`Exchanged ${xpCost} XP for Rs ${rupees}`);
     return;
   }
 
@@ -4114,7 +4320,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=179", { updateViaCache: "none" })
+      .register("sw.js?v=180", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
@@ -4189,6 +4395,7 @@ async function init() {
   createLevelUpCelebrationModal();
   createLoveMilestoneCelebrationModal();
   createChestResultModal();
+  createDailyChestModal();
   syncAchievements(false);
   applyTheme();
   updateHeaderControls();
@@ -4209,6 +4416,8 @@ async function init() {
     openOnboarding();
   } else if (shouldShowAppStartScreen()) {
     openAppStartScreen();
+  } else {
+    maybeShowDailyChestPrompt();
   }
   persist();
 }
