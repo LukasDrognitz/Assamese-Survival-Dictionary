@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=20260715-95" />
+  <link rel="stylesheet" href="css/style.css?v=20260715-96" />
 </head>
 <body>
   <div class="bg-shape bg-shape-a" aria-hidden="true"></div>
@@ -53,8 +53,50 @@
     <div class="toast" role="status" aria-live="polite"></div>
   </template>
 
+  <script>
+    (function bootstrapFreshBuild() {
+      var INDEX_BUILD = "20260715-179";
+      var KEY = "assamese-app-index-build";
+      var FLAG = "assamese-app-index-refreshing";
+
+      try {
+        var previous = localStorage.getItem(KEY);
+        var refreshing = sessionStorage.getItem(FLAG) === "1";
+        if (previous === INDEX_BUILD || refreshing) return;
+
+        localStorage.setItem(KEY, INDEX_BUILD);
+        sessionStorage.setItem(FLAG, "1");
+
+        var clearPromise = Promise.resolve();
+        if ("serviceWorker" in navigator) {
+          clearPromise = navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            return Promise.all(registrations.map(function(registration) {
+              return registration.unregister();
+            }));
+          });
+        }
+
+        clearPromise
+          .then(function() {
+            if (!("caches" in window)) return;
+            return caches.keys().then(function(keys) {
+              return Promise.all(keys.map(function(key) {
+                return caches.delete(key);
+              }));
+            });
+          })
+          .finally(function() {
+            var url = new URL(window.location.href);
+            url.searchParams.set("cb", String(Date.now()));
+            window.location.replace(url.toString());
+          });
+      } catch (_error) {
+        // Continue app boot when cache cleanup cannot run.
+      }
+    })();
+  </script>
   <script src="assets/vendor/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="js/app.js?v=20260715-178"></script>
+  <script type="module" src="js/app.js?v=20260715-179"></script>
 </body>
 </html>

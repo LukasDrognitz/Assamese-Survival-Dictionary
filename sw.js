@@ -1,10 +1,10 @@
-const CACHE_NAME = "assamese-survival-dictionary-v190";
+const CACHE_NAME = "assamese-survival-dictionary-v191";
 
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./css/style.css?v=20260715-95",
-  "./js/app.js?v=20260715-178",
+  "./css/style.css?v=20260715-96",
+  "./js/app.js?v=20260715-179",
   "./js/dictionary.js?v=20260710-45",
   "./js/lessons.js?v=20260715-07",
   "./js/flashcards.js?v=20260713-38",
@@ -75,7 +75,7 @@ self.addEventListener("fetch", (event) => {
 
   if (event.request.mode === "navigate") {
     event.respondWith(
-      fetch(event.request)
+      fetch(event.request, { cache: "no-store" })
         .then((response) => {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put("./index.html", clone));
