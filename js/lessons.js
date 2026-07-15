@@ -562,7 +562,7 @@ function renderLessonMatchingDetail(lesson, session) {
       <footer class="lesson-match-footer ${feedbackTone}">
         <p class="lesson-match-feedback-line">${matching.feedback.text}</p>
         ${completed
-    ? '<button class="btn accent lesson-match-continue" data-action="lesson-match-continue">Continue to Step 3</button>'
+    ? '<button class="btn accent lesson-match-continue" data-action="lesson-match-continue">Continue</button>'
     : '<p class="meta lesson-match-helper">Cards stay available until you find the correct pair.</p>'}
       </footer>
     </article>

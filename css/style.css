@@ -1422,17 +1422,19 @@ body.lesson-immersive .topbar {
 .lesson-learning-card {
   min-height: 640px;
   gap: 12px;
-  background:
-    radial-gradient(circle at 10% -20%, rgba(79, 212, 255, 0.14), transparent 48%),
-    radial-gradient(circle at 90% -30%, rgba(137, 229, 83, 0.12), transparent 52%),
-    color-mix(in srgb, var(--surface) 92%, rgba(7, 24, 37, 0.42));
+  background: linear-gradient(180deg, #f6fbff 0%, #eff7ff 100%);
+  color: #102331;
+}
+
+.lesson-learning-card .meta {
+  color: #375063;
 }
 
 .lesson-learning-card .lesson-learning-progress {
   height: 16px;
   border-radius: 999px;
-  background: rgba(66, 88, 105, 0.72);
-  border-color: rgba(127, 152, 170, 0.34);
+  background: #dce8f2;
+  border-color: #c1d2df;
 }
 
 .lesson-learning-card .lesson-learning-progress-bar {
@@ -1444,9 +1446,9 @@ body.lesson-immersive .topbar {
 }
 
 .lesson-match-counter {
-  background: color-mix(in srgb, #0f3148 66%, transparent);
-  color: #92f8ff;
-  border: 1px solid rgba(108, 212, 227, 0.45);
+  background: #e8f3ff;
+  color: #17578a;
+  border: 1px solid #b7d6ef;
 }
 
 .lesson-match-grid {
@@ -1460,46 +1462,46 @@ body.lesson-immersive .topbar {
 .lesson-match-card {
   min-height: 82px;
   border-radius: 20px;
-  border: 2px solid rgba(74, 102, 121, 0.9);
-  background: linear-gradient(180deg, rgba(9, 34, 51, 0.82), rgba(8, 27, 41, 0.9));
-  color: color-mix(in srgb, var(--text) 78%, #bdd6e4);
+  border: 2px solid #bdd3e3;
+  background: #ffffff;
+  color: #163247;
   font-size: 1.15rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.01em;
   transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
 }
 
 .lesson-match-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(114, 156, 180, 0.92);
+  border-color: #7eb5d9;
 }
 
 .lesson-match-card.selected {
-  border-color: rgba(79, 218, 255, 0.98);
-  box-shadow: 0 0 0 2px rgba(79, 218, 255, 0.32) inset;
-  color: #e7fbff;
+  border-color: #16b4f0;
+  box-shadow: 0 0 0 2px rgba(22, 180, 240, 0.22) inset;
+  color: #124f78;
 }
 
 .lesson-match-card.matched {
-  border-color: rgba(131, 217, 67, 0.95);
-  background: linear-gradient(180deg, rgba(122, 206, 63, 0.2), rgba(79, 154, 44, 0.32));
-  color: #e8ffd2;
-  box-shadow: 0 0 0 1px rgba(172, 235, 117, 0.35) inset;
-  opacity: 0.72;
+  border-color: #78c83d;
+  background: #edfadb;
+  color: #2d6b0b;
+  box-shadow: 0 0 0 1px rgba(120, 200, 61, 0.26) inset;
+  opacity: 0.95;
 }
 
 .lesson-match-card.wrong {
-  border-color: rgba(255, 126, 110, 0.98);
-  background: linear-gradient(180deg, rgba(244, 107, 93, 0.24), rgba(196, 70, 58, 0.28));
-  color: #ffe1dc;
+  border-color: #ef7f73;
+  background: #ffe8e5;
+  color: #8b2c24;
   animation: lesson-match-shake 0.22s ease;
 }
 
 .lesson-match-footer {
   margin-top: auto;
   border-radius: 18px;
-  border: 1px solid rgba(88, 117, 137, 0.35);
-  background: linear-gradient(180deg, rgba(20, 43, 60, 0.9), rgba(17, 34, 49, 0.94));
+  border: 1px solid #c8d9e8;
+  background: #ffffff;
   padding: 14px;
   display: grid;
   gap: 10px;
@@ -1513,25 +1515,25 @@ body.lesson-immersive .topbar {
 }
 
 .lesson-match-footer.success {
-  border-color: rgba(121, 213, 71, 0.6);
-  background: linear-gradient(180deg, rgba(95, 167, 52, 0.26), rgba(49, 103, 25, 0.34));
+  border-color: #9ad26b;
+  background: #edfadb;
 }
 
 .lesson-match-footer.success .lesson-match-feedback-line {
-  color: #dfffb9;
+  color: #2d6b0b;
 }
 
 .lesson-match-footer.error {
-  border-color: rgba(240, 123, 123, 0.64);
-  background: linear-gradient(180deg, rgba(206, 85, 85, 0.24), rgba(121, 44, 44, 0.34));
+  border-color: #efb1aa;
+  background: #ffe8e5;
 }
 
 .lesson-match-footer.error .lesson-match-feedback-line {
-  color: #ffd6d6;
+  color: #8b2c24;
 }
 
 .lesson-match-footer.neutral .lesson-match-feedback-line {
-  color: #d4ebf3;
+  color: #14344d;
 }
 
 .lesson-match-helper {
