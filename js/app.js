@@ -91,16 +91,17 @@ const LEGACY_AVATAR_MAP = {
 };
 
 const AVATAR_META_BY_ID = Object.fromEntries(AVATAR_REWARDS.map((item) => [item.value, item]));
+const AVATAR_IMAGE_VERSION = "20260715-180";
 const USER_AVATAR_OPTIONS = {
   peacock: {
     label: "Pavo the Peacock",
-    avatarImage: "assets/images/avatars/Peacock.png",
-    profileImage: "assets/images/avatars/Peacock_Profile.png"
+    avatarImage: `assets/images/avatars/Peacock.png?v=${AVATAR_IMAGE_VERSION}`,
+    profileImage: `assets/images/avatars/Peacock_Profile.png?v=${AVATAR_IMAGE_VERSION}`
   },
   monkey: {
     label: "Milo the Monkey",
-    avatarImage: "assets/images/avatars/Monkey.png",
-    profileImage: "assets/images/avatars/Monkey_Profile.png"
+    avatarImage: `assets/images/avatars/Monkey.png?v=${AVATAR_IMAGE_VERSION}`,
+    profileImage: `assets/images/avatars/Monkey_Profile.png?v=${AVATAR_IMAGE_VERSION}`
   }
 };
 const DEFAULT_USER_AVATAR = "peacock";
@@ -373,7 +374,7 @@ const CONVERSATION_TOPICS = {
 const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
 const LOVE_MILESTONE_STEP_XP = 2110;
 const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
-const APP_BUILD_VERSION = "20260715-179";
+const APP_BUILD_VERSION = "20260715-180";
 const CHEST_OPEN_ANIMATION_MS = 1050;
 
 function customDictionaryEntryCount() {
@@ -2438,13 +2439,6 @@ function renderProfile() {
       </article>
 
       <article class="card grid" style="gap:12px;">
-        <h3>Profile Picture</h3>
-        <figure class="profile-picture-frame" aria-label="Profile picture preview">
-          <img class="profile-picture-image" src="${activeAvatarOption.profileImage}" alt="${activeAvatarOption.label} profile picture" loading="eager" decoding="async" />
-        </figure>
-      </article>
-
-      <article class="card grid" style="gap:12px;">
         <h3>Avatar</h3>
         <figure class="profile-avatar-frame" aria-label="Avatar preview">
           <img class="profile-avatar-image" src="${activeAvatarOption.avatarImage}" alt="${activeAvatarOption.label} avatar" loading="eager" decoding="async" />
@@ -4094,7 +4088,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=191", { updateViaCache: "none" })
+      .register("sw.js?v=192", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
