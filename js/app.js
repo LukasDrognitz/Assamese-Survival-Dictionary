@@ -359,7 +359,7 @@ const CONVERSATION_TOPICS = {
 const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
 const LOVE_MILESTONE_STEP_XP = 2110;
 const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
-const APP_BUILD_VERSION = "20260715-173";
+const APP_BUILD_VERSION = "20260715-174";
 const CHEST_OPEN_ANIMATION_MS = 1050;
 
 function customDictionaryEntryCount() {
@@ -2839,8 +2839,13 @@ function addRecentWord(wordId) {
 }
 
 async function onClick(event) {
-  const target = event.target;
-  if (!(target instanceof Element)) return;
+  const rawTarget = event.target;
+  const target = rawTarget instanceof Element
+    ? rawTarget
+    : rawTarget instanceof Node
+      ? rawTarget.parentElement
+      : null;
+  if (!target) return;
   const actionTarget = target.closest("[data-action]");
   const action = actionTarget?.dataset.action;
   const actionSource = actionTarget || target;
@@ -4116,7 +4121,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=185", { updateViaCache: "none" })
+      .register("sw.js?v=186", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
