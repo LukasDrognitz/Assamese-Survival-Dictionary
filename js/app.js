@@ -44,7 +44,7 @@ import {
   selectLessonMatchingCard,
   startLessonWritingStage,
   submitLessonWritingAnswer
-} from "./lessons.js?v=20260715-06";
+} from "./lessons.js?v=20260715-07";
 import { updateSpacedRepetition, shuffleCards, renderFlashcard, renderFlashSummary } from "./flashcards.js?v=20260713-38";
 import { buildQuizQuestions, renderQuizView } from "./quiz.js?v=20260710-33";
 import {
@@ -359,7 +359,7 @@ const CONVERSATION_TOPICS = {
 const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
 const LOVE_MILESTONE_STEP_XP = 2110;
 const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
-const APP_BUILD_VERSION = "20260715-172";
+const APP_BUILD_VERSION = "20260715-173";
 const CHEST_OPEN_ANIMATION_MS = 1050;
 
 function customDictionaryEntryCount() {
@@ -2840,6 +2840,7 @@ function addRecentWord(wordId) {
 
 async function onClick(event) {
   const target = event.target;
+  if (!(target instanceof Element)) return;
   const actionTarget = target.closest("[data-action]");
   const action = actionTarget?.dataset.action;
   const actionSource = actionTarget || target;
@@ -3105,25 +3106,52 @@ async function onClick(event) {
   }
 
   if (action === "open-lesson") {
-    state.activeLessonId = actionSource.dataset.lesson;
+    const requestedLessonId = String(
+      actionSource.dataset.lesson
+      || actionSource.closest("[data-lesson]")?.dataset.lesson
+      || ""
+    ).trim();
+    if (!requestedLessonId) {
+      toast("Lesson not found");
+      return;
+    }
+
+    state.activeLessonId = requestedLessonId;
     state.activeLessonIndex = 0;
     state.lessonsScreen = "detail";
     const lesson = state.lessons.find((item) => item.id === state.activeLessonId);
     if (lesson) {
       startLessonLearningSession(lesson);
+    } else {
+      toast("Lesson not found");
+      return;
     }
     renderLessons();
     return;
   }
 
   if (action === "restart-lesson") {
-    state.activeLessonId = actionSource.dataset.lesson;
+    const requestedLessonId = String(
+      actionSource.dataset.lesson
+      || actionSource.closest("[data-lesson]")?.dataset.lesson
+      || state.activeLessonId
+      || ""
+    ).trim();
+    if (!requestedLessonId) {
+      toast("Lesson not found");
+      return;
+    }
+
+    state.activeLessonId = requestedLessonId;
     state.activeLessonIndex = 0;
     state.lessonsScreen = "detail";
     const lesson = state.lessons.find((item) => item.id === state.activeLessonId);
     if (lesson) {
       xpGain(10, `Restarted lesson ${lesson.title}`);
       startLessonLearningSession(lesson);
+    } else {
+      toast("Lesson not found");
+      return;
     }
     renderLessons();
     return;
@@ -4088,7 +4116,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=184", { updateViaCache: "none" })
+      .register("sw.js?v=185", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.

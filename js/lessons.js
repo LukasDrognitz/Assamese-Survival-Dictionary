@@ -653,7 +653,7 @@ export function renderLessonsOverview(lessons, progress, activeLessonId, favorit
       const unitLabel = lesson.kind === "phrase-sentence" ? "phrases" : "words";
       const displayTitle = cleanLessonCardTitle(lesson.title);
       return `
-        <article class="lesson-card">
+        <article class="lesson-card" data-lesson="${lesson.id}">
           <span class="pill lesson-word-count">${lesson.items.length} ${unitLabel}</span>
           <div class="row lesson-card-head">
             <h4>${renderLessonHeadline(lesson.icon, displayTitle)}</h4>
