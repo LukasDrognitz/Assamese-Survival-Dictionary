@@ -517,6 +517,10 @@ function renderLessonMatchingDetail(lesson, session) {
   if (!matching) return "";
   const matchedIds = new Set(matching.matchedWordIds || []);
   const wrongPair = matching.wrongPair || { leftId: "", rightId: "" };
+  const totalPairs = Math.max(1, matching.leftCards.length);
+  const matchedCount = matchedIds.size;
+  const completed = matchedCount >= totalPairs;
+  const feedbackTone = matching.feedback.tone || "neutral";
 
   const leftCards = matching.leftCards
     .map((card) => {
@@ -547,12 +551,20 @@ function renderLessonMatchingDetail(lesson, session) {
   return `
     <article class="card lesson-detail-card lesson-learning-card">
       ${renderLessonSessionHeader(session, `${lesson.icon} ${lesson.title} · Step 2: Match`)}
-      <p class="meta">Tap one Assamese card and one English card to match.</p>
+      <div class="row lesson-match-meta" style="flex-wrap: wrap;">
+        <p class="meta">Tap one card from each column to build a pair.</p>
+        <span class="pill lesson-match-counter">${matchedCount}/${totalPairs} pairs</span>
+      </div>
       <div class="lesson-match-grid">
         <div class="lesson-match-column">${leftCards}</div>
         <div class="lesson-match-column">${rightCards}</div>
       </div>
-      <footer class="lesson-learning-feedback ${matching.feedback.tone || "neutral"}">${matching.feedback.text}</footer>
+      <footer class="lesson-match-footer ${feedbackTone}">
+        <p class="lesson-match-feedback-line">${matching.feedback.text}</p>
+        ${completed
+    ? '<button class="btn accent lesson-match-continue" data-action="lesson-match-continue">Continue to Step 3</button>'
+    : '<p class="meta lesson-match-helper">Cards stay available until you find the correct pair.</p>'}
+      </footer>
     </article>
   `;
 }

@@ -2876,11 +2876,22 @@ async function onClick(event) {
         }
       });
 
-      if (result.completed) {
-        startLessonWritingStage(session);
-      }
     }
 
+    persist();
+    renderLessons();
+    return;
+  }
+
+  if (action === "lesson-match-continue") {
+    const session = state.lessonLearning.session;
+    if (!session || session.stage !== "matching" || !session.matching) return;
+
+    const totalPairs = session.matching.leftCards.length;
+    const matchedPairs = session.matching.matchedWordIds.length;
+    if (matchedPairs < totalPairs) return;
+
+    startLessonWritingStage(session);
     persist();
     renderLessons();
     return;
