@@ -93,10 +93,11 @@ const LEGACY_AVATAR_MAP = {
 };
 
 const AVATAR_META_BY_ID = Object.fromEntries(AVATAR_REWARDS.map((item) => [item.value, item]));
-const AVATAR_IMAGE_VERSION = "20260715-186";
+const AVATAR_IMAGE_VERSION = "20260715-187";
 const MONKEY_OUTFIT_OPTIONS = [
   { value: "classic", label: "Classic" },
-  { value: "student", label: "Student" }
+  { value: "student", label: "Student" },
+  { value: "explorer", label: "Explorer" }
 ];
 const RHINO_OUTFIT_OPTIONS = [
   { value: "classic", label: "Classic" },
@@ -120,6 +121,10 @@ const USER_AVATAR_OPTIONS = {
       student: {
         avatarImage: `assets/images/avatars/langur_monkey_clothed_same_style_full_body.png?v=${AVATAR_IMAGE_VERSION}`,
         profileImage: `assets/images/avatars/langur_monkey_clothed_same_style_profile.png?v=${AVATAR_IMAGE_VERSION}`
+      },
+      explorer: {
+        avatarImage: `assets/images/avatars/langur_monkey_high_quality_same_style_full_body_no_background.png?v=${AVATAR_IMAGE_VERSION}`,
+        profileImage: `assets/images/avatars/langur_monkey_high_quality_same_style_profile_no_background.png?v=${AVATAR_IMAGE_VERSION}`
       }
     }
   },
@@ -414,7 +419,7 @@ const CONVERSATION_TOPICS = {
 const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
 const LOVE_MILESTONE_STEP_XP = 2110;
 const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
-const APP_BUILD_VERSION = "20260715-186";
+const APP_BUILD_VERSION = "20260715-187";
 const CHEST_OPEN_ANIMATION_MS = 1050;
 
 function customDictionaryEntryCount() {
@@ -633,7 +638,7 @@ function avatarOutfitSelection(avatarId) {
     : {};
 
   if (selectedAvatarId === "monkey") {
-    return stored.monkey === "student" ? "student" : "classic";
+    return ["classic", "student", "explorer"].includes(stored.monkey) ? stored.monkey : "classic";
   }
 
   if (selectedAvatarId === "rhino") {
@@ -650,7 +655,7 @@ function setAvatarOutfitSelection(avatarId, outfit) {
     : {};
 
   if (selectedAvatarId === "monkey") {
-    nextOutfits.monkey = outfit === "student" ? "student" : "classic";
+    nextOutfits.monkey = ["classic", "student", "explorer"].includes(outfit) ? outfit : "classic";
   }
 
   if (selectedAvatarId === "rhino") {
@@ -737,7 +742,9 @@ function normalizeSettings() {
   state.settings.avatarOutfits = state.settings.avatarOutfits && typeof state.settings.avatarOutfits === "object"
     ? { ...state.settings.avatarOutfits }
     : { monkey: "classic", rhino: "classic" };
-  state.settings.avatarOutfits.monkey = state.settings.avatarOutfits.monkey === "student" ? "student" : "classic";
+  state.settings.avatarOutfits.monkey = ["classic", "student", "explorer"].includes(state.settings.avatarOutfits.monkey)
+    ? state.settings.avatarOutfits.monkey
+    : "classic";
   state.settings.avatarOutfits.rhino = state.settings.avatarOutfits.rhino === "student" ? "student" : "classic";
   state.settings.syncEndpoint = String(state.settings.syncEndpoint || "").trim();
   state.settings.syncToken = String(state.settings.syncToken || "").trim();
@@ -4206,7 +4213,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=198", { updateViaCache: "none" })
+      .register("sw.js?v=199", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
