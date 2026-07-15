@@ -3333,6 +3333,113 @@ body.love-milestone-open .sidebar {
   border-radius: 50%;
 }
 
+/* Species-specific idle animation system */
+.avatar-body,
+.avatar-head,
+.avatar-tail,
+.avatar-ear,
+.avatar-trunk,
+.avatar-crest,
+.avatar-beak,
+.avatar-antler,
+.avatar-shell,
+.avatar-leg {
+  transform-origin: center;
+  will-change: transform;
+}
+
+.avatar-body {
+  animation: avatar-body-breathe 4.6s ease-in-out infinite;
+}
+
+.avatar-head {
+  animation: avatar-head-bob 4.1s ease-in-out infinite;
+}
+
+.avatar-tail {
+  animation: avatar-tail-sway 3.8s ease-in-out infinite;
+}
+
+.avatar-animal.animal-rhino .avatar-head {
+  animation: rhino-head-nod 5.2s ease-in-out infinite;
+}
+
+.avatar-animal.animal-rhino .avatar-horn {
+  animation: rhino-horn-tilt 5.2s ease-in-out infinite;
+}
+
+.avatar-animal.animal-tiger .avatar-tail,
+.avatar-animal.animal-snow-leopard .avatar-tail {
+  animation: cat-tail-flick 2.8s ease-in-out infinite;
+}
+
+.avatar-animal.animal-tiger .avatar-whisker,
+.avatar-animal.animal-snow-leopard .avatar-whisker {
+  animation: whisker-twitch 3s ease-in-out infinite;
+}
+
+.avatar-animal.animal-deer .avatar-head {
+  animation: deer-alert-head 3.6s ease-in-out infinite;
+}
+
+.avatar-animal.animal-deer .avatar-antler {
+  animation: deer-antler-sway 3.6s ease-in-out infinite;
+}
+
+.avatar-animal.animal-deer .avatar-antler.right {
+  animation-name: deer-antler-sway-right;
+}
+
+.avatar-animal.animal-hoolock .avatar-body,
+.avatar-animal.animal-hoolock .avatar-head {
+  animation: hoolock-sway 3.4s ease-in-out infinite;
+}
+
+.avatar-animal.animal-hornbill .avatar-beak {
+  animation: hornbill-peck 4.2s ease-in-out infinite;
+}
+
+.avatar-animal.animal-hornbill .avatar-body {
+  animation: bird-perch-bob 2.8s ease-in-out infinite;
+}
+
+.avatar-animal.animal-elephant .avatar-trunk {
+  animation: elephant-trunk-sway 3.3s ease-in-out infinite;
+}
+
+.avatar-animal.animal-elephant .avatar-ear {
+  animation: elephant-ear-flap 3.2s ease-in-out infinite;
+}
+
+.avatar-animal.animal-buffalo .avatar-head {
+  animation: buffalo-head-thrust 4.8s ease-in-out infinite;
+}
+
+.avatar-animal.animal-peacock .avatar-tail {
+  animation: peacock-tail-fan 3.8s ease-in-out infinite;
+}
+
+.avatar-animal.animal-peacock .avatar-crest {
+  animation: peacock-crest-bob 2.2s ease-in-out infinite;
+}
+
+.avatar-animal.animal-river-dolphin .avatar-body,
+.avatar-animal.animal-river-dolphin .avatar-head {
+  animation: dolphin-glide 3.4s ease-in-out infinite;
+}
+
+.avatar-animal.animal-river-dolphin .avatar-tail {
+  animation: dolphin-tail-wave 1.7s ease-in-out infinite;
+}
+
+.avatar-animal.animal-tortoise .avatar-head {
+  animation: tortoise-peek 5s ease-in-out infinite;
+}
+
+.avatar-animal.animal-tortoise .avatar-shell {
+  animation: tortoise-shell-shift 5s ease-in-out infinite;
+}
+
 .avatar-wear {
   position: absolute;
   display: block;
@@ -3553,6 +3660,125 @@ body.love-milestone-open .sidebar {
 
 .avatar-shop-item.locked {
   opacity: 0.92;
+}
+
+@keyframes avatar-body-breathe {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.025); }
+}
+
+@keyframes avatar-head-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1px); }
+}
+
+@keyframes avatar-tail-sway {
+  0%, 100% { transform: rotate(10deg); }
+  50% { transform: rotate(18deg); }
+}
+
+@keyframes rhino-head-nod {
+  0%, 100% { transform: rotate(0deg); }
+  45% { transform: rotate(-3deg); }
+  65% { transform: rotate(1.5deg); }
+}
+
+@keyframes rhino-horn-tilt {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-5deg); }
+}
+
+@keyframes cat-tail-flick {
+  0%, 100% { transform: rotate(16deg); }
+  35% { transform: rotate(28deg); }
+  70% { transform: rotate(4deg); }
+}
+
+@keyframes whisker-twitch {
+  0%, 100% { transform: rotate(0deg); }
+  48% { transform: rotate(4deg); }
+  52% { transform: rotate(-4deg); }
+}
+
+@keyframes deer-alert-head {
+  0%, 100% { transform: rotate(0deg); }
+  30% { transform: rotate(-3deg); }
+  65% { transform: rotate(2deg); }
+}
+
+@keyframes deer-antler-sway {
+  0%, 100% { transform: rotate(-18deg); }
+  50% { transform: rotate(-12deg); }
+}
+
+@keyframes deer-antler-sway-right {
+  0%, 100% { transform: scaleX(-1) rotate(-18deg); }
+  50% { transform: scaleX(-1) rotate(-12deg); }
+}
+
+@keyframes hoolock-sway {
+  0%, 100% { transform: translateX(0); }
+  35% { transform: translateX(-1.5px); }
+  70% { transform: translateX(1.5px); }
+}
+
+@keyframes hornbill-peck {
+  0%, 100% { transform: translateY(0); }
+  45% { transform: translateY(3px); }
+  60% { transform: translateY(-1px); }
+}
+
+@keyframes bird-perch-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+@keyframes elephant-trunk-sway {
+  0%, 100% { transform: rotate(0deg); }
+  30% { transform: rotate(6deg); }
+  70% { transform: rotate(-6deg); }
+}
+
+@keyframes elephant-ear-flap {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(8deg); }
+}
+
+@keyframes buffalo-head-thrust {
+  0%, 100% { transform: translateX(0); }
+  45% { transform: translateX(2px); }
+  60% { transform: translateX(-1px); }
+}
+
+@keyframes peacock-tail-fan {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(4deg) scale(1.03); }
+}
+
+@keyframes peacock-crest-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+@keyframes dolphin-glide {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+@keyframes dolphin-tail-wave {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(10deg); }
+}
+
+@keyframes tortoise-peek {
+  0%, 100% { transform: translateY(0); }
+  45% { transform: translateY(-2px); }
+  65% { transform: translateY(1px); }
+}
+
+@keyframes tortoise-shell-shift {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(1px); }
 }
 
 @keyframes shimmer {
