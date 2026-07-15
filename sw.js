@@ -1,10 +1,10 @@
-const CACHE_NAME = "assamese-survival-dictionary-v192";
+const CACHE_NAME = "assamese-survival-dictionary-v193";
 
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./css/style.css?v=20260715-97",
-  "./js/app.js?v=20260715-180",
+  "./css/style.css?v=20260715-98",
+  "./js/app.js?v=20260715-181",
   "./js/dictionary.js?v=20260710-45",
   "./js/lessons.js?v=20260715-07",
   "./js/flashcards.js?v=20260713-38",
@@ -31,10 +31,12 @@ const APP_SHELL = [
   "./assets/images/avatars/nilgai.svg",
   "./assets/images/avatars/fox.svg",
   "./assets/images/avatars/langur.svg",
-  "./assets/images/avatars/Peacock.png?v=20260715-180",
-  "./assets/images/avatars/Peacock_Profile.png?v=20260715-180",
-  "./assets/images/avatars/Monkey.png?v=20260715-180",
-  "./assets/images/avatars/Monkey_Profile.png?v=20260715-180",
+  "./assets/images/avatars/Peacock.png?v=20260715-181",
+  "./assets/images/avatars/Peacock_Profile.png?v=20260715-181",
+  "./assets/images/avatars/Monkey.png?v=20260715-181",
+  "./assets/images/avatars/Monkey_Profile.png?v=20260715-181",
+  "./assets/images/avatars/Bear.png?v=20260715-181",
+  "./assets/images/avatars/Bear_Profile.png?v=20260715-181",
   "./assets/vendor/chart.umd.min.js"
 ];
 

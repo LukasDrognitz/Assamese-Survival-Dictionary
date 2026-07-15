@@ -2998,8 +2998,11 @@ body.love-milestone-open .sidebar {
 .profile-picture-image,
 .profile-avatar-image {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  object-position: center;
 }
 
 .avatar-character-profile {
