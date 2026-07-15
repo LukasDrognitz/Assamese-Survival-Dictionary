@@ -19,7 +19,7 @@ import {
   testSyncConnection,
   syncStateFromServer,
   startAutoSync
-} from "./storage.js?v=20260713-38";
+} from "./storage.js?v=20260715-39";
 import {
   loadDictionary,
   filterDictionary,
@@ -44,7 +44,7 @@ import {
   selectLessonMatchingCard,
   startLessonWritingStage,
   submitLessonWritingAnswer
-} from "./lessons.js?v=20260715-04";
+} from "./lessons.js?v=20260715-05";
 import { updateSpacedRepetition, shuffleCards, renderFlashcard, renderFlashSummary } from "./flashcards.js?v=20260713-38";
 import { buildQuizQuestions, renderQuizView } from "./quiz.js?v=20260710-33";
 import {
@@ -315,7 +315,7 @@ const CONVERSATION_TOPICS = {
 const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
 const LOVE_MILESTONE_STEP_XP = 2110;
 const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
-const APP_BUILD_VERSION = "20260715-161";
+const APP_BUILD_VERSION = "20260715-162";
 
 function customDictionaryEntryCount() {
   return getCustomWords().length;
@@ -4014,7 +4014,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=173", { updateViaCache: "none" })
+      .register("sw.js?v=174", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
