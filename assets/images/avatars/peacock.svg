@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Peacock portrait">
+  <defs>
+    <radialGradient id="bg" cx="35%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#b6def5"/>
+      <stop offset="100%" stop-color="#78b5dc"/>
+    </radialGradient>
+    <radialGradient id="feather" cx="35%" cy="28%" r="70%">
+      <stop offset="0%" stop-color="#1590e0"/>
+      <stop offset="100%" stop-color="#0a5dac"/>
+    </radialGradient>
+  </defs>
+  <circle cx="256" cy="256" r="248" fill="url(#bg)"/>
+  <ellipse cx="256" cy="402" rx="108" ry="78" fill="#0e5aa5"/>
+  <ellipse cx="256" cy="244" rx="108" ry="128" fill="url(#feather)"/>
+  <ellipse cx="232" cy="186" rx="9" ry="44" fill="#0f4f8e" transform="rotate(-18 232 186)"/>
+  <ellipse cx="280" cy="186" rx="9" ry="44" fill="#0f4f8e" transform="rotate(18 280 186)"/>
+  <ellipse cx="256" cy="174" rx="9" ry="50" fill="#0f4f8e"/>
+  <circle cx="226" cy="138" r="13" fill="#1d6fc2"/>
+  <circle cx="286" cy="138" r="13" fill="#1d6fc2"/>
+  <circle cx="256" cy="122" r="13" fill="#1d6fc2"/>
+  <ellipse cx="216" cy="248" rx="24" ry="28" fill="#fff"/>
+  <ellipse cx="296" cy="248" rx="24" ry="28" fill="#fff"/>
+  <circle cx="216" cy="251" r="12" fill="#1f2a38"/>
+  <circle cx="296" cy="251" r="12" fill="#1f2a38"/>
+  <circle cx="212" cy="245" r="4" fill="#fff"/>
+  <circle cx="292" cy="245" r="4" fill="#fff"/>
+  <path d="M236 297h40l-20 30z" fill="#f3be4b"/>
+  <path d="M228 337q28 22 56 0" fill="none" stroke="#7f3f20" stroke-width="8" stroke-linecap="round"/>
+  <ellipse cx="384" cy="296" rx="74" ry="64" fill="#2e8f4f"/>
+  <circle cx="352" cy="290" r="22" fill="#1f6fb0"/>
+  <circle cx="352" cy="290" r="10" fill="#f2c548"/>
+  <circle cx="410" cy="308" r="20" fill="#1f6fb0"/>
+  <circle cx="410" cy="308" r="9" fill="#f2c548"/>
+</svg>

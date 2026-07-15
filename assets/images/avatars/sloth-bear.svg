@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Sloth bear portrait">
+  <defs>
+    <radialGradient id="bg" cx="35%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#cec9ef"/>
+      <stop offset="100%" stop-color="#9b96d2"/>
+    </radialGradient>
+    <radialGradient id="fur" cx="35%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#3b3f46"/>
+      <stop offset="100%" stop-color="#242830"/>
+    </radialGradient>
+  </defs>
+  <circle cx="256" cy="256" r="248" fill="url(#bg)"/>
+  <ellipse cx="256" cy="402" rx="116" ry="80" fill="#22262d"/>
+  <ellipse cx="184" cy="172" rx="48" ry="50" fill="#282c33"/>
+  <ellipse cx="328" cy="172" rx="48" ry="50" fill="#282c33"/>
+  <ellipse cx="256" cy="250" rx="132" ry="126" fill="url(#fur)"/>
+  <ellipse cx="256" cy="287" rx="78" ry="68" fill="#e9decb"/>
+  <ellipse cx="214" cy="245" rx="24" ry="28" fill="#fff"/>
+  <ellipse cx="298" cy="245" rx="24" ry="28" fill="#fff"/>
+  <circle cx="214" cy="248" r="12" fill="#1f2a38"/>
+  <circle cx="298" cy="248" r="12" fill="#1f2a38"/>
+  <circle cx="210" cy="242" r="4" fill="#fff"/>
+  <circle cx="294" cy="242" r="4" fill="#fff"/>
+  <ellipse cx="256" cy="304" rx="22" ry="15" fill="#8a5950"/>
+  <path d="M228 334q28 24 56 0" fill="none" stroke="#764135" stroke-width="8" stroke-linecap="round"/>
+</svg>

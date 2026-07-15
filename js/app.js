@@ -44,7 +44,7 @@ import {
   selectLessonMatchingCard,
   startLessonWritingStage,
   submitLessonWritingAnswer
-} from "./lessons.js?v=20260715-05";
+} from "./lessons.js?v=20260715-06";
 import { updateSpacedRepetition, shuffleCards, renderFlashcard, renderFlashSummary } from "./flashcards.js?v=20260713-38";
 import { buildQuizQuestions, renderQuizView } from "./quiz.js?v=20260710-33";
 import {
@@ -132,6 +132,17 @@ const AVATAR_CHARACTER_PROFILES = {
     personality: "Curious adventurer",
     defaultOutfit: "Travel shirt and shorts"
   }
+};
+
+const AVATAR_PORTRAIT_ASSETS = {
+  tiger: "assets/images/avatars/tiger.svg",
+  elephant: "assets/images/avatars/elephant.svg",
+  peacock: "assets/images/avatars/peacock.svg",
+  rhino: "assets/images/avatars/rhino.svg",
+  "sloth-bear": "assets/images/avatars/sloth-bear.svg",
+  nilgai: "assets/images/avatars/nilgai.svg",
+  fox: "assets/images/avatars/fox.svg",
+  langur: "assets/images/avatars/langur.svg"
 };
 
 const ASSAM_DID_YOU_KNOW_FACTS = [
@@ -378,7 +389,7 @@ const CONVERSATION_TOPICS = {
 const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
 const LOVE_MILESTONE_STEP_XP = 2110;
 const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
-const APP_BUILD_VERSION = "20260715-169";
+const APP_BUILD_VERSION = "20260715-170";
 const XP_TO_RUPEE_RATE = 5;
 const CHEST_OPEN_ANIMATION_MS = 1050;
 
@@ -643,32 +654,19 @@ function avatarDisplayName(avatarId) {
   return avatarMeta(avatarId)?.label || "Animal Avatar";
 }
 
+function avatarPortraitSrc(avatarId) {
+  const safeId = avatarMeta(avatarId).value;
+  return AVATAR_PORTRAIT_ASSETS[safeId] || AVATAR_PORTRAIT_ASSETS.tiger;
+}
+
 function renderAnimalBadge(avatarId, variant = "mini") {
   const safeId = avatarMeta(avatarId).value;
   const safeVariant = ["mini", "chip"].includes(variant) ? variant : "mini";
+  const src = avatarPortraitSrc(safeId);
+  const label = avatarDisplayName(safeId);
   return `
-    <span class="animal-badge portrait-badge ${safeVariant} animal-${safeId}" aria-hidden="true">
-      <span class="badge-bg"></span>
-      <span class="badge-neck"></span>
-      <span class="badge-head"></span>
-      <span class="badge-mane"></span>
-      <span class="badge-ear left"></span>
-      <span class="badge-ear right"></span>
-      <span class="badge-eye left"></span>
-      <span class="badge-eye right"></span>
-      <span class="badge-muzzle"></span>
-      <span class="badge-nose"></span>
-      <span class="badge-mouth"></span>
-      <span class="badge-horn"></span>
-      <span class="badge-trunk"></span>
-      <span class="badge-crest"></span>
-      <span class="badge-beak"></span>
-      <span class="badge-antler left"></span>
-      <span class="badge-antler right"></span>
-      <span class="badge-tusk left"></span>
-      <span class="badge-tusk right"></span>
-      <span class="badge-stripe left"></span>
-      <span class="badge-stripe right"></span>
+    <span class="animal-badge-image ${safeVariant} animal-${safeId}" aria-hidden="true">
+      <img src="${src}" alt="${label}" loading="lazy" decoding="async" />
     </span>
   `;
 }
@@ -2512,28 +2510,7 @@ function renderAvatarStudio() {
       <div class="avatar-studio-preview">
         <div class="avatar-preview-canvas ${skinThemeClass}" aria-label="Avatar preview">
           <div class="avatar-animal avatar-portrait animal-${activeAvatarMeta.value} ${furClass} ${expressionClass} ${poseClass}" role="img" aria-label="${activeAvatarMeta.label} avatar preview">
-            <span class="portrait-bg"></span>
-            <span class="portrait-shoulder"></span>
-            <span class="portrait-neck"></span>
-            <span class="portrait-head"></span>
-            <span class="portrait-mane"></span>
-            <span class="portrait-ear left"></span>
-            <span class="portrait-ear right"></span>
-            <span class="portrait-eye left"></span>
-            <span class="portrait-eye right"></span>
-            <span class="portrait-muzzle"></span>
-            <span class="portrait-nose"></span>
-            <span class="portrait-mouth"></span>
-            <span class="portrait-horn"></span>
-            <span class="portrait-trunk"></span>
-            <span class="portrait-crest"></span>
-            <span class="portrait-beak"></span>
-            <span class="portrait-antler left"></span>
-            <span class="portrait-antler right"></span>
-            <span class="portrait-tusk left"></span>
-            <span class="portrait-tusk right"></span>
-            <span class="portrait-stripe left"></span>
-            <span class="portrait-stripe right"></span>
+            <img class="avatar-portrait-art" src="${avatarPortraitSrc(activeAvatarMeta.value)}" alt="${activeAvatarMeta.label}" loading="eager" decoding="async" />
             ${layers}
           </div>
         </div>
@@ -4311,7 +4288,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=181", { updateViaCache: "none" })
+      .register("sw.js?v=182", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.

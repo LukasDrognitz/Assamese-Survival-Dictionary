@@ -665,10 +665,9 @@ export function renderLessonsOverview(lessons, progress, activeLessonId, favorit
           </div>
           <div class="row lesson-restart-row">
             <button
-              class="btn ghost small ${isCompleted ? "" : "lesson-restart-placeholder"}"
+              class="btn ghost small"
               data-action="restart-lesson"
               data-lesson="${lesson.id}"
-              ${isCompleted ? "" : "disabled tabindex='-1' aria-hidden='true'"}
             >Restart lesson</button>
           </div>
         </article>
@@ -713,6 +712,7 @@ export function renderLessonDetail(lesson, index, progress, isFavorite, learning
       <p style="margin:8px 0">Example: ${item.example}</p>
 
       <div class="row" style="margin-top:28px; flex-wrap: wrap;">
+        <button class="btn ghost" data-action="restart-lesson" data-lesson="${lesson.id}">Restart</button>
         <button class="btn ghost" data-action="lesson-prev">Previous</button>
         <button class="btn ghost" data-action="lesson-next">Next</button>
       </div>

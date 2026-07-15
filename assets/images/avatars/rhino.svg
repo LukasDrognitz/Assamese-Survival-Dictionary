@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Rhino portrait">
+  <defs>
+    <radialGradient id="bg" cx="35%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#c5dfcb"/>
+      <stop offset="100%" stop-color="#97bf9f"/>
+    </radialGradient>
+    <radialGradient id="skin" cx="35%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#9f9b93"/>
+      <stop offset="100%" stop-color="#85827b"/>
+    </radialGradient>
+  </defs>
+  <circle cx="256" cy="256" r="248" fill="url(#bg)"/>
+  <ellipse cx="256" cy="402" rx="116" ry="80" fill="#8e8a83"/>
+  <ellipse cx="256" cy="252" rx="138" ry="126" fill="url(#skin)"/>
+  <ellipse cx="196" cy="176" rx="28" ry="36" fill="#8e8a83"/>
+  <ellipse cx="316" cy="176" rx="28" ry="36" fill="#8e8a83"/>
+  <path d="M244 150h24l-12 38z" fill="#ede2cf"/>
+  <ellipse cx="214" cy="248" rx="24" ry="28" fill="#fff"/>
+  <ellipse cx="298" cy="248" rx="24" ry="28" fill="#fff"/>
+  <circle cx="214" cy="251" r="12" fill="#1f2a38"/>
+  <circle cx="298" cy="251" r="12" fill="#1f2a38"/>
+  <circle cx="210" cy="245" r="4" fill="#fff"/>
+  <circle cx="294" cy="245" r="4" fill="#fff"/>
+  <ellipse cx="256" cy="304" rx="40" ry="30" fill="#dcd4c9"/>
+  <ellipse cx="242" cy="302" rx="7" ry="5" fill="#52535a"/>
+  <ellipse cx="270" cy="302" rx="7" ry="5" fill="#52535a"/>
+  <path d="M228 334q28 24 56 0" fill="none" stroke="#5f4638" stroke-width="8" stroke-linecap="round"/>
+</svg>

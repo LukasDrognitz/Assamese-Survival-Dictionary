@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Elephant portrait">
+  <defs>
+    <radialGradient id="bg" cx="35%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#d7f2a8"/>
+      <stop offset="100%" stop-color="#aacf62"/>
+    </radialGradient>
+    <radialGradient id="skin" cx="35%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#aaa59d"/>
+      <stop offset="100%" stop-color="#8a877f"/>
+    </radialGradient>
+  </defs>
+  <circle cx="256" cy="256" r="248" fill="url(#bg)"/>
+  <ellipse cx="160" cy="228" rx="76" ry="94" fill="#8f8a82"/>
+  <ellipse cx="352" cy="228" rx="76" ry="94" fill="#8f8a82"/>
+  <ellipse cx="166" cy="236" rx="50" ry="66" fill="#e2b4a1"/>
+  <ellipse cx="346" cy="236" rx="50" ry="66" fill="#e2b4a1"/>
+  <ellipse cx="256" cy="245" rx="132" ry="128" fill="url(#skin)"/>
+  <ellipse cx="256" cy="390" rx="118" ry="86" fill="#918f88"/>
+  <path d="M235 292c0 54 42 54 42 0v62c0 22-8 40-21 40s-21-18-21-40z" fill="#969289"/>
+  <ellipse cx="215" cy="244" rx="24" ry="28" fill="#fff"/>
+  <ellipse cx="297" cy="244" rx="24" ry="28" fill="#fff"/>
+  <circle cx="215" cy="248" r="12" fill="#1f2a38"/>
+  <circle cx="297" cy="248" r="12" fill="#1f2a38"/>
+  <circle cx="211" cy="243" r="4" fill="#fff"/>
+  <circle cx="293" cy="243" r="4" fill="#fff"/>
+  <ellipse cx="238" cy="320" rx="8" ry="22" fill="#f1e6d3"/>
+  <ellipse cx="274" cy="320" rx="8" ry="22" fill="#f1e6d3"/>
+  <path d="M226 344q30 30 60 0" fill="none" stroke="#66463a" stroke-width="8" stroke-linecap="round"/>
+</svg>

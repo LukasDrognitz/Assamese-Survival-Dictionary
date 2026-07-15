@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Tiger portrait">
+  <defs>
+    <radialGradient id="bg" cx="35%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#ffdd90"/>
+      <stop offset="100%" stop-color="#f2a03e"/>
+    </radialGradient>
+    <radialGradient id="fur" cx="35%" cy="28%" r="70%">
+      <stop offset="0%" stop-color="#ffbe57"/>
+      <stop offset="100%" stop-color="#e98520"/>
+    </radialGradient>
+  </defs>
+  <circle cx="256" cy="256" r="248" fill="url(#bg)"/>
+  <ellipse cx="256" cy="402" rx="116" ry="82" fill="#f8ecd6"/>
+  <ellipse cx="180" cy="168" rx="54" ry="64" fill="#1f1b17"/>
+  <ellipse cx="332" cy="168" rx="54" ry="64" fill="#1f1b17"/>
+  <ellipse cx="184" cy="176" rx="34" ry="42" fill="#f8dfc1"/>
+  <ellipse cx="328" cy="176" rx="34" ry="42" fill="#f8dfc1"/>
+  <ellipse cx="256" cy="244" rx="132" ry="128" fill="url(#fur)"/>
+  <ellipse cx="256" cy="284" rx="74" ry="62" fill="#fff2d8"/>
+  <ellipse cx="212" cy="244" rx="26" ry="30" fill="#fff"/>
+  <ellipse cx="300" cy="244" rx="26" ry="30" fill="#fff"/>
+  <circle cx="212" cy="248" r="13" fill="#1b2534"/>
+  <circle cx="300" cy="248" r="13" fill="#1b2534"/>
+  <circle cx="207" cy="242" r="4" fill="#fff"/>
+  <circle cx="295" cy="242" r="4" fill="#fff"/>
+  <ellipse cx="256" cy="297" rx="20" ry="14" fill="#713527"/>
+  <path d="M224 324q32 30 64 0" fill="none" stroke="#7a3c2b" stroke-width="8" stroke-linecap="round"/>
+  <path d="M184 170l44 20" stroke="#1f1b17" stroke-width="10" stroke-linecap="round"/>
+  <path d="M328 170l-44 20" stroke="#1f1b17" stroke-width="10" stroke-linecap="round"/>
+  <path d="M160 238l34 14" stroke="#1f1b17" stroke-width="10" stroke-linecap="round"/>
+  <path d="M352 238l-34 14" stroke="#1f1b17" stroke-width="10" stroke-linecap="round"/>
+  <path d="M242 162l14 30 14-30" fill="none" stroke="#1f1b17" stroke-width="10" stroke-linecap="round"/>
+</svg>
