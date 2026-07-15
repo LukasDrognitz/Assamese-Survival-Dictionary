@@ -331,7 +331,7 @@ const CONVERSATION_TOPICS = {
 const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
 const LOVE_MILESTONE_STEP_XP = 2110;
 const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
-const APP_BUILD_VERSION = "20260715-166";
+const APP_BUILD_VERSION = "20260715-167";
 
 function customDictionaryEntryCount() {
   return getCustomWords().length;
@@ -586,12 +586,15 @@ function renderAnimalBadge(avatarId, variant = "mini") {
     <span class="animal-badge ${safeVariant} animal-${safeId}" aria-hidden="true">
       <span class="animal-badge-mark left"></span>
       <span class="animal-badge-mark right"></span>
+      <span class="animal-badge-brow left"></span>
+      <span class="animal-badge-brow right"></span>
       <span class="animal-badge-ear left"></span>
       <span class="animal-badge-ear right"></span>
       <span class="animal-badge-head"></span>
       <span class="animal-badge-eye left"></span>
       <span class="animal-badge-eye right"></span>
       <span class="animal-badge-snout"></span>
+      <span class="animal-badge-nose"></span>
       <span class="animal-badge-horn"></span>
       <span class="animal-badge-trunk"></span>
       <span class="animal-badge-crest"></span>
@@ -2306,15 +2309,14 @@ function renderAvatarStudio() {
     const owned = ownedSet.has(item.id);
     const isEquipped = String(equipped[item.slot] || "") === item.id;
     const action = owned ? "avatar-equip-item" : "avatar-buy-item";
-    const actionLabel = owned ? (isEquipped ? "Equipped" : "Equip") : `Buy Rs ${item.price}`;
-    const disabled = owned && isEquipped ? "disabled" : "";
+    const actionLabel = owned ? (isEquipped ? "Unequip" : "Equip") : `Buy Rs ${item.price}`;
     return `
       <article class="avatar-shop-item ${owned ? "owned" : "locked"}">
         <p class="avatar-shop-icon" aria-hidden="true"><span class="avatar-item-preview ${item.previewClass}"></span></p>
         <h4>${item.label}</h4>
         <p class="avatar-rarity ${item.rarity}">${String(item.rarity || "common").toUpperCase()}</p>
         <p class="meta">${item.slot}</p>
-        <button class="btn ${owned ? "ghost" : "accent"} small" data-action="${action}" data-item-id="${item.id}" ${disabled}>${actionLabel}</button>
+        <button class="btn ${owned ? "ghost" : "accent"} small" data-action="${action}" data-item-id="${item.id}">${actionLabel}</button>
       </article>
     `;
   }).join("");
@@ -2331,16 +2333,22 @@ function renderAvatarStudio() {
           <div class="avatar-animal animal-${activeAvatarMeta.value} ${furClass}" role="img" aria-label="${activeAvatarMeta.label} avatar preview">
             <span class="avatar-mark left"></span>
             <span class="avatar-mark right"></span>
+            <span class="avatar-brow left"></span>
+            <span class="avatar-brow right"></span>
             <span class="avatar-tail"></span>
             <span class="avatar-body"></span>
+            <span class="avatar-belly"></span>
             <span class="avatar-leg left"></span>
             <span class="avatar-leg right"></span>
+            <span class="avatar-paw left"></span>
+            <span class="avatar-paw right"></span>
             <span class="avatar-head"></span>
             <span class="avatar-ear left"></span>
             <span class="avatar-ear right"></span>
             <span class="avatar-eye left"></span>
             <span class="avatar-eye right"></span>
             <span class="avatar-snout"></span>
+            <span class="avatar-nose"></span>
             <span class="avatar-horn"></span>
             <span class="avatar-trunk"></span>
             <span class="avatar-crest"></span>
@@ -4106,7 +4114,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=178", { updateViaCache: "none" })
+      .register("sw.js?v=179", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.

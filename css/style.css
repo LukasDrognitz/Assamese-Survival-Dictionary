@@ -2340,13 +2340,42 @@ body.love-milestone-open .sidebar {
   background: color-mix(in srgb, #ffffff 62%, var(--animal-fur));
 }
 
+.animal-badge-nose {
+  position: absolute;
+  left: 46%;
+  top: 58%;
+  width: 8%;
+  height: 8%;
+  border-radius: 999px;
+  background: #1b212d;
+}
+
 .animal-badge-mark,
+.animal-badge-brow,
 .animal-badge-beak,
 .animal-badge-antler,
 .animal-badge-tusk,
 .animal-badge-whisker {
   position: absolute;
   display: none;
+}
+
+.animal-badge-brow {
+  top: 36%;
+  width: 12%;
+  height: 3%;
+  background: color-mix(in srgb, var(--animal-mark) 76%, transparent);
+  border-radius: 999px;
+}
+
+.animal-badge-brow.left {
+  left: 30%;
+  transform: rotate(-10deg);
+}
+
+.animal-badge-brow.right {
+  right: 30%;
+  transform: rotate(10deg);
 }
 
 .animal-badge-mark {
@@ -2487,8 +2516,10 @@ body.love-milestone-open .sidebar {
 
 .animal-tiger .animal-badge-mark,
 .animal-tiger .animal-badge-whisker,
+.animal-tiger .animal-badge-brow,
 .avatar-animal.animal-tiger .avatar-mark,
-.avatar-animal.animal-tiger .avatar-whisker {
+.avatar-animal.animal-tiger .avatar-whisker,
+.avatar-animal.animal-tiger .avatar-brow {
   display: block;
 }
 
@@ -2615,6 +2646,17 @@ body.love-milestone-open .sidebar {
 .avatar-animal.animal-snow-leopard .avatar-mark {
   display: block;
   border-radius: 50%;
+}
+
+.animal-snow-leopard .animal-badge-brow,
+.animal-rhino .animal-badge-brow,
+.animal-elephant .animal-badge-brow,
+.animal-buffalo .animal-badge-brow,
+.avatar-animal.animal-snow-leopard .avatar-brow,
+.avatar-animal.animal-rhino .avatar-brow,
+.avatar-animal.animal-elephant .avatar-brow,
+.avatar-animal.animal-buffalo .avatar-brow {
+  display: block;
 }
 
 /* Badge silhouette tuning per species */
@@ -2868,13 +2910,73 @@ body.love-milestone-open .sidebar {
 }
 
 .avatar-mark,
+.avatar-brow,
 .avatar-beak,
 .avatar-antler,
 .avatar-tusk,
 .avatar-whisker,
-.avatar-shell {
+.avatar-shell,
+.avatar-belly,
+.avatar-paw,
+.avatar-nose {
   position: absolute;
   display: none;
+}
+
+.avatar-brow {
+  top: 29px;
+  width: 11px;
+  height: 3px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--animal-mark) 78%, transparent);
+}
+
+.avatar-brow.left {
+  left: 47px;
+  transform: rotate(-10deg);
+}
+
+.avatar-brow.right {
+  right: 47px;
+  transform: rotate(10deg);
+}
+
+.avatar-nose {
+  top: 45px;
+  left: 58px;
+  width: 10px;
+  height: 7px;
+  border-radius: 999px;
+  background: #1b212c;
+  display: block;
+}
+
+.avatar-belly {
+  left: 40px;
+  right: 40px;
+  bottom: 24px;
+  height: 38px;
+  border-radius: 22px;
+  background: color-mix(in srgb, #ffffff 52%, var(--animal-fur));
+  opacity: 0.5;
+  display: block;
+}
+
+.avatar-paw {
+  width: 16px;
+  height: 8px;
+  bottom: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--animal-mark) 42%, var(--animal-fur));
+  display: block;
+}
+
+.avatar-paw.left {
+  left: 40px;
+}
+
+.avatar-paw.right {
+  right: 40px;
 }
 
 .avatar-mark {
@@ -3089,6 +3191,13 @@ body.love-milestone-open .sidebar {
   top: 1px;
 }
 
+.avatar-animal.animal-rhino .avatar-belly {
+  left: 32px;
+  right: 30px;
+  bottom: 22px;
+  height: 34px;
+}
+
 .avatar-animal.animal-tiger .avatar-ear {
   width: 16px;
   height: 16px;
@@ -3102,6 +3211,16 @@ body.love-milestone-open .sidebar {
   transform: rotate(20deg);
 }
 
+.avatar-animal.animal-tiger .avatar-mark {
+  width: 9px;
+  height: 22px;
+  top: 72px;
+}
+
+.avatar-animal.animal-tiger .avatar-belly {
+  background: linear-gradient(180deg, rgba(247, 218, 171, 0.9), rgba(232, 188, 124, 0.72));
+}
+
 .avatar-animal.animal-deer .avatar-body {
   left: 28px;
   right: 26px;
@@ -3112,6 +3231,11 @@ body.love-milestone-open .sidebar {
   width: 14px;
   height: 48px;
   border-radius: 8px;
+}
+
+.avatar-animal.animal-deer .avatar-paw {
+  width: 10px;
+  height: 6px;
 }
 
 .avatar-animal.animal-deer .avatar-leg.left {
@@ -3138,6 +3262,10 @@ body.love-milestone-open .sidebar {
   left: 36px;
 }
 
+.avatar-animal.animal-hoolock .avatar-belly {
+  background: color-mix(in srgb, #f0f2f6 70%, #a7aeb8);
+}
+
 .avatar-animal.animal-hornbill .avatar-body {
   left: 36px;
   right: 36px;
@@ -3159,6 +3287,11 @@ body.love-milestone-open .sidebar {
 }
 
 .avatar-animal.animal-hornbill .avatar-snout {
+  display: none;
+}
+
+.avatar-animal.animal-hornbill .avatar-nose,
+.avatar-animal.animal-river-dolphin .avatar-nose {
   display: none;
 }
 
@@ -3192,6 +3325,12 @@ body.love-milestone-open .sidebar {
   left: 57px;
 }
 
+.avatar-animal.animal-elephant .avatar-belly {
+  left: 28px;
+  right: 28px;
+  background: color-mix(in srgb, #d8dde6 68%, var(--animal-fur));
+}
+
 .avatar-animal.animal-buffalo .avatar-body {
   left: 18px;
   right: 18px;
@@ -3205,6 +3344,12 @@ body.love-milestone-open .sidebar {
 
 .avatar-animal.animal-buffalo .avatar-leg {
   width: 20px;
+}
+
+.avatar-animal.animal-buffalo .avatar-belly {
+  left: 30px;
+  right: 30px;
+  background: color-mix(in srgb, #9aa1af 48%, var(--animal-fur));
 }
 
 .avatar-animal.animal-buffalo .avatar-leg.left {
@@ -3240,6 +3385,14 @@ body.love-milestone-open .sidebar {
 
 .avatar-animal.animal-peacock .avatar-leg.right {
   right: 54px;
+}
+
+.avatar-animal.animal-peacock .avatar-belly {
+  left: 48px;
+  right: 48px;
+  bottom: 28px;
+  height: 28px;
+  background: color-mix(in srgb, #79c7f0 72%, #2a7dc4);
 }
 
 .avatar-animal.animal-river-dolphin .avatar-body {
@@ -3282,6 +3435,19 @@ body.love-milestone-open .sidebar {
   border-radius: 10px;
 }
 
+.avatar-animal.animal-river-dolphin .avatar-belly {
+  left: 34px;
+  right: 34px;
+  bottom: 32px;
+  height: 18px;
+  border-radius: 999px;
+  background: color-mix(in srgb, #efd7e4 76%, #af8ea4);
+}
+
+.avatar-animal.animal-river-dolphin .avatar-paw {
+  display: none;
+}
+
 .avatar-animal.animal-tortoise .avatar-body {
   left: 30px;
   right: 30px;
@@ -3317,6 +3483,16 @@ body.love-milestone-open .sidebar {
   top: 88px;
 }
 
+.avatar-animal.animal-tortoise .avatar-belly {
+  display: none;
+}
+
+.avatar-animal.animal-tortoise .avatar-paw {
+  width: 10px;
+  height: 6px;
+  bottom: 12px;
+}
+
 .avatar-animal.animal-snow-leopard .avatar-tail {
   width: 20px;
   height: 70px;
@@ -3331,6 +3507,10 @@ body.love-milestone-open .sidebar {
   height: 10px;
   top: 80px;
   border-radius: 50%;
+}
+
+.avatar-animal.animal-snow-leopard .avatar-belly {
+  background: color-mix(in srgb, #f3f6fb 78%, #cfd5de);
 }
 
 /* Species-specific idle animation system */
