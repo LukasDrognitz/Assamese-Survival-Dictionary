@@ -1,28 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Indian fox portrait">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Indian fox character sheet">
   <defs>
-    <radialGradient id="bg" cx="35%" cy="30%" r="75%">
-      <stop offset="0%" stop-color="#dbeac1"/>
-      <stop offset="100%" stop-color="#afcb8e"/>
+    <radialGradient id="bg" cx="34%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#dcebc2"/>
+      <stop offset="100%" stop-color="#aecb8e"/>
     </radialGradient>
-    <radialGradient id="fur" cx="35%" cy="28%" r="72%">
-      <stop offset="0%" stop-color="#e5a24f"/>
-      <stop offset="100%" stop-color="#d8842f"/>
+    <radialGradient id="fur" cx="36%" cy="27%" r="72%">
+      <stop offset="0%" stop-color="#e8ab5f"/>
+      <stop offset="100%" stop-color="#d88733"/>
     </radialGradient>
+    <linearGradient id="hood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6f7ea0"/>
+      <stop offset="100%" stop-color="#4b5974"/>
+    </linearGradient>
   </defs>
-  <circle cx="256" cy="256" r="248" fill="url(#bg)"/>
-  <ellipse cx="256" cy="402" rx="116" ry="82" fill="#de8f39"/>
-  <path d="M158 210l44-96 56 72z" fill="#de8f39"/>
-  <path d="M354 210l-44-96-56 72z" fill="#de8f39"/>
-  <path d="M178 188l24-52 30 38z" fill="#f8dfc1"/>
-  <path d="M334 188l-24-52-30 38z" fill="#f8dfc1"/>
-  <ellipse cx="256" cy="254" rx="126" ry="120" fill="url(#fur)"/>
-  <ellipse cx="256" cy="294" rx="76" ry="66" fill="#fff2dc"/>
-  <ellipse cx="214" cy="246" rx="24" ry="28" fill="#fff"/>
-  <ellipse cx="298" cy="246" rx="24" ry="28" fill="#fff"/>
-  <circle cx="214" cy="249" r="12" fill="#1f2a38"/>
-  <circle cx="298" cy="249" r="12" fill="#1f2a38"/>
-  <circle cx="210" cy="243" r="4" fill="#fff"/>
-  <circle cx="294" cy="243" r="4" fill="#fff"/>
-  <ellipse cx="256" cy="302" rx="20" ry="14" fill="#6a3a29"/>
-  <path d="M226 332q30 24 60 0" fill="none" stroke="#724334" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="512" cy="512" r="496" fill="url(#bg)"/>
+  <circle cx="512" cy="512" r="490" fill="none" stroke="#ffffff" stroke-opacity="0.34" stroke-width="12"/>
+  <ellipse cx="512" cy="808" rx="244" ry="170" fill="url(#hood)"/>
+  <path d="M320 420l136-226 164 160" fill="#de903e"/>
+  <path d="M704 420l-136-226-164 160" fill="#de903e"/>
+  <path d="M366 370l76-132 94 96" fill="#f7dfc4"/>
+  <path d="M658 370l-76-132-94 96" fill="#f7dfc4"/>
+  <ellipse cx="512" cy="518" rx="258" ry="244" fill="url(#fur)"/>
+  <ellipse cx="512" cy="612" rx="170" ry="148" fill="#fff2dd"/>
+  <ellipse cx="428" cy="508" rx="52" ry="62" fill="#ffffff"/>
+  <ellipse cx="596" cy="508" rx="52" ry="62" fill="#ffffff"/>
+  <circle cx="428" cy="520" r="28" fill="#1f2a38"/>
+  <circle cx="596" cy="520" r="28" fill="#1f2a38"/>
+  <circle cx="416" cy="504" r="10" fill="#ffffff"/>
+  <circle cx="584" cy="504" r="10" fill="#ffffff"/>
+  <ellipse cx="512" cy="628" rx="42" ry="30" fill="#6c3d2d"/>
+  <path d="M448 694q64 44 128 0" fill="none" stroke="#744536" stroke-width="18" stroke-linecap="round"/>
 </svg>

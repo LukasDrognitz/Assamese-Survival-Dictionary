@@ -1,26 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Sloth bear portrait">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Sloth bear character sheet">
   <defs>
-    <radialGradient id="bg" cx="35%" cy="30%" r="75%">
-      <stop offset="0%" stop-color="#cec9ef"/>
-      <stop offset="100%" stop-color="#9b96d2"/>
+    <radialGradient id="bg" cx="34%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#d1ccef"/>
+      <stop offset="100%" stop-color="#9b97d1"/>
     </radialGradient>
-    <radialGradient id="fur" cx="35%" cy="28%" r="72%">
-      <stop offset="0%" stop-color="#3b3f46"/>
-      <stop offset="100%" stop-color="#242830"/>
+    <radialGradient id="fur" cx="36%" cy="27%" r="72%">
+      <stop offset="0%" stop-color="#434750"/>
+      <stop offset="100%" stop-color="#252a32"/>
     </radialGradient>
+    <linearGradient id="hoodie" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6f7fa2"/>
+      <stop offset="100%" stop-color="#4b5873"/>
+    </linearGradient>
   </defs>
-  <circle cx="256" cy="256" r="248" fill="url(#bg)"/>
-  <ellipse cx="256" cy="402" rx="116" ry="80" fill="#22262d"/>
-  <ellipse cx="184" cy="172" rx="48" ry="50" fill="#282c33"/>
-  <ellipse cx="328" cy="172" rx="48" ry="50" fill="#282c33"/>
-  <ellipse cx="256" cy="250" rx="132" ry="126" fill="url(#fur)"/>
-  <ellipse cx="256" cy="287" rx="78" ry="68" fill="#e9decb"/>
-  <ellipse cx="214" cy="245" rx="24" ry="28" fill="#fff"/>
-  <ellipse cx="298" cy="245" rx="24" ry="28" fill="#fff"/>
-  <circle cx="214" cy="248" r="12" fill="#1f2a38"/>
-  <circle cx="298" cy="248" r="12" fill="#1f2a38"/>
-  <circle cx="210" cy="242" r="4" fill="#fff"/>
-  <circle cx="294" cy="242" r="4" fill="#fff"/>
-  <ellipse cx="256" cy="304" rx="22" ry="15" fill="#8a5950"/>
-  <path d="M228 334q28 24 56 0" fill="none" stroke="#764135" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="512" cy="512" r="496" fill="url(#bg)"/>
+  <circle cx="512" cy="512" r="490" fill="none" stroke="#ffffff" stroke-opacity="0.34" stroke-width="12"/>
+  <ellipse cx="512" cy="806" rx="246" ry="170" fill="url(#hoodie)"/>
+  <path d="M382 748h260" stroke="#2e3950" stroke-width="14" stroke-linecap="round"/>
+  <ellipse cx="368" cy="354" rx="98" ry="104" fill="#2c3139"/>
+  <ellipse cx="656" cy="354" rx="98" ry="104" fill="#2c3139"/>
+  <ellipse cx="512" cy="510" rx="272" ry="250" fill="url(#fur)"/>
+  <ellipse cx="512" cy="596" rx="178" ry="150" fill="#ece1cf"/>
+  <ellipse cx="426" cy="494" rx="52" ry="62" fill="#ffffff"/>
+  <ellipse cx="598" cy="494" rx="52" ry="62" fill="#ffffff"/>
+  <circle cx="426" cy="506" r="28" fill="#1f2a38"/>
+  <circle cx="598" cy="506" r="28" fill="#1f2a38"/>
+  <circle cx="414" cy="490" r="10" fill="#ffffff"/>
+  <circle cx="586" cy="490" r="10" fill="#ffffff"/>
+  <ellipse cx="512" cy="622" rx="52" ry="36" fill="#8b5a51"/>
+  <path d="M444 694q68 48 136 0" fill="none" stroke="#7a4539" stroke-width="18" stroke-linecap="round"/>
 </svg>
