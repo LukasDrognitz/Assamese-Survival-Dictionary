@@ -38,6 +38,7 @@ const DEFAULT_PROGRESS = {
     date: todayKey()
   },
   spacedRepetition: {},
+  lessonWordProgress: {},
   achievements: [],
   activity: [],
   loveMilestoneXpSeen: 0
@@ -342,6 +343,16 @@ export function startAutoSync(onRemoteUpdate) {
 export function getProgress() {
   const progress = { ...DEFAULT_PROGRESS, ...read(KEYS.progress, DEFAULT_PROGRESS) };
   progress.dailyGoal = { ...DEFAULT_PROGRESS.dailyGoal, ...(progress.dailyGoal || {}) };
+  const legacyFlashProgress = progress.flashWordProgress && typeof progress.flashWordProgress === "object"
+    ? progress.flashWordProgress
+    : {};
+  progress.lessonWordProgress = progress.lessonWordProgress && typeof progress.lessonWordProgress === "object"
+    ? progress.lessonWordProgress
+    : {};
+  if (!Object.keys(progress.lessonWordProgress).length && Object.keys(legacyFlashProgress).length) {
+    progress.lessonWordProgress = { ...legacyFlashProgress };
+  }
+  delete progress.flashWordProgress;
   progress.loveMilestoneXpSeen = Math.max(0, Number(progress.loveMilestoneXpSeen) || 0);
 
   if (typeof progress.dailyGoal.targetXp !== "number" || Number.isNaN(progress.dailyGoal.targetXp)) {

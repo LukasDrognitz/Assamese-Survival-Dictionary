@@ -1276,6 +1276,158 @@ body.lesson-immersive .topbar {
   background: linear-gradient(120deg, var(--accent), #6075ec);
 }
 
+.flash-learning-card,
+.lesson-learning-card {
+  min-height: 560px;
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+}
+
+.flash-learning-header,
+.lesson-learning-header {
+  display: grid;
+  gap: 8px;
+}
+
+.flash-learning-headline,
+.lesson-learning-headline {
+  align-items: center;
+}
+
+.flash-learning-progress,
+.lesson-learning-progress {
+  width: 100%;
+  height: 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 70%, rgba(104, 113, 136, 0.35));
+  overflow: hidden;
+  border: 1px solid rgba(104, 113, 136, 0.22);
+}
+
+.flash-learning-progress-fill,
+.lesson-learning-progress-bar {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(120deg, #ff8f1c, #ffd152);
+  transition: width 0.25s ease;
+}
+
+.flash-match-grid,
+.lesson-match-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  align-content: start;
+}
+
+.flash-match-column,
+.lesson-match-column {
+  display: grid;
+  gap: 10px;
+}
+
+.flash-match-card,
+.lesson-match-card {
+  min-height: 68px;
+  border-radius: 14px;
+  border: 1px solid rgba(104, 113, 136, 0.34);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  color: var(--text);
+  padding: 10px 12px;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+}
+
+.flash-match-card:hover,
+.lesson-match-card:hover {
+  transform: translateY(-1px);
+}
+
+.flash-match-card.selected,
+.lesson-match-card.selected {
+  border-color: color-mix(in srgb, var(--accent) 68%, #4fd4ff);
+  background: color-mix(in srgb, var(--surface) 76%, rgba(79, 212, 255, 0.24));
+}
+
+.flash-match-card.matched,
+.lesson-match-card.matched {
+  border-color: rgba(98, 182, 65, 0.85);
+  background: linear-gradient(120deg, rgba(98, 182, 65, 0.3), rgba(125, 206, 85, 0.18));
+  color: color-mix(in srgb, var(--text) 92%, #ffffff);
+  opacity: 0.72;
+  cursor: default;
+}
+
+.flash-match-card.wrong,
+.lesson-match-card.wrong {
+  border-color: rgba(226, 96, 96, 0.82);
+  background: linear-gradient(120deg, rgba(226, 96, 96, 0.22), rgba(226, 96, 96, 0.12));
+}
+
+.flash-match-card:disabled,
+.lesson-match-card:disabled {
+  pointer-events: none;
+}
+
+.flash-writing-prompt,
+.lesson-writing-prompt {
+  border: 1px solid rgba(104, 113, 136, 0.25);
+  border-radius: 14px;
+  padding: 14px;
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+}
+
+.flash-writing-prompt h2,
+.lesson-writing-prompt h2 {
+  margin-top: 6px;
+  font-size: clamp(1.2rem, 4.2vw, 1.6rem);
+  line-height: 1.2;
+}
+
+.flash-learning-feedback,
+.lesson-learning-feedback {
+  margin-top: auto;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  border: 1px solid rgba(104, 113, 136, 0.2);
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+}
+
+.flash-learning-feedback.success,
+.lesson-learning-feedback.success {
+  border-color: rgba(108, 194, 63, 0.6);
+  background: linear-gradient(120deg, rgba(108, 194, 63, 0.26), rgba(108, 194, 63, 0.12));
+  color: color-mix(in srgb, var(--text) 90%, #89e553);
+}
+
+.flash-learning-feedback.error,
+.lesson-learning-feedback.error {
+  border-color: rgba(233, 109, 109, 0.62);
+  background: linear-gradient(120deg, rgba(233, 109, 109, 0.24), rgba(233, 109, 109, 0.1));
+  color: color-mix(in srgb, var(--text) 90%, #ff9191);
+}
+
+.flash-learning-complete {
+  justify-items: center;
+  text-align: center;
+}
+
+@media (max-width: 520px) {
+  .flash-match-card,
+  .lesson-match-card {
+    min-height: 62px;
+    font-size: 0.95rem;
+    padding: 9px 10px;
+  }
+}
+
 .row {
   display: flex;
   align-items: center;

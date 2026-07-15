@@ -96,7 +96,8 @@ export function renderTeacherAvatar(expression = "good-job", context = "congrats
           class="teacher-photo ${pose.className}"
           src="${poseSrc}"
           alt="${pose.title}"
-          loading="lazy"
+          loading="eager"
+          decoding="async"
         />
         <span class="teacher-mood-badge">${pose.badge}</span>
       </div>

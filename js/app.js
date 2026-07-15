@@ -30,7 +30,20 @@ import {
   restoreDeletedDictionaryWord,
   resetDictionaryCache
 } from "./dictionary.js?v=20260710-45";
-import { loadLessons, renderLessonsOverview, renderLessonDetail, flattenLessonWords, resetLessonsCache } from "./lessons.js?v=20260710-55";
+import {
+  loadLessons,
+  renderLessonsOverview,
+  renderLessonDetail,
+  flattenLessonWords,
+  resetLessonsCache,
+  createLessonLearningSession,
+  markLessonReviewComplete,
+  lessonReviewComplete,
+  startLessonMatchingStage,
+  selectLessonMatchingCard,
+  startLessonWritingStage,
+  submitLessonWritingAnswer
+} from "./lessons.js?v=20260715-01";
 import { updateSpacedRepetition, shuffleCards, renderFlashcard, renderFlashSummary } from "./flashcards.js?v=20260713-38";
 import { buildQuizQuestions, renderQuizView } from "./quiz.js?v=20260710-33";
 import {
@@ -352,6 +365,9 @@ const state = {
     hardWordIds: [],
     categoryDropAnimating: false,
     categoryDropFromType: "words"
+  },
+  lessonLearning: {
+    session: null
   },
   quiz: {
     questions: [],
@@ -1407,7 +1423,8 @@ function renderLessons() {
     lesson,
     state.activeLessonIndex,
     state.progress,
-    state.favorites.words.includes(activeWord?.id)
+    state.favorites.words.includes(activeWord?.id),
+    state.lessonLearning.session
   );
 
   panel.innerHTML = `
@@ -2332,6 +2349,129 @@ function guidedAnswerForLearnerQuestion(questionEntry) {
     null;
 }
 
+function ensureLessonProgressStore() {
+  if (!state.progress.lessonWordProgress || typeof state.progress.lessonWordProgress !== "object") {
+    state.progress.lessonWordProgress = {};
+  }
+}
+
+function ensureLessonWordProgressEntry(item) {
+  ensureLessonProgressStore();
+  const id = String(item?.id || "");
+  if (!id) return null;
+
+  const existing = state.progress.lessonWordProgress[id] || {};
+  state.progress.lessonWordProgress[id] = {
+    id,
+    term: String(item?.assamese || "").trim(),
+    translation: String(item?.english || "").trim(),
+    reviewCompleted: Boolean(existing.reviewCompleted),
+    matchingCorrectCount: Math.max(0, Number(existing.matchingCorrectCount) || 0),
+    writingCorrectCount: Math.max(0, Number(existing.writingCorrectCount) || 0),
+    mistakeCount: Math.max(0, Number(existing.mistakeCount) || 0),
+    learned: Boolean(existing.learned),
+    lastPracticedAt: existing.lastPracticedAt || null
+  };
+
+  return state.progress.lessonWordProgress[id];
+}
+
+function touchLessonWordProgress(wordId) {
+  const id = String(wordId || "");
+  if (!id) return;
+  ensureLessonProgressStore();
+  if (!state.progress.lessonWordProgress[id]) return;
+  state.progress.lessonWordProgress[id].lastPracticedAt = new Date().toISOString();
+}
+
+function markLessonWordReviewed(item) {
+  const entry = ensureLessonWordProgressEntry(item);
+  if (!entry) return;
+  entry.reviewCompleted = true;
+  touchLessonWordProgress(entry.id);
+}
+
+function recordLessonMatchResult(item, isCorrect) {
+  const entry = ensureLessonWordProgressEntry(item);
+  if (!entry) return;
+  if (isCorrect) {
+    entry.matchingCorrectCount += 1;
+  } else {
+    entry.mistakeCount += 1;
+    entry.learned = false;
+  }
+  touchLessonWordProgress(entry.id);
+}
+
+function recordLessonWritingResult(item, isCorrect) {
+  const entry = ensureLessonWordProgressEntry(item);
+  if (!entry) return;
+  if (isCorrect) {
+    entry.writingCorrectCount += 1;
+  } else {
+    entry.writingCorrectCount = Math.max(0, entry.writingCorrectCount - 1);
+    entry.mistakeCount += 1;
+    entry.learned = false;
+  }
+  touchLessonWordProgress(entry.id);
+}
+
+function startLessonLearningSession(lesson) {
+  state.lessonLearning.session = createLessonLearningSession(lesson);
+  state.activeLessonIndex = 0;
+}
+
+function finishLessonLearningSession(lesson) {
+  const session = state.lessonLearning.session;
+  if (!lesson || !session) return;
+
+  ensureLessonProgressStore();
+  state.progress.wordsLearned = [...new Set((state.progress.wordsLearned || []).filter(Boolean).map((id) => String(id)))];
+
+  let learnedNowCount = 0;
+  session.words.forEach((item) => {
+    const id = String(item.id || "");
+    if (!id) return;
+    const entry = ensureLessonWordProgressEntry(item);
+    if (!entry) return;
+
+    const unresolvedMistake = Boolean(session.unresolvedMistakesByWord?.[id]);
+    const learned = entry.reviewCompleted
+      && entry.matchingCorrectCount >= 1
+      && entry.writingCorrectCount >= 2
+      && !unresolvedMistake;
+
+    entry.learned = learned;
+    touchLessonWordProgress(id);
+
+    if (learned) {
+      if (!state.progress.wordsLearned.includes(id)) {
+        state.progress.wordsLearned.push(id);
+        xpGain(12, "Learned a new word");
+        addActivity(`Learned word ${id}`);
+      }
+      addRecentWord(id);
+      learnedNowCount += 1;
+    }
+  });
+
+  session.learnedNowCount = learnedNowCount;
+
+  const allLessonWordsLearned = lesson.items.every((item) => {
+    const id = String(item.id || "");
+    const progressEntry = state.progress.lessonWordProgress?.[id];
+    return Boolean(progressEntry?.learned);
+  });
+
+  if (allLessonWordsLearned && !state.progress.lessonsCompleted.includes(lesson.id)) {
+    state.progress.lessonsCompleted.push(lesson.id);
+    pruneCompletedLessonFavorites();
+    state.progress.dailyGoal.lessonsDone += 1;
+    xpGain(30, `Completed lesson ${lesson.title}`);
+    if (state.settings.animations) drawConfetti();
+  }
+}
+
 function addRecentWord(wordId) {
   state.recentWords = [wordId, ...state.recentWords.filter((id) => id !== wordId)].slice(0, 20);
 }
@@ -2605,6 +2745,10 @@ async function onClick(event) {
     state.activeLessonId = actionSource.dataset.lesson;
     state.activeLessonIndex = 0;
     state.lessonsScreen = "detail";
+    const lesson = state.lessons.find((item) => item.id === state.activeLessonId);
+    if (lesson) {
+      startLessonLearningSession(lesson);
+    }
     renderLessons();
     return;
   }
@@ -2613,25 +2757,34 @@ async function onClick(event) {
     state.activeLessonId = actionSource.dataset.lesson;
     state.activeLessonIndex = 0;
     state.lessonsScreen = "detail";
+    const lesson = state.lessons.find((item) => item.id === state.activeLessonId);
+    if (lesson) {
+      startLessonLearningSession(lesson);
+    }
     renderLessons();
     return;
   }
 
   if (action === "lesson-back") {
     state.lessonsScreen = "overview";
+    state.lessonLearning.session = null;
     renderLessons();
     return;
   }
 
   if (action === "lesson-congrats-overview") {
     state.lessonsScreen = "overview";
+    state.lessonLearning.session = null;
     renderLessons();
     return;
   }
 
   if (action === "lesson-congrats-review") {
     state.lessonsScreen = "detail";
-    state.activeLessonIndex = 0;
+    const lesson = state.lessons.find((item) => item.id === state.activeLessonId);
+    if (lesson) {
+      startLessonLearningSession(lesson);
+    }
     renderLessons();
     return;
   }
@@ -2646,12 +2799,14 @@ async function onClick(event) {
   }
 
   if (action === "lesson-prev") {
+    if (state.lessonLearning.session?.stage && state.lessonLearning.session.stage !== "review") return;
     state.activeLessonIndex = Math.max(0, state.activeLessonIndex - 1);
     renderLessons();
     return;
   }
 
   if (action === "lesson-next") {
+    if (state.lessonLearning.session?.stage && state.lessonLearning.session.stage !== "review") return;
     const lesson = state.lessons.find((item) => item.id === state.activeLessonId);
     if (!lesson) return;
     state.activeLessonIndex = Math.min(lesson.items.length - 1, state.activeLessonIndex + 1);
@@ -2665,51 +2820,109 @@ async function onClick(event) {
       toast("This lesson item cannot be marked as learned");
       return;
     }
-
-    let didChange = false;
-    let lessonJustCompleted = false;
-
-    // Normalize persisted state before updating counters.
-    state.progress.wordsLearned = [...new Set((state.progress.wordsLearned || []).filter(Boolean).map((id) => String(id)))];
-
-    if (!state.progress.wordsLearned.includes(wordId)) {
-      state.progress.wordsLearned.push(wordId);
-      xpGain(12, "Learned a new word");
-      addActivity(`Learned word ${wordId}`);
-      addRecentWord(wordId);
-      didChange = true;
-    }
-
     const lesson = state.lessons.find((item) => item.id === state.activeLessonId);
-    if (lesson) {
-      const allLessonWordsLearned = lesson.items.every((item) => state.progress.wordsLearned.includes(String(item.id)));
-
-      if (allLessonWordsLearned && !state.progress.lessonsCompleted.includes(lesson.id)) {
-        state.progress.lessonsCompleted.push(lesson.id);
-        pruneCompletedLessonFavorites();
-        state.progress.dailyGoal.lessonsDone += 1;
-        xpGain(30, `Completed lesson ${lesson.title}`);
-        if (state.settings.animations) drawConfetti();
-        didChange = true;
-        lessonJustCompleted = true;
-      }
+    if (!lesson) return;
+    if (!state.lessonLearning.session) {
+      startLessonLearningSession(lesson);
     }
 
-    if (didChange) persist();
+    const session = state.lessonLearning.session;
+    if (session?.stage !== "review") return;
 
-    if (lessonJustCompleted) {
-      state.lessonsScreen = "congrats";
+    const currentItem = lesson.items.find((item) => String(item.id) === wordId) || lesson.items[state.activeLessonIndex];
+    if (!currentItem) return;
+
+    markLessonWordReviewed(currentItem);
+    markLessonReviewComplete(session, currentItem.id);
+
+    if (lessonReviewComplete(session)) {
+      startLessonMatchingStage(session);
+      persist();
       renderLessons();
-      renderHome();
       return;
     }
 
-    if (lesson) {
-      state.activeLessonIndex = Math.min(lesson.items.length - 1, state.activeLessonIndex + 1);
-    }
-
+    state.activeLessonIndex = Math.min(lesson.items.length - 1, state.activeLessonIndex + 1);
+    persist();
     renderLessons();
     renderHome();
+    return;
+  }
+
+  if (action === "lesson-match-select") {
+    const lesson = state.lessons.find((item) => item.id === state.activeLessonId);
+    const session = state.lessonLearning.session;
+    if (!lesson || !session) return;
+    if (session.stage !== "matching") return;
+
+    const side = actionSource.dataset.side;
+    const cardId = actionSource.dataset.cardId;
+    const result = selectLessonMatchingCard(session, side, cardId);
+    if (!result?.changed) return;
+
+    if (result.resolved) {
+      (result.wordIds || []).forEach((id) => {
+        const item = lesson.items.find((entry) => String(entry.id) === String(id));
+        if (!item) return;
+
+        if (result.correct) {
+          recordLessonMatchResult(item, true);
+          updateSpacedRepetition(state.progress, item.id, "good");
+          session.unresolvedMistakesByWord[String(item.id)] = false;
+        } else {
+          recordLessonMatchResult(item, false);
+          updateSpacedRepetition(state.progress, item.id, "hard");
+          session.unresolvedMistakesByWord[String(item.id)] = true;
+        }
+      });
+
+      if (result.completed) {
+        startLessonWritingStage(session);
+      }
+    }
+
+    persist();
+    renderLessons();
+    return;
+  }
+
+  if (action === "lesson-writing-submit") {
+    const lesson = state.lessons.find((item) => item.id === state.activeLessonId);
+    const session = state.lessonLearning.session;
+    if (!lesson || !session || session.stage !== "writing") return;
+
+    const input = document.getElementById("lesson-writing-input");
+    const typed = String(input?.value || "");
+    const result = submitLessonWritingAnswer(session, typed);
+    if (!result?.changed) return;
+
+    const currentItem = lesson.items.find((item) => String(item.id) === String(result.wordId));
+    if (currentItem) {
+      if (result.correct) {
+        recordLessonWritingResult(currentItem, true);
+        updateSpacedRepetition(state.progress, currentItem.id, "good");
+        session.unresolvedMistakesByWord[String(currentItem.id)] = false;
+      } else {
+        recordLessonWritingResult(currentItem, false);
+        updateSpacedRepetition(state.progress, currentItem.id, "hard");
+        session.unresolvedMistakesByWord[String(currentItem.id)] = true;
+      }
+    }
+
+    if (result.completed) {
+      finishLessonLearningSession(lesson);
+      state.lessonsScreen = "congrats";
+    }
+
+    persist();
+    renderLessons();
+    renderHome();
+    return;
+  }
+
+  if (action === "lesson-session-finish") {
+    state.lessonsScreen = "congrats";
+    renderLessons();
     return;
   }
 
@@ -2982,16 +3195,7 @@ async function onClick(event) {
       return;
     }
 
-    state.flash.cards = hardCards;
-    state.flash.index = 0;
-    state.flash.flipped = false;
-    state.flash.setupStage = "session";
-    state.flash.mode = "session";
-    state.flash.reviewedCount = 0;
-    state.flash.sessionTotal = hardCards.length;
-    state.flash.hardCount = 0;
-    state.flash.easyCount = 0;
-    state.flash.hardWordIds = [];
+    resetFlashSession(hardCards);
     renderPractice();
     return;
   }
