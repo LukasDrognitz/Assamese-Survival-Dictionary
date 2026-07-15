@@ -647,28 +647,28 @@ function renderAnimalBadge(avatarId, variant = "mini") {
   const safeId = avatarMeta(avatarId).value;
   const safeVariant = ["mini", "chip"].includes(variant) ? variant : "mini";
   return `
-    <span class="animal-badge ${safeVariant} animal-${safeId}" aria-hidden="true">
-      <span class="animal-badge-mark left"></span>
-      <span class="animal-badge-mark right"></span>
-      <span class="animal-badge-brow left"></span>
-      <span class="animal-badge-brow right"></span>
-      <span class="animal-badge-ear left"></span>
-      <span class="animal-badge-ear right"></span>
-      <span class="animal-badge-head"></span>
-      <span class="animal-badge-eye left"></span>
-      <span class="animal-badge-eye right"></span>
-      <span class="animal-badge-snout"></span>
-      <span class="animal-badge-nose"></span>
-      <span class="animal-badge-horn"></span>
-      <span class="animal-badge-trunk"></span>
-      <span class="animal-badge-crest"></span>
-      <span class="animal-badge-beak"></span>
-      <span class="animal-badge-antler left"></span>
-      <span class="animal-badge-antler right"></span>
-      <span class="animal-badge-tusk left"></span>
-      <span class="animal-badge-tusk right"></span>
-      <span class="animal-badge-whisker left"></span>
-      <span class="animal-badge-whisker right"></span>
+    <span class="animal-badge portrait-badge ${safeVariant} animal-${safeId}" aria-hidden="true">
+      <span class="badge-bg"></span>
+      <span class="badge-neck"></span>
+      <span class="badge-head"></span>
+      <span class="badge-mane"></span>
+      <span class="badge-ear left"></span>
+      <span class="badge-ear right"></span>
+      <span class="badge-eye left"></span>
+      <span class="badge-eye right"></span>
+      <span class="badge-muzzle"></span>
+      <span class="badge-nose"></span>
+      <span class="badge-mouth"></span>
+      <span class="badge-horn"></span>
+      <span class="badge-trunk"></span>
+      <span class="badge-crest"></span>
+      <span class="badge-beak"></span>
+      <span class="badge-antler left"></span>
+      <span class="badge-antler right"></span>
+      <span class="badge-tusk left"></span>
+      <span class="badge-tusk right"></span>
+      <span class="badge-stripe left"></span>
+      <span class="badge-stripe right"></span>
     </span>
   `;
 }
@@ -2511,38 +2511,29 @@ function renderAvatarStudio() {
       </div>
       <div class="avatar-studio-preview">
         <div class="avatar-preview-canvas ${skinThemeClass}" aria-label="Avatar preview">
-          <div class="avatar-animal animal-${activeAvatarMeta.value} ${furClass} ${expressionClass} ${poseClass}" role="img" aria-label="${activeAvatarMeta.label} avatar preview">
-            <span class="avatar-mark left"></span>
-            <span class="avatar-mark right"></span>
-            <span class="avatar-brow left"></span>
-            <span class="avatar-brow right"></span>
-            <span class="avatar-tail"></span>
-            <span class="avatar-body"></span>
-            <span class="avatar-arm left"></span>
-            <span class="avatar-arm right"></span>
-            <span class="avatar-belly"></span>
-            <span class="avatar-leg left"></span>
-            <span class="avatar-leg right"></span>
-            <span class="avatar-paw left"></span>
-            <span class="avatar-paw right"></span>
-            <span class="avatar-head"></span>
-            <span class="avatar-ear left"></span>
-            <span class="avatar-ear right"></span>
-            <span class="avatar-eye left"></span>
-            <span class="avatar-eye right"></span>
-            <span class="avatar-snout"></span>
-            <span class="avatar-nose"></span>
-            <span class="avatar-horn"></span>
-            <span class="avatar-trunk"></span>
-            <span class="avatar-crest"></span>
-            <span class="avatar-beak"></span>
-            <span class="avatar-antler left"></span>
-            <span class="avatar-antler right"></span>
-            <span class="avatar-tusk left"></span>
-            <span class="avatar-tusk right"></span>
-            <span class="avatar-whisker left"></span>
-            <span class="avatar-whisker right"></span>
-            <span class="avatar-shell"></span>
+          <div class="avatar-animal avatar-portrait animal-${activeAvatarMeta.value} ${furClass} ${expressionClass} ${poseClass}" role="img" aria-label="${activeAvatarMeta.label} avatar preview">
+            <span class="portrait-bg"></span>
+            <span class="portrait-shoulder"></span>
+            <span class="portrait-neck"></span>
+            <span class="portrait-head"></span>
+            <span class="portrait-mane"></span>
+            <span class="portrait-ear left"></span>
+            <span class="portrait-ear right"></span>
+            <span class="portrait-eye left"></span>
+            <span class="portrait-eye right"></span>
+            <span class="portrait-muzzle"></span>
+            <span class="portrait-nose"></span>
+            <span class="portrait-mouth"></span>
+            <span class="portrait-horn"></span>
+            <span class="portrait-trunk"></span>
+            <span class="portrait-crest"></span>
+            <span class="portrait-beak"></span>
+            <span class="portrait-antler left"></span>
+            <span class="portrait-antler right"></span>
+            <span class="portrait-tusk left"></span>
+            <span class="portrait-tusk right"></span>
+            <span class="portrait-stripe left"></span>
+            <span class="portrait-stripe right"></span>
             ${layers}
           </div>
         </div>
