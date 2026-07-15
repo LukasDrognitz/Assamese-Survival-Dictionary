@@ -2617,6 +2617,101 @@ body.love-milestone-open .sidebar {
   border-radius: 50%;
 }
 
+/* Badge silhouette tuning per species */
+.animal-rhino .animal-badge-head {
+  border-radius: 44% 44% 52% 52%;
+}
+
+.animal-tiger .animal-badge-ear {
+  width: 24%;
+  height: 24%;
+  top: 6%;
+}
+
+.animal-deer .animal-badge-ear {
+  width: 20%;
+  height: 26%;
+  top: 10%;
+}
+
+.animal-hoolock .animal-badge-head {
+  border-radius: 46% 46% 56% 56%;
+}
+
+.animal-hoolock .animal-badge-snout {
+  left: 35%;
+  right: 35%;
+  height: 13%;
+}
+
+.animal-hornbill .animal-badge-ear {
+  width: 14%;
+  height: 12%;
+  top: 10%;
+}
+
+.animal-hornbill .animal-badge-snout {
+  display: none;
+}
+
+.animal-elephant .animal-badge-ear {
+  width: 38%;
+  height: 34%;
+  top: 10%;
+}
+
+.animal-elephant .animal-badge-head {
+  inset: 14% 8% 6%;
+}
+
+.animal-buffalo .animal-badge-ear {
+  width: 26%;
+  height: 22%;
+  top: 12%;
+}
+
+.animal-buffalo .animal-badge-head {
+  inset: 15% 6% 7%;
+}
+
+.animal-peacock .animal-badge-ear {
+  display: none;
+}
+
+.animal-peacock .animal-badge-head {
+  inset: 20% 22% 10%;
+  border-radius: 50% 50% 45% 45%;
+}
+
+.animal-river-dolphin .animal-badge-ear {
+  display: none;
+}
+
+.animal-river-dolphin .animal-badge-head {
+  inset: 26% 18% 16%;
+  border-radius: 56% 56% 46% 46%;
+}
+
+.animal-river-dolphin .animal-badge-snout {
+  display: none;
+}
+
+.animal-tortoise .animal-badge-head {
+  inset: 22% 17% 15%;
+}
+
+.animal-tortoise .animal-badge-ear {
+  width: 18%;
+  height: 16%;
+  top: 24%;
+}
+
+.animal-snow-leopard .animal-badge-mark {
+  width: 12%;
+  height: 12%;
+  top: 33%;
+}
+
 .avatar-chip.selected {
   background: linear-gradient(120deg, rgba(76, 175, 80, 0.24), rgba(63, 81, 181, 0.24));
   border-color: color-mix(in srgb, var(--primary) 45%, var(--accent));
@@ -2970,6 +3065,272 @@ body.love-milestone-open .sidebar {
   right: 0;
   border-radius: 50% 20% 20% 50%;
   background: radial-gradient(circle at 20% 30%, #4bc2d7 10%, #1d7fb3 38%, #0d4f7f 68%);
+}
+
+/* Full preview species body plans */
+.avatar-animal.animal-rhino .avatar-body {
+  left: 18px;
+  right: 16px;
+  height: 80px;
+  border-radius: 26px;
+}
+
+.avatar-animal.animal-rhino .avatar-head {
+  left: 30px;
+  width: 66px;
+  height: 56px;
+  border-radius: 44% 44% 52% 52%;
+}
+
+.avatar-animal.animal-rhino .avatar-horn {
+  width: 12px;
+  height: 20px;
+  left: 58px;
+  top: 1px;
+}
+
+.avatar-animal.animal-tiger .avatar-ear {
+  width: 16px;
+  height: 16px;
+  top: 6px;
+}
+
+.avatar-animal.animal-tiger .avatar-tail {
+  width: 14px;
+  height: 62px;
+  top: 46px;
+  transform: rotate(20deg);
+}
+
+.avatar-animal.animal-deer .avatar-body {
+  left: 28px;
+  right: 26px;
+  height: 68px;
+}
+
+.avatar-animal.animal-deer .avatar-leg {
+  width: 14px;
+  height: 48px;
+  border-radius: 8px;
+}
+
+.avatar-animal.animal-deer .avatar-leg.left {
+  left: 42px;
+}
+
+.avatar-animal.animal-deer .avatar-leg.right {
+  right: 42px;
+}
+
+.avatar-animal.animal-hoolock .avatar-tail {
+  display: none;
+}
+
+.avatar-animal.animal-hoolock .avatar-body {
+  left: 26px;
+  right: 26px;
+  height: 84px;
+}
+
+.avatar-animal.animal-hoolock .avatar-head {
+  top: 6px;
+  width: 56px;
+  left: 36px;
+}
+
+.avatar-animal.animal-hornbill .avatar-body {
+  left: 36px;
+  right: 36px;
+  height: 78px;
+  border-radius: 44% 44% 30% 30%;
+}
+
+.avatar-animal.animal-hornbill .avatar-leg {
+  width: 12px;
+  height: 46px;
+}
+
+.avatar-animal.animal-hornbill .avatar-leg.left {
+  left: 48px;
+}
+
+.avatar-animal.animal-hornbill .avatar-leg.right {
+  right: 48px;
+}
+
+.avatar-animal.animal-hornbill .avatar-snout {
+  display: none;
+}
+
+.avatar-animal.animal-hornbill .avatar-beak {
+  width: 16px;
+  height: 22px;
+  left: 56px;
+  top: 36px;
+}
+
+.avatar-animal.animal-elephant .avatar-body {
+  left: 16px;
+  right: 16px;
+  height: 84px;
+  border-radius: 26px;
+}
+
+.avatar-animal.animal-elephant .avatar-head {
+  left: 28px;
+  width: 70px;
+}
+
+.avatar-animal.animal-elephant .avatar-tail {
+  width: 10px;
+  height: 46px;
+}
+
+.avatar-animal.animal-elephant .avatar-trunk {
+  width: 14px;
+  height: 30px;
+  left: 57px;
+}
+
+.avatar-animal.animal-buffalo .avatar-body {
+  left: 18px;
+  right: 18px;
+  height: 82px;
+}
+
+.avatar-animal.animal-buffalo .avatar-head {
+  left: 28px;
+  width: 70px;
+}
+
+.avatar-animal.animal-buffalo .avatar-leg {
+  width: 20px;
+}
+
+.avatar-animal.animal-buffalo .avatar-leg.left {
+  left: 34px;
+}
+
+.avatar-animal.animal-buffalo .avatar-leg.right {
+  right: 34px;
+}
+
+.avatar-animal.animal-peacock .avatar-body {
+  left: 42px;
+  right: 42px;
+  height: 72px;
+  border-radius: 48% 48% 30% 30%;
+}
+
+.avatar-animal.animal-peacock .avatar-head {
+  left: 42px;
+  width: 44px;
+  height: 44px;
+  top: 14px;
+}
+
+.avatar-animal.animal-peacock .avatar-leg {
+  width: 10px;
+  height: 44px;
+}
+
+.avatar-animal.animal-peacock .avatar-leg.left {
+  left: 54px;
+}
+
+.avatar-animal.animal-peacock .avatar-leg.right {
+  right: 54px;
+}
+
+.avatar-animal.animal-river-dolphin .avatar-body {
+  left: 20px;
+  right: 20px;
+  height: 52px;
+  bottom: 24px;
+  border-radius: 60% 60% 42% 42%;
+}
+
+.avatar-animal.animal-river-dolphin .avatar-head {
+  left: 30px;
+  width: 66px;
+  height: 42px;
+  top: 30px;
+  border-radius: 58% 58% 42% 42%;
+}
+
+.avatar-animal.animal-river-dolphin .avatar-leg {
+  display: none;
+}
+
+.avatar-animal.animal-river-dolphin .avatar-snout {
+  display: none;
+}
+
+.avatar-animal.animal-river-dolphin .avatar-beak {
+  width: 20px;
+  height: 10px;
+  top: 46px;
+  left: 54px;
+  border-radius: 999px;
+}
+
+.avatar-animal.animal-river-dolphin .avatar-tail {
+  width: 24px;
+  height: 32px;
+  top: 64px;
+  right: 10px;
+  border-radius: 10px;
+}
+
+.avatar-animal.animal-tortoise .avatar-body {
+  left: 30px;
+  right: 30px;
+  height: 48px;
+  bottom: 24px;
+  border-radius: 50%;
+}
+
+.avatar-animal.animal-tortoise .avatar-head {
+  left: 46px;
+  width: 36px;
+  height: 28px;
+  top: 34px;
+}
+
+.avatar-animal.animal-tortoise .avatar-leg {
+  width: 14px;
+  height: 24px;
+  bottom: 14px;
+}
+
+.avatar-animal.animal-tortoise .avatar-leg.left {
+  left: 30px;
+}
+
+.avatar-animal.animal-tortoise .avatar-leg.right {
+  right: 30px;
+}
+
+.avatar-animal.animal-tortoise .avatar-tail {
+  width: 8px;
+  height: 18px;
+  top: 88px;
+}
+
+.avatar-animal.animal-snow-leopard .avatar-tail {
+  width: 20px;
+  height: 70px;
+  top: 38px;
+  right: 6px;
+  border-radius: 999px;
+  background: repeating-linear-gradient(180deg, #c9ced6 0 10px, #7a818f 10px 13px);
+}
+
+.avatar-animal.animal-snow-leopard .avatar-mark {
+  width: 10px;
+  height: 10px;
+  top: 80px;
+  border-radius: 50%;
 }
 
 .avatar-wear {
