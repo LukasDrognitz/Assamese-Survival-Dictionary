@@ -43,7 +43,7 @@ import {
   selectLessonMatchingCard,
   startLessonWritingStage,
   submitLessonWritingAnswer
-} from "./lessons.js?v=20260715-03";
+} from "./lessons.js?v=20260715-04";
 import { updateSpacedRepetition, shuffleCards, renderFlashcard, renderFlashSummary } from "./flashcards.js?v=20260713-38";
 import { buildQuizQuestions, renderQuizView } from "./quiz.js?v=20260710-33";
 import {
@@ -314,6 +314,7 @@ const CONVERSATION_TOPICS = {
 const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
 const LOVE_MILESTONE_STEP_XP = 2110;
 const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
+const APP_BUILD_VERSION = "20260715-161";
 
 let chatPinIntervalId = null;
 
@@ -3648,12 +3649,27 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=172", { updateViaCache: "none" })
+      .register("sw.js?v=173", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
       });
   }
+}
+
+async function ensureLatestBuildLoaded() {
+  try {
+    const key = "assamese-app-build-version";
+    const previous = localStorage.getItem(key);
+    if (previous !== APP_BUILD_VERSION) {
+      localStorage.setItem(key, APP_BUILD_VERSION);
+      await forceRefreshAppShell();
+      return false;
+    }
+  } catch {
+    // Ignore storage failures and continue with best effort.
+  }
+  return true;
 }
 
 async function forceRefreshAppShell() {
@@ -3692,6 +3708,9 @@ function refreshStateFromStorage() {
 }
 
 async function init() {
+  const isCurrentBuild = await ensureLatestBuildLoaded();
+  if (!isCurrentBuild) return;
+
   await syncStateFromServer();
   refreshStateFromStorage();
   if (!state.settings.onboardingCompleted) {
