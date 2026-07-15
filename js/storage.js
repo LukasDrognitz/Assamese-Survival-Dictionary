@@ -56,7 +56,7 @@ const DEFAULT_SETTINGS = {
   notifications: false,
   onboardingCompleted: false,
   profileName: "Learner",
-  avatar: "🦜",
+  avatar: "rhino",
   syncEndpoint: "",
   syncToken: ""
 };

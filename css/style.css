@@ -190,9 +190,11 @@ body.hide-topbar .topbar {
   border: 1px solid rgba(104, 113, 136, 0.24);
 }
 
-.welcome-avatar-glyph {
-  font-size: 1.15rem;
-  line-height: 1;
+.welcome-avatar-art {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
 }
 
 .welcome-level-badge {
@@ -2242,18 +2244,226 @@ body.love-milestone-open .sidebar {
 
 .avatar-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(56px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
   gap: 10px;
 }
 
 .avatar-chip {
   position: relative;
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  padding: 8px 6px;
   border: 1px solid rgba(104, 113, 136, 0.35);
   background: color-mix(in srgb, var(--surface) 90%, transparent);
   border-radius: 14px;
-  min-height: 52px;
-  font-size: 1.5rem;
+  min-height: 90px;
   cursor: pointer;
+}
+
+.avatar-chip-name {
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.animal-badge {
+  position: relative;
+  display: inline-block;
+  --animal-fur: #969ca7;
+  --animal-fur-soft: #b8bec7;
+  --animal-mark: #2f3440;
+  --animal-ear-size: 32%;
+}
+
+.animal-badge.mini {
+  width: 22px;
+  height: 22px;
+}
+
+.animal-badge.chip {
+  width: 34px;
+  height: 34px;
+}
+
+.animal-badge-head {
+  position: absolute;
+  inset: 12% 9% 6%;
+  border-radius: 50% 50% 44% 44%;
+  background: var(--animal-fur);
+  border: 1px solid color-mix(in srgb, var(--animal-mark) 35%, transparent);
+}
+
+.animal-badge-ear {
+  position: absolute;
+  width: var(--animal-ear-size);
+  height: var(--animal-ear-size);
+  border-radius: 50%;
+  top: 2%;
+  background: var(--animal-fur-soft);
+  border: 1px solid color-mix(in srgb, var(--animal-mark) 35%, transparent);
+}
+
+.animal-badge-ear.left {
+  left: 8%;
+}
+
+.animal-badge-ear.right {
+  right: 8%;
+}
+
+.animal-badge-eye {
+  position: absolute;
+  width: 10%;
+  height: 10%;
+  border-radius: 999px;
+  top: 44%;
+  background: #19202d;
+}
+
+.animal-badge-eye.left {
+  left: 34%;
+}
+
+.animal-badge-eye.right {
+  right: 34%;
+}
+
+.animal-badge-snout {
+  position: absolute;
+  left: 32%;
+  right: 32%;
+  bottom: 18%;
+  height: 16%;
+  border-radius: 999px;
+  background: color-mix(in srgb, #ffffff 62%, var(--animal-fur));
+}
+
+.animal-badge-horn,
+.animal-badge-trunk,
+.animal-badge-crest {
+  position: absolute;
+  display: none;
+}
+
+.animal-badge-horn {
+  width: 10%;
+  height: 18%;
+  left: 45%;
+  top: 3%;
+  border-radius: 3px 3px 40% 40%;
+  background: #e4dcc7;
+}
+
+.animal-badge-trunk {
+  width: 12%;
+  height: 26%;
+  left: 44%;
+  top: 58%;
+  border-radius: 0 0 10px 10px;
+  background: color-mix(in srgb, var(--animal-fur) 88%, #e2e8f0);
+}
+
+.animal-badge-crest {
+  width: 30%;
+  height: 16%;
+  left: 35%;
+  top: -2%;
+  border-radius: 50%;
+  background: #2875e1;
+}
+
+.animal-rhino,
+.avatar-animal.animal-rhino {
+  --animal-fur: #8e939b;
+  --animal-fur-soft: #adb3bc;
+  --animal-mark: #5b6069;
+}
+
+.animal-rhino .animal-badge-horn,
+.avatar-animal.animal-rhino .avatar-horn {
+  display: block;
+}
+
+.animal-tiger,
+.avatar-animal.animal-tiger {
+  --animal-fur: #d78738;
+  --animal-fur-soft: #ebad6f;
+  --animal-mark: #262a30;
+}
+
+.animal-deer,
+.avatar-animal.animal-deer {
+  --animal-fur: #a07a4d;
+  --animal-fur-soft: #c29d72;
+  --animal-mark: #4d3c2a;
+}
+
+.animal-hoolock,
+.avatar-animal.animal-hoolock {
+  --animal-fur: #2f3640;
+  --animal-fur-soft: #4a525d;
+  --animal-mark: #12161e;
+}
+
+.animal-hornbill,
+.avatar-animal.animal-hornbill {
+  --animal-fur: #212831;
+  --animal-fur-soft: #f5da72;
+  --animal-mark: #11161d;
+}
+
+.animal-elephant,
+.avatar-animal.animal-elephant {
+  --animal-fur: #8a919f;
+  --animal-fur-soft: #a8afbc;
+  --animal-mark: #5b6270;
+}
+
+.animal-elephant .animal-badge-trunk,
+.avatar-animal.animal-elephant .avatar-trunk {
+  display: block;
+}
+
+.animal-buffalo,
+.avatar-animal.animal-buffalo {
+  --animal-fur: #3e3f49;
+  --animal-fur-soft: #575a64;
+  --animal-mark: #20232a;
+}
+
+.animal-peacock,
+.avatar-animal.animal-peacock {
+  --animal-fur: #1f6fb5;
+  --animal-fur-soft: #2f8ddb;
+  --animal-mark: #0f2b46;
+}
+
+.animal-peacock .animal-badge-crest,
+.avatar-animal.animal-peacock .avatar-crest {
+  display: block;
+}
+
+.animal-river-dolphin,
+.avatar-animal.animal-river-dolphin {
+  --animal-fur: #8c7b84;
+  --animal-fur-soft: #b29ea8;
+  --animal-mark: #5d4f56;
+}
+
+.animal-tortoise,
+.avatar-animal.animal-tortoise {
+  --animal-fur: #6f8760;
+  --animal-fur-soft: #8fa37f;
+  --animal-mark: #3f5235;
+}
+
+.animal-snow-leopard,
+.avatar-animal.animal-snow-leopard {
+  --animal-fur: #c9ced6;
+  --animal-fur-soft: #dfe4eb;
+  --animal-mark: #5f6672;
 }
 
 .avatar-chip.selected {
@@ -2285,7 +2495,7 @@ body.love-milestone-open .sidebar {
 
 .avatar-preview-canvas {
   width: min(220px, 70vw);
-  min-height: 148px;
+  min-height: 176px;
   border: 1px solid rgba(104, 113, 136, 0.24);
   border-radius: 18px;
   background: color-mix(in srgb, var(--surface) 94%, transparent);
@@ -2307,35 +2517,257 @@ body.love-milestone-open .sidebar {
   background: linear-gradient(145deg, rgba(181, 242, 255, 0.95), rgba(124, 168, 255, 0.86));
 }
 
-.avatar-layer {
+.avatar-animal {
   position: absolute;
-  line-height: 1;
+  bottom: 16px;
+  width: 128px;
+  height: 138px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
-.avatar-layer-skin {
-  font-size: 4rem;
-  top: 34px;
+.avatar-tail {
+  position: absolute;
+  right: 14px;
+  top: 54px;
+  width: 16px;
+  height: 52px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--animal-fur) 82%, #20232b);
+  transform: rotate(14deg);
 }
 
-.avatar-layer-headwear {
-  font-size: 2.2rem;
+.avatar-body {
+  position: absolute;
+  left: 23px;
+  right: 22px;
+  bottom: 16px;
+  height: 76px;
+  border-radius: 30px;
+  background: var(--animal-fur);
+  border: 1px solid color-mix(in srgb, var(--animal-mark) 34%, transparent);
+}
+
+.avatar-leg {
+  position: absolute;
+  width: 22px;
+  height: 42px;
+  bottom: 0;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--animal-fur) 88%, #242a34);
+}
+
+.avatar-leg.left {
+  left: 36px;
+}
+
+.avatar-leg.right {
+  right: 36px;
+}
+
+.avatar-head {
+  position: absolute;
+  left: 34px;
   top: 8px;
+  width: 60px;
+  height: 58px;
+  border-radius: 50%;
+  background: var(--animal-fur);
+  border: 1px solid color-mix(in srgb, var(--animal-mark) 34%, transparent);
 }
 
-.avatar-layer-eyewear {
-  font-size: 1.8rem;
-  top: 52px;
+.avatar-ear {
+  position: absolute;
+  top: 0;
+  width: 22px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--animal-fur-soft);
+  border: 1px solid color-mix(in srgb, var(--animal-mark) 34%, transparent);
 }
 
-.avatar-layer-top,
-.avatar-layer-dress {
-  font-size: 2.4rem;
-  top: 86px;
+.avatar-ear.left {
+  left: 28px;
 }
 
-.avatar-layer-bottom {
-  font-size: 1.8rem;
-  top: 118px;
+.avatar-ear.right {
+  right: 28px;
+}
+
+.avatar-eye {
+  position: absolute;
+  top: 31px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #141a24;
+}
+
+.avatar-eye.left {
+  left: 52px;
+}
+
+.avatar-eye.right {
+  right: 52px;
+}
+
+.avatar-snout {
+  position: absolute;
+  left: 52px;
+  right: 52px;
+  top: 42px;
+  height: 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, #ffffff 62%, var(--animal-fur));
+}
+
+.avatar-horn,
+.avatar-trunk,
+.avatar-crest {
+  position: absolute;
+  display: none;
+}
+
+.avatar-horn {
+  top: 2px;
+  left: 60px;
+  width: 9px;
+  height: 18px;
+  border-radius: 4px 4px 40% 40%;
+  background: #e7e0cf;
+}
+
+.avatar-trunk {
+  top: 47px;
+  left: 58px;
+  width: 12px;
+  height: 24px;
+  border-radius: 0 0 10px 10px;
+  background: color-mix(in srgb, var(--animal-fur) 88%, #e2e8f0);
+}
+
+.avatar-crest {
+  top: -2px;
+  left: 52px;
+  width: 24px;
+  height: 10px;
+  border-radius: 999px;
+  background: #2f7fe0;
+}
+
+.avatar-animal.fur-earth {
+  --animal-fur: #8f939b;
+  --animal-fur-soft: #aeb5bf;
+}
+
+.avatar-animal.fur-sun {
+  --animal-fur: #c88e45;
+  --animal-fur-soft: #e2ad6d;
+}
+
+.avatar-animal.fur-moon {
+  --animal-fur: #5e7aa5;
+  --animal-fur-soft: #89a5d1;
+}
+
+.avatar-animal.animal-tiger .avatar-body,
+.avatar-animal.animal-tiger .avatar-head {
+  background-image: repeating-linear-gradient(120deg, transparent 0 8px, rgba(0, 0, 0, 0.2) 8px 10px);
+}
+
+.avatar-wear {
+  position: absolute;
+  display: block;
+}
+
+.avatar-wear.wear-cap-basic {
+  top: 2px;
+  left: 43px;
+  width: 42px;
+  height: 14px;
+  border-radius: 10px 10px 6px 6px;
+  background: #1e5cb2;
+}
+
+.avatar-wear.wear-crown-gold {
+  top: 0;
+  left: 44px;
+  width: 40px;
+  height: 16px;
+  border-radius: 6px;
+  background: linear-gradient(120deg, #d9a81f, #f2d570);
+  box-shadow: 0 0 0 1px rgba(130, 96, 13, 0.5) inset;
+}
+
+.avatar-wear.wear-top-blue,
+.avatar-wear.wear-top-green,
+.avatar-wear.wear-dress-red,
+.avatar-wear.wear-dress-floral {
+  left: 35px;
+  width: 58px;
+  border-radius: 12px;
+}
+
+.avatar-wear.wear-top-blue,
+.avatar-wear.wear-top-green {
+  top: 66px;
+  height: 42px;
+}
+
+.avatar-wear.wear-top-blue {
+  background: #2f69cc;
+}
+
+.avatar-wear.wear-top-green {
+  background: #2c8d58;
+}
+
+.avatar-wear.wear-bottom-indigo,
+.avatar-wear.wear-bottom-track {
+  top: 105px;
+  left: 39px;
+  width: 50px;
+  height: 26px;
+  border-radius: 8px;
+}
+
+.avatar-wear.wear-bottom-indigo {
+  background: #334b7a;
+}
+
+.avatar-wear.wear-bottom-track {
+  background: #2a3250;
+  box-shadow: inset 0 0 0 2px #8393d0;
+}
+
+.avatar-wear.wear-dress-red,
+.avatar-wear.wear-dress-floral {
+  top: 66px;
+  height: 66px;
+}
+
+.avatar-wear.wear-dress-red {
+  background: linear-gradient(180deg, #bc4040, #9f2424);
+}
+
+.avatar-wear.wear-dress-floral {
+  background: linear-gradient(180deg, #f4dde8, #d78ca9);
+  box-shadow: inset 0 0 0 2px rgba(170, 62, 107, 0.35);
+}
+
+.avatar-wear.wear-eyewear-basic,
+.avatar-wear.wear-eyewear-star {
+  top: 27px;
+  left: 44px;
+  width: 40px;
+  height: 12px;
+  border-radius: 8px;
+  border: 2px solid #1b202b;
+}
+
+.avatar-wear.wear-eyewear-star {
+  border-color: #f2ba2f;
+  box-shadow: inset 0 0 0 1px #8b5b00;
 }
 
 .avatar-shop-grid {
@@ -2385,7 +2817,76 @@ body.love-milestone-open .sidebar {
 }
 
 .avatar-shop-icon {
-  font-size: 1.7rem;
+  min-height: 28px;
+}
+
+.avatar-item-preview {
+  display: inline-block;
+  width: 28px;
+  height: 20px;
+  border-radius: 999px;
+  background: #7d8593;
+  box-shadow: inset 0 0 0 1px rgba(15, 20, 30, 0.24);
+}
+
+.avatar-item-preview.wear-crown-gold {
+  border-radius: 6px;
+  background: linear-gradient(120deg, #d9a81f, #f2d570);
+}
+
+.avatar-item-preview.wear-cap-basic {
+  border-radius: 10px;
+  background: #1e5cb2;
+}
+
+.avatar-item-preview.wear-top-blue {
+  background: #2f69cc;
+}
+
+.avatar-item-preview.wear-top-green {
+  background: #2c8d58;
+}
+
+.avatar-item-preview.wear-bottom-indigo {
+  background: #334b7a;
+}
+
+.avatar-item-preview.wear-bottom-track {
+  background: #2a3250;
+  box-shadow: inset 0 0 0 2px #8393d0;
+}
+
+.avatar-item-preview.wear-dress-red {
+  border-radius: 8px;
+  background: linear-gradient(180deg, #bc4040, #9f2424);
+}
+
+.avatar-item-preview.wear-dress-floral {
+  border-radius: 8px;
+  background: linear-gradient(180deg, #f4dde8, #d78ca9);
+}
+
+.avatar-item-preview.wear-eyewear-basic,
+.avatar-item-preview.wear-eyewear-star {
+  border-radius: 8px;
+  background: transparent;
+  border: 2px solid #1b202b;
+}
+
+.avatar-item-preview.wear-eyewear-star {
+  border-color: #f2ba2f;
+}
+
+.avatar-item-preview.fur-earth {
+  background: linear-gradient(120deg, #8f939b, #aeb5bf);
+}
+
+.avatar-item-preview.fur-sun {
+  background: linear-gradient(120deg, #c88e45, #e2ad6d);
+}
+
+.avatar-item-preview.fur-moon {
+  background: linear-gradient(120deg, #5e7aa5, #89a5d1);
 }
 
 .avatar-shop-item.owned {
