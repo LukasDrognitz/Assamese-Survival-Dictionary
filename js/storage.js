@@ -58,7 +58,8 @@ const DEFAULT_SETTINGS = {
   profileName: "Learner",
   avatar: "peacock",
   avatarOutfits: {
-    monkey: "classic"
+    monkey: "classic",
+    rhino: "classic"
   },
   syncEndpoint: "",
   syncToken: ""

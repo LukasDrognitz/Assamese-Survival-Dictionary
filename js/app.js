@@ -93,8 +93,12 @@ const LEGACY_AVATAR_MAP = {
 };
 
 const AVATAR_META_BY_ID = Object.fromEntries(AVATAR_REWARDS.map((item) => [item.value, item]));
-const AVATAR_IMAGE_VERSION = "20260715-185";
+const AVATAR_IMAGE_VERSION = "20260715-186";
 const MONKEY_OUTFIT_OPTIONS = [
+  { value: "classic", label: "Classic" },
+  { value: "student", label: "Student" }
+];
+const RHINO_OUTFIT_OPTIONS = [
   { value: "classic", label: "Classic" },
   { value: "student", label: "Student" }
 ];
@@ -127,7 +131,17 @@ const USER_AVATAR_OPTIONS = {
   rhino: {
     label: "Rani the Rhino",
     avatarImage: `assets/images/avatars/rani_rhino_one_horn_full_body.png?v=${AVATAR_IMAGE_VERSION}`,
-    profileImage: `assets/images/avatars/Rhino.png?v=${AVATAR_IMAGE_VERSION}`
+    profileImage: `assets/images/avatars/Rhino.png?v=${AVATAR_IMAGE_VERSION}`,
+    outfits: {
+      classic: {
+        avatarImage: `assets/images/avatars/rani_rhino_one_horn_full_body.png?v=${AVATAR_IMAGE_VERSION}`,
+        profileImage: `assets/images/avatars/Rhino.png?v=${AVATAR_IMAGE_VERSION}`
+      },
+      student: {
+        avatarImage: `assets/images/avatars/rani_rhino_one_horn_clothed_full_body.png?v=${AVATAR_IMAGE_VERSION}`,
+        profileImage: `assets/images/avatars/rani_rhino_one_horn_clothed_profile.png?v=${AVATAR_IMAGE_VERSION}`
+      }
+    }
   }
 };
 const DEFAULT_USER_AVATAR = "peacock";
@@ -400,7 +414,7 @@ const CONVERSATION_TOPICS = {
 const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
 const LOVE_MILESTONE_STEP_XP = 2110;
 const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
-const APP_BUILD_VERSION = "20260715-185";
+const APP_BUILD_VERSION = "20260715-186";
 const CHEST_OPEN_ANIMATION_MS = 1050;
 
 function customDictionaryEntryCount() {
@@ -622,6 +636,10 @@ function avatarOutfitSelection(avatarId) {
     return stored.monkey === "student" ? "student" : "classic";
   }
 
+  if (selectedAvatarId === "rhino") {
+    return stored.rhino === "student" ? "student" : "classic";
+  }
+
   return "classic";
 }
 
@@ -633,6 +651,10 @@ function setAvatarOutfitSelection(avatarId, outfit) {
 
   if (selectedAvatarId === "monkey") {
     nextOutfits.monkey = outfit === "student" ? "student" : "classic";
+  }
+
+  if (selectedAvatarId === "rhino") {
+    nextOutfits.rhino = outfit === "student" ? "student" : "classic";
   }
 
   state.settings.avatarOutfits = nextOutfits;
@@ -714,8 +736,9 @@ function normalizeSettings() {
   state.settings.avatar = resolveUserAvatarId(state.settings.avatar);
   state.settings.avatarOutfits = state.settings.avatarOutfits && typeof state.settings.avatarOutfits === "object"
     ? { ...state.settings.avatarOutfits }
-    : { monkey: "classic" };
+    : { monkey: "classic", rhino: "classic" };
   state.settings.avatarOutfits.monkey = state.settings.avatarOutfits.monkey === "student" ? "student" : "classic";
+  state.settings.avatarOutfits.rhino = state.settings.avatarOutfits.rhino === "student" ? "student" : "classic";
   state.settings.syncEndpoint = String(state.settings.syncEndpoint || "").trim();
   state.settings.syncToken = String(state.settings.syncToken || "").trim();
 }
@@ -2485,11 +2508,16 @@ function renderProfile() {
   const syncToken = escapeHtmlAttr(state.settings.syncToken || "");
   const activeAvatar = resolveUserAvatarId(state.settings.avatar);
   const activeAvatarOption = userAvatarAssets(activeAvatar);
-  const monkeyOutfitSelector = activeAvatar === "monkey"
+  const activeOutfitOptions = activeAvatar === "monkey"
+    ? MONKEY_OUTFIT_OPTIONS
+    : activeAvatar === "rhino"
+      ? RHINO_OUTFIT_OPTIONS
+      : null;
+  const avatarOutfitSelector = activeOutfitOptions
     ? `
         <label for="profile-avatar-outfit" class="meta">Outfit</label>
-        <select id="profile-avatar-outfit" class="input" aria-label="Monkey outfit">
-          ${MONKEY_OUTFIT_OPTIONS.map((option) => `<option value="${option.value}" ${activeAvatarOption.outfit === option.value ? "selected" : ""}>${option.label}</option>`).join("")}
+        <select id="profile-avatar-outfit" class="input" aria-label="Avatar outfit">
+          ${activeOutfitOptions.map((option) => `<option value="${option.value}" ${activeAvatarOption.outfit === option.value ? "selected" : ""}>${option.label}</option>`).join("")}
         </select>
       `
     : "";
@@ -2516,7 +2544,7 @@ function renderProfile() {
           <option value="bear" ${activeAvatar === "bear" ? "selected" : ""}>Balu the Bear</option>
           <option value="rhino" ${activeAvatar === "rhino" ? "selected" : ""}>Rani the Rhino</option>
         </select>
-        ${monkeyOutfitSelector}
+        ${avatarOutfitSelector}
       </article>
 
       <article class="card grid" style="gap:12px;">
@@ -4178,7 +4206,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=197", { updateViaCache: "none" })
+      .register("sw.js?v=198", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
