@@ -57,6 +57,9 @@ const DEFAULT_SETTINGS = {
   onboardingCompleted: false,
   profileName: "Learner",
   avatar: "peacock",
+  avatarOutfits: {
+    monkey: "classic"
+  },
   syncEndpoint: "",
   syncToken: ""
 };

@@ -93,7 +93,11 @@ const LEGACY_AVATAR_MAP = {
 };
 
 const AVATAR_META_BY_ID = Object.fromEntries(AVATAR_REWARDS.map((item) => [item.value, item]));
-const AVATAR_IMAGE_VERSION = "20260715-184";
+const AVATAR_IMAGE_VERSION = "20260715-185";
+const MONKEY_OUTFIT_OPTIONS = [
+  { value: "classic", label: "Classic" },
+  { value: "student", label: "Student" }
+];
 const USER_AVATAR_OPTIONS = {
   peacock: {
     label: "Pavo the Peacock",
@@ -103,7 +107,17 @@ const USER_AVATAR_OPTIONS = {
   monkey: {
     label: "Milo the Monkey",
     avatarImage: `assets/images/avatars/Monkey.png?v=${AVATAR_IMAGE_VERSION}`,
-    profileImage: `assets/images/avatars/Monkey_Profile.png?v=${AVATAR_IMAGE_VERSION}`
+    profileImage: `assets/images/avatars/Monkey_Profile.png?v=${AVATAR_IMAGE_VERSION}`,
+    outfits: {
+      classic: {
+        avatarImage: `assets/images/avatars/Monkey.png?v=${AVATAR_IMAGE_VERSION}`,
+        profileImage: `assets/images/avatars/Monkey_Profile.png?v=${AVATAR_IMAGE_VERSION}`
+      },
+      student: {
+        avatarImage: `assets/images/avatars/langur_monkey_clothed_same_style_full_body.png?v=${AVATAR_IMAGE_VERSION}`,
+        profileImage: `assets/images/avatars/langur_monkey_clothed_same_style_profile.png?v=${AVATAR_IMAGE_VERSION}`
+      }
+    }
   },
   bear: {
     label: "Balu the Bear",
@@ -386,7 +400,7 @@ const CONVERSATION_TOPICS = {
 const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
 const LOVE_MILESTONE_STEP_XP = 2110;
 const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
-const APP_BUILD_VERSION = "20260715-184";
+const APP_BUILD_VERSION = "20260715-185";
 const CHEST_OPEN_ANIMATION_MS = 1050;
 
 function customDictionaryEntryCount() {
@@ -598,6 +612,46 @@ function userAvatarOption(value) {
   return USER_AVATAR_OPTIONS[resolveUserAvatarId(value)] || USER_AVATAR_OPTIONS[DEFAULT_USER_AVATAR];
 }
 
+function avatarOutfitSelection(avatarId) {
+  const selectedAvatarId = resolveUserAvatarId(avatarId);
+  const stored = state.settings.avatarOutfits && typeof state.settings.avatarOutfits === "object"
+    ? state.settings.avatarOutfits
+    : {};
+
+  if (selectedAvatarId === "monkey") {
+    return stored.monkey === "student" ? "student" : "classic";
+  }
+
+  return "classic";
+}
+
+function setAvatarOutfitSelection(avatarId, outfit) {
+  const selectedAvatarId = resolveUserAvatarId(avatarId);
+  const nextOutfits = state.settings.avatarOutfits && typeof state.settings.avatarOutfits === "object"
+    ? { ...state.settings.avatarOutfits }
+    : {};
+
+  if (selectedAvatarId === "monkey") {
+    nextOutfits.monkey = outfit === "student" ? "student" : "classic";
+  }
+
+  state.settings.avatarOutfits = nextOutfits;
+}
+
+function userAvatarAssets(avatarId) {
+  const selectedAvatarId = resolveUserAvatarId(avatarId);
+  const option = userAvatarOption(selectedAvatarId);
+  const selectedOutfit = avatarOutfitSelection(selectedAvatarId);
+  const outfitAssets = option.outfits?.[selectedOutfit];
+
+  return {
+    label: option.label,
+    avatarImage: outfitAssets?.avatarImage || option.avatarImage,
+    profileImage: outfitAssets?.profileImage || option.profileImage,
+    outfit: selectedOutfit
+  };
+}
+
 function avatarMeta(avatarId) {
   const safeId = normalizeAvatarId(avatarId);
   return AVATAR_META_BY_ID[safeId] || AVATAR_REWARDS[0];
@@ -635,7 +689,7 @@ function avatarSheetImagePath(avatarId, selection) {
 function renderAnimalBadge(avatarId, variant = "mini") {
   const safeVariant = ["mini", "chip"].includes(variant) ? variant : "mini";
   const selectedAvatarId = resolveUserAvatarId(avatarId);
-  const selectedUserAvatar = USER_AVATAR_OPTIONS[selectedAvatarId];
+  const selectedUserAvatar = userAvatarAssets(selectedAvatarId);
   const src = selectedUserAvatar
     ? (safeVariant === "mini" ? selectedUserAvatar.profileImage : selectedUserAvatar.avatarImage)
     : avatarSheetImagePath(avatarMeta(avatarId).value, avatarSheetSelectionFor(avatarId));
@@ -658,6 +712,10 @@ function normalizeSettings() {
   state.settings.onboardingCompleted = Boolean(state.settings.onboardingCompleted);
   state.settings.profileName = state.settings.profileName || "Learner";
   state.settings.avatar = resolveUserAvatarId(state.settings.avatar);
+  state.settings.avatarOutfits = state.settings.avatarOutfits && typeof state.settings.avatarOutfits === "object"
+    ? { ...state.settings.avatarOutfits }
+    : { monkey: "classic" };
+  state.settings.avatarOutfits.monkey = state.settings.avatarOutfits.monkey === "student" ? "student" : "classic";
   state.settings.syncEndpoint = String(state.settings.syncEndpoint || "").trim();
   state.settings.syncToken = String(state.settings.syncToken || "").trim();
 }
@@ -2426,7 +2484,15 @@ function renderProfile() {
   const syncEndpoint = escapeHtmlAttr(state.settings.syncEndpoint || "");
   const syncToken = escapeHtmlAttr(state.settings.syncToken || "");
   const activeAvatar = resolveUserAvatarId(state.settings.avatar);
-  const activeAvatarOption = userAvatarOption(activeAvatar);
+  const activeAvatarOption = userAvatarAssets(activeAvatar);
+  const monkeyOutfitSelector = activeAvatar === "monkey"
+    ? `
+        <label for="profile-avatar-outfit" class="meta">Outfit</label>
+        <select id="profile-avatar-outfit" class="input" aria-label="Monkey outfit">
+          ${MONKEY_OUTFIT_OPTIONS.map((option) => `<option value="${option.value}" ${activeAvatarOption.outfit === option.value ? "selected" : ""}>${option.label}</option>`).join("")}
+        </select>
+      `
+    : "";
 
   panel.innerHTML = `
     <section class="grid" style="gap:14px">
@@ -2450,6 +2516,7 @@ function renderProfile() {
           <option value="bear" ${activeAvatar === "bear" ? "selected" : ""}>Balu the Bear</option>
           <option value="rhino" ${activeAvatar === "rhino" ? "selected" : ""}>Rani the Rhino</option>
         </select>
+        ${monkeyOutfitSelector}
       </article>
 
       <article class="card grid" style="gap:12px;">
@@ -3966,6 +4033,15 @@ function onInput(event) {
     }
   }
 
+  if (target.id === "profile-avatar-outfit") {
+    setAvatarOutfitSelection(state.settings.avatar, target.value);
+    updateHeaderControls();
+    persist();
+    if (state.view === "profile") {
+      renderProfile();
+    }
+  }
+
   if (target.id === "profile-daily-goal") {
     const next = Math.max(20, Math.min(5000, Number(target.value) || 120));
     state.progress.dailyGoal.targetXp = next;
@@ -4102,7 +4178,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=196", { updateViaCache: "none" })
+      .register("sw.js?v=197", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
