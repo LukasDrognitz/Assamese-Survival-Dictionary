@@ -85,15 +85,25 @@ const LEGACY_AVATAR_MAP = {
   "hornbill": "langur",
   "buffalo": "rhino",
   "river-dolphin": "langur",
+  "monkey": "monkey",
   "tortoise": "nilgai",
   "snow-leopard": "fox"
 };
 
 const AVATAR_META_BY_ID = Object.fromEntries(AVATAR_REWARDS.map((item) => [item.value, item]));
-const FIXED_AVATAR_ID = "peacock";
-const FIXED_AVATAR_LABEL = "Pavo the Peacock";
-const FIXED_AVATAR_IMAGE_PATH = "assets/images/avatars/Peacock.png";
-const FIXED_PROFILE_IMAGE_PATH = "assets/images/avatars/Peacock_Profile.png";
+const USER_AVATAR_OPTIONS = {
+  peacock: {
+    label: "Pavo the Peacock",
+    avatarImage: "assets/images/avatars/Peacock.png",
+    profileImage: "assets/images/avatars/Peacock_Profile.png"
+  },
+  monkey: {
+    label: "Milo the Monkey",
+    avatarImage: "assets/images/avatars/Monkey.png",
+    profileImage: "assets/images/avatars/Monkey_Profile.png"
+  }
+};
+const DEFAULT_USER_AVATAR = "peacock";
 
 const AVATAR_SHEET_DEFAULTS = {
   eyewear: "none",
@@ -363,7 +373,7 @@ const CONVERSATION_TOPICS = {
 const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
 const LOVE_MILESTONE_STEP_XP = 2110;
 const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
-const APP_BUILD_VERSION = "20260715-177";
+const APP_BUILD_VERSION = "20260715-178";
 const CHEST_OPEN_ANIMATION_MS = 1050;
 
 function customDictionaryEntryCount() {
@@ -565,13 +575,24 @@ function normalizeAvatarId(value) {
   return LEGACY_AVATAR_MAP[raw] || raw;
 }
 
+function resolveUserAvatarId(value) {
+  const normalized = normalizeAvatarId(value);
+  if (normalized === "langur") return "monkey";
+  return USER_AVATAR_OPTIONS[normalized] ? normalized : DEFAULT_USER_AVATAR;
+}
+
+function userAvatarOption(value) {
+  return USER_AVATAR_OPTIONS[resolveUserAvatarId(value)] || USER_AVATAR_OPTIONS[DEFAULT_USER_AVATAR];
+}
+
 function avatarMeta(avatarId) {
-  const safeId = FIXED_AVATAR_ID || normalizeAvatarId(avatarId);
+  const safeId = normalizeAvatarId(avatarId);
   return AVATAR_META_BY_ID[safeId] || AVATAR_REWARDS[0];
 }
 
 function avatarDisplayName(avatarId) {
-  return FIXED_AVATAR_LABEL || avatarMeta(avatarId)?.label || "Animal Avatar";
+  const userOption = USER_AVATAR_OPTIONS[resolveUserAvatarId(avatarId)];
+  return userOption?.label || avatarMeta(avatarId)?.label || "Animal Avatar";
 }
 
 function avatarSheetSelectionFor(avatarId) {
@@ -600,10 +621,14 @@ function avatarSheetImagePath(avatarId, selection) {
 
 function renderAnimalBadge(avatarId, variant = "mini") {
   const safeVariant = ["mini", "chip"].includes(variant) ? variant : "mini";
-  const src = safeVariant === "mini" ? FIXED_PROFILE_IMAGE_PATH : FIXED_AVATAR_IMAGE_PATH;
-  const label = avatarDisplayName(FIXED_AVATAR_ID);
+  const selectedAvatarId = resolveUserAvatarId(avatarId);
+  const selectedUserAvatar = USER_AVATAR_OPTIONS[selectedAvatarId];
+  const src = selectedUserAvatar
+    ? (safeVariant === "mini" ? selectedUserAvatar.profileImage : selectedUserAvatar.avatarImage)
+    : avatarSheetImagePath(avatarMeta(avatarId).value, avatarSheetSelectionFor(avatarId));
+  const label = avatarDisplayName(selectedAvatarId);
   return `
-    <span class="animal-badge-image ${safeVariant} animal-${FIXED_AVATAR_ID}" aria-hidden="true">
+    <span class="animal-badge-image ${safeVariant} animal-${selectedAvatarId}" aria-hidden="true">
       <img src="${src}" alt="${label}" loading="lazy" decoding="async" />
     </span>
   `;
@@ -619,7 +644,7 @@ function escapeHtmlAttr(value) {
 function normalizeSettings() {
   state.settings.onboardingCompleted = Boolean(state.settings.onboardingCompleted);
   state.settings.profileName = state.settings.profileName || "Learner";
-  state.settings.avatar = FIXED_AVATAR_ID;
+  state.settings.avatar = resolveUserAvatarId(state.settings.avatar);
   state.settings.syncEndpoint = String(state.settings.syncEndpoint || "").trim();
   state.settings.syncToken = String(state.settings.syncToken || "").trim();
 }
@@ -1401,7 +1426,7 @@ function finishOnboarding() {
   const dailyXp = Math.max(20, Math.min(5000, Number(state.onboarding.dailyXpTarget) || 120));
 
   state.settings.profileName = cleanName;
-  state.settings.avatar = FIXED_AVATAR_ID;
+  state.settings.avatar = resolveUserAvatarId(state.settings.avatar || state.onboarding.avatar);
   state.settings.theme = state.onboarding.preferredTheme;
   state.settings.onboardingCompleted = true;
 
@@ -2387,7 +2412,8 @@ function renderProfile() {
   const nextLevelCopy = xpToNextLevel === 0 ? "Max level reached" : `${xpToNextLevel} XP to next level`;
   const syncEndpoint = escapeHtmlAttr(state.settings.syncEndpoint || "");
   const syncToken = escapeHtmlAttr(state.settings.syncToken || "");
-  const activeAvatar = FIXED_AVATAR_ID;
+  const activeAvatar = resolveUserAvatarId(state.settings.avatar);
+  const activeAvatarOption = userAvatarOption(activeAvatar);
 
   panel.innerHTML = `
     <section class="grid" style="gap:14px">
@@ -2401,22 +2427,27 @@ function renderProfile() {
 
       <article class="card grid">
         <h3>Profile</h3>
-        <p class="meta">Update your display name and use your fixed peacock identity.</p>
+        <p class="meta">Update your display name and choose your avatar.</p>
         <label for="profile-name" class="meta">Display name</label>
         <input id="profile-name" class="input" value="${state.settings.profileName}" maxlength="30" aria-label="Display name" />
+        <label for="profile-avatar-choice" class="meta">Avatar</label>
+        <select id="profile-avatar-choice" class="input" aria-label="Avatar choice">
+          <option value="peacock" ${activeAvatar === "peacock" ? "selected" : ""}>Pavo the Peacock</option>
+          <option value="monkey" ${activeAvatar === "monkey" ? "selected" : ""}>Milo the Monkey</option>
+        </select>
       </article>
 
       <article class="card grid" style="gap:12px;">
         <h3>Profile Picture</h3>
         <figure class="profile-picture-frame" aria-label="Profile picture preview">
-          <img class="profile-picture-image" src="${FIXED_PROFILE_IMAGE_PATH}" alt="${FIXED_AVATAR_LABEL} profile picture" loading="eager" decoding="async" />
+          <img class="profile-picture-image" src="${activeAvatarOption.profileImage}" alt="${activeAvatarOption.label} profile picture" loading="eager" decoding="async" />
         </figure>
       </article>
 
       <article class="card grid" style="gap:12px;">
         <h3>Avatar</h3>
         <figure class="profile-avatar-frame" aria-label="Avatar preview">
-          <img class="profile-avatar-image" src="${FIXED_AVATAR_IMAGE_PATH}" alt="${FIXED_AVATAR_LABEL} avatar" loading="eager" decoding="async" />
+          <img class="profile-avatar-image" src="${activeAvatarOption.avatarImage}" alt="${activeAvatarOption.label} avatar" loading="eager" decoding="async" />
         </figure>
       </article>
 
@@ -3918,6 +3949,15 @@ function onInput(event) {
     persist();
   }
 
+  if (target.id === "profile-avatar-choice") {
+    state.settings.avatar = resolveUserAvatarId(target.value);
+    updateHeaderControls();
+    persist();
+    if (state.view === "profile") {
+      renderProfile();
+    }
+  }
+
   if (target.id === "profile-daily-goal") {
     const next = Math.max(20, Math.min(5000, Number(target.value) || 120));
     state.progress.dailyGoal.targetXp = next;
@@ -4054,7 +4094,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=189", { updateViaCache: "none" })
+      .register("sw.js?v=190", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
