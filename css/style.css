@@ -2977,6 +2977,23 @@ body.love-milestone-open .sidebar {
   display: block;
 }
 
+.profile-picture-frame,
+.profile-avatar-frame {
+  width: min(320px, 84vw);
+  margin: 0 auto;
+  border: 1px solid rgba(104, 113, 136, 0.24);
+  border-radius: 18px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--surface) 95%, transparent);
+}
+
+.profile-picture-image,
+.profile-avatar-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
 .avatar-character-profile {
   border: 1px solid rgba(104, 113, 136, 0.22);
   border-radius: 12px;

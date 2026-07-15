@@ -90,6 +90,10 @@ const LEGACY_AVATAR_MAP = {
 };
 
 const AVATAR_META_BY_ID = Object.fromEntries(AVATAR_REWARDS.map((item) => [item.value, item]));
+const FIXED_AVATAR_ID = "peacock";
+const FIXED_AVATAR_LABEL = "Pavo the Peacock";
+const FIXED_AVATAR_IMAGE_PATH = "assets/images/avatars/Peacock.png";
+const FIXED_PROFILE_IMAGE_PATH = "assets/images/avatars/Peacock_Profile.png";
 
 const AVATAR_SHEET_DEFAULTS = {
   eyewear: "none",
@@ -359,7 +363,7 @@ const CONVERSATION_TOPICS = {
 const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
 const LOVE_MILESTONE_STEP_XP = 2110;
 const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
-const APP_BUILD_VERSION = "20260715-176";
+const APP_BUILD_VERSION = "20260715-177";
 const CHEST_OPEN_ANIMATION_MS = 1050;
 
 function customDictionaryEntryCount() {
@@ -562,12 +566,12 @@ function normalizeAvatarId(value) {
 }
 
 function avatarMeta(avatarId) {
-  const safeId = normalizeAvatarId(avatarId);
+  const safeId = FIXED_AVATAR_ID || normalizeAvatarId(avatarId);
   return AVATAR_META_BY_ID[safeId] || AVATAR_REWARDS[0];
 }
 
 function avatarDisplayName(avatarId) {
-  return avatarMeta(avatarId)?.label || "Animal Avatar";
+  return FIXED_AVATAR_LABEL || avatarMeta(avatarId)?.label || "Animal Avatar";
 }
 
 function avatarSheetSelectionFor(avatarId) {
@@ -595,12 +599,11 @@ function avatarSheetImagePath(avatarId, selection) {
 }
 
 function renderAnimalBadge(avatarId, variant = "mini") {
-  const safeId = avatarMeta(avatarId).value;
   const safeVariant = ["mini", "chip"].includes(variant) ? variant : "mini";
-  const src = avatarSheetImagePath(safeId, avatarSheetSelectionFor(safeId));
-  const label = avatarDisplayName(safeId);
+  const src = safeVariant === "mini" ? FIXED_PROFILE_IMAGE_PATH : FIXED_AVATAR_IMAGE_PATH;
+  const label = avatarDisplayName(FIXED_AVATAR_ID);
   return `
-    <span class="animal-badge-image ${safeVariant} animal-${safeId}" aria-hidden="true">
+    <span class="animal-badge-image ${safeVariant} animal-${FIXED_AVATAR_ID}" aria-hidden="true">
       <img src="${src}" alt="${label}" loading="lazy" decoding="async" />
     </span>
   `;
@@ -616,10 +619,7 @@ function escapeHtmlAttr(value) {
 function normalizeSettings() {
   state.settings.onboardingCompleted = Boolean(state.settings.onboardingCompleted);
   state.settings.profileName = state.settings.profileName || "Learner";
-  const knownAvatars = AVATAR_REWARDS.map((item) => item.value);
-  const defaultAvatar = knownAvatars[0] || "rhino";
-  const normalizedAvatar = normalizeAvatarId(state.settings.avatar);
-  state.settings.avatar = knownAvatars.includes(normalizedAvatar) ? normalizedAvatar : defaultAvatar;
+  state.settings.avatar = FIXED_AVATAR_ID;
   state.settings.syncEndpoint = String(state.settings.syncEndpoint || "").trim();
   state.settings.syncToken = String(state.settings.syncToken || "").trim();
 }
@@ -1401,7 +1401,7 @@ function finishOnboarding() {
   const dailyXp = Math.max(20, Math.min(5000, Number(state.onboarding.dailyXpTarget) || 120));
 
   state.settings.profileName = cleanName;
-  state.settings.avatar = normalizeAvatarId(state.onboarding.avatar);
+  state.settings.avatar = FIXED_AVATAR_ID;
   state.settings.theme = state.onboarding.preferredTheme;
   state.settings.onboardingCompleted = true;
 
@@ -2376,54 +2376,6 @@ function renderAchievements() {
     .join("");
 }
 
-function renderAvatarStudio() {
-  const activeAvatarMeta = avatarMeta(state.settings.avatar);
-  const currentLevel = levelMetaFromXp(state.progress.xp).level;
-  const selection = avatarSheetSelectionFor(activeAvatarMeta.value);
-  const sheetPath = avatarSheetImagePath(activeAvatarMeta.value, selection);
-
-  const avatarOptions = AVATAR_REWARDS.map((item) => {
-    const unlocked = isAvatarUnlocked(item.value, currentLevel) || item.value === activeAvatarMeta.value;
-    return `<option value="${item.value}" ${item.value === activeAvatarMeta.value ? "selected" : ""} ${unlocked ? "" : "disabled"}>${item.label}${unlocked ? "" : ` (Unlock L${item.unlockLevel})`}</option>`;
-  }).join("");
-
-  const dropdown = (slot, label) => {
-    const options = AVATAR_SHEET_OPTIONS[slot]
-      .map((entry) => `<option value="${entry.value}" ${selection[slot] === entry.value ? "selected" : ""}>${entry.label}</option>`)
-      .join("");
-    return `
-      <label class="meta" for="avatar-${slot}-select">${label}</label>
-      <select id="avatar-${slot}-select" class="input" aria-label="${label}">
-        ${options}
-      </select>
-    `;
-  };
-
-  return `
-    <article class="card grid" style="gap:12px;">
-      <div class="row" style="flex-wrap:wrap; justify-content:space-between; align-items:center; gap:8px;">
-        <h3>Avatar Studio</h3>
-        <span class="pill">Character Sheets</span>
-      </div>
-      <div class="avatar-sheet-layout">
-        <div class="avatar-sheet-controls grid" style="gap:8px;">
-          <label class="meta" for="avatar-character-select">Character</label>
-          <select id="avatar-character-select" class="input" aria-label="Character">
-            ${avatarOptions}
-          </select>
-          ${dropdown("eyewear", "Eyewear")}
-          ${dropdown("outfit", "Outfit")}
-          ${dropdown("headwear", "Headwear")}
-        </div>
-        <figure class="avatar-sheet-preview" aria-label="Character preview">
-          <img class="avatar-sheet-image" src="${sheetPath}" alt="${activeAvatarMeta.label} customized character" loading="eager" decoding="async" />
-        </figure>
-      </div>
-      <p class="meta">Select a character, then customize with dropdown menus. The preview image switches to a matching PNG sheet instantly.</p>
-    </article>
-  `;
-}
-
 function renderProfile() {
   syncAchievements(false);
   const panel = document.getElementById("view-profile");
@@ -2435,7 +2387,7 @@ function renderProfile() {
   const nextLevelCopy = xpToNextLevel === 0 ? "Max level reached" : `${xpToNextLevel} XP to next level`;
   const syncEndpoint = escapeHtmlAttr(state.settings.syncEndpoint || "");
   const syncToken = escapeHtmlAttr(state.settings.syncToken || "");
-  const activeAvatar = normalizeAvatarId(state.settings.avatar);
+  const activeAvatar = FIXED_AVATAR_ID;
 
   panel.innerHTML = `
     <section class="grid" style="gap:14px">
@@ -2448,13 +2400,25 @@ function renderProfile() {
       </article>
 
       <article class="card grid">
-        <h3>Avatar Customization</h3>
-        <p class="meta">Update your display name. Character and visual customization are managed in Avatar Studio below.</p>
+        <h3>Profile</h3>
+        <p class="meta">Update your display name and use your fixed peacock identity.</p>
         <label for="profile-name" class="meta">Display name</label>
         <input id="profile-name" class="input" value="${state.settings.profileName}" maxlength="30" aria-label="Display name" />
       </article>
 
-      ${renderAvatarStudio()}
+      <article class="card grid" style="gap:12px;">
+        <h3>Profile Picture</h3>
+        <figure class="profile-picture-frame" aria-label="Profile picture preview">
+          <img class="profile-picture-image" src="${FIXED_PROFILE_IMAGE_PATH}" alt="${FIXED_AVATAR_LABEL} profile picture" loading="eager" decoding="async" />
+        </figure>
+      </article>
+
+      <article class="card grid" style="gap:12px;">
+        <h3>Avatar</h3>
+        <figure class="profile-avatar-frame" aria-label="Avatar preview">
+          <img class="profile-avatar-image" src="${FIXED_AVATAR_IMAGE_PATH}" alt="${FIXED_AVATAR_LABEL} avatar" loading="eager" decoding="async" />
+        </figure>
+      </article>
 
       <article class="card grid auto">
         <div class="stat"><span class="label">Level Progress</span><span class="value">${nextLevelCopy}</span></div>
@@ -3963,43 +3927,6 @@ function onInput(event) {
     }
   }
 
-  if (target.id === "avatar-character-select") {
-    const requestedAvatar = normalizeAvatarId(target.value || state.settings.avatar);
-    const currentLevel = levelMetaFromXp(state.progress.xp).level;
-    if (!isAvatarUnlocked(requestedAvatar, currentLevel)) {
-      toast(`Unlock this avatar at Level ${avatarUnlockLevel(requestedAvatar)}`);
-      target.value = state.settings.avatar;
-      return;
-    }
-
-    state.settings.avatar = requestedAvatar;
-    ensureAvatarSheetSelections();
-    updateHeaderControls();
-    persist();
-    if (state.view === "profile") {
-      renderProfile();
-    }
-  }
-
-  if (target.id === "avatar-eyewear-select" || target.id === "avatar-outfit-select" || target.id === "avatar-headwear-select") {
-    const currentAvatar = normalizeAvatarId(state.settings.avatar);
-    if (target.id === "avatar-eyewear-select") {
-      setAvatarSheetSelection(currentAvatar, { eyewear: target.value });
-    }
-    if (target.id === "avatar-outfit-select") {
-      setAvatarSheetSelection(currentAvatar, { outfit: target.value });
-    }
-    if (target.id === "avatar-headwear-select") {
-      setAvatarSheetSelection(currentAvatar, { headwear: target.value });
-    }
-
-    updateHeaderControls();
-    persist();
-    if (state.view === "profile") {
-      renderProfile();
-    }
-  }
-
   if (target.id === "profile-sync-endpoint") {
     state.settings.syncEndpoint = String(target.value || "").trim();
   }
@@ -4127,7 +4054,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=188", { updateViaCache: "none" })
+      .register("sw.js?v=189", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
