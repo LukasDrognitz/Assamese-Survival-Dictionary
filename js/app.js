@@ -2540,7 +2540,11 @@ function renderProfile() {
   const nextLevelCopy = xpToNextLevel === 0 ? "Max level reached" : `${xpToNextLevel} XP to next level`;
   const syncEndpoint = escapeHtmlAttr(state.settings.syncEndpoint || "");
   const syncToken = escapeHtmlAttr(state.settings.syncToken || "");
-  const avatarChoices = Object.keys(USER_AVATAR_OPTIONS);
+  const avatarChoices = Object.keys(USER_AVATAR_OPTIONS).sort((a, b) => {
+    const levelDiff = userAvatarUnlockLevel(a) - userAvatarUnlockLevel(b);
+    if (levelDiff !== 0) return levelDiff;
+    return avatarDisplayName(a).localeCompare(avatarDisplayName(b));
+  });
   const activeAvatarValue = resolveUserAvatarId(state.settings.avatar);
   const activeAvatar = isUserAvatarUnlocked(activeAvatarValue, currentLevel)
     ? activeAvatarValue
