@@ -93,7 +93,7 @@ const LEGACY_AVATAR_MAP = {
 };
 
 const AVATAR_META_BY_ID = Object.fromEntries(AVATAR_REWARDS.map((item) => [item.value, item]));
-const AVATAR_IMAGE_VERSION = "20260716-193";
+const AVATAR_IMAGE_VERSION = "20260716-194";
 const MONKEY_OUTFIT_OPTIONS = [
   { value: "classic", label: "Classic" },
   { value: "student", label: "Student" },
@@ -2607,19 +2607,8 @@ function renderProfile() {
         <p class="meta">Update your display name and choose your avatar.</p>
         <label for="profile-name" class="meta">Display name</label>
         <input id="profile-name" class="input" value="${state.settings.profileName}" maxlength="30" aria-label="Display name" />
-        <p class="meta">Avatar Gallery (unlocks by level)</p>
+        <p class="meta">Avatar Gallery</p>
         <div class="avatar-grid profile-avatar-grid">${avatarProfileGallery}</div>
-        <label for="profile-avatar-choice" class="meta">Avatar</label>
-        <select id="profile-avatar-choice" class="input" aria-label="Avatar choice">
-          ${avatarChoices
-            .map((avatarId) => {
-              const option = userAvatarAssets(avatarId);
-              const unlocked = isUserAvatarUnlocked(avatarId, currentLevel);
-              const unlockLevel = userAvatarUnlockLevel(avatarId);
-              return `<option value="${avatarId}" ${activeAvatar === avatarId ? "selected" : ""} ${unlocked ? "" : "disabled"}>${option.label}${unlocked ? "" : ` (Unlock Lv ${unlockLevel})`}</option>`;
-            })
-            .join("")}
-        </select>
         ${avatarOutfitSelector}
       </article>
 
@@ -4144,22 +4133,6 @@ function onInput(event) {
     persist();
   }
 
-  if (target.id === "profile-avatar-choice") {
-    const selectedAvatar = resolveUserAvatarId(target.value);
-    const currentLevel = levelMetaFromXp(state.progress.xp).level;
-    if (!isUserAvatarUnlocked(selectedAvatar, currentLevel)) {
-      toast(`Unlocks at Level ${userAvatarUnlockLevel(selectedAvatar)}`);
-      target.value = state.settings.avatar;
-      return;
-    }
-    state.settings.avatar = selectedAvatar;
-    updateHeaderControls();
-    persist();
-    if (state.view === "profile") {
-      renderProfile();
-    }
-  }
-
   if (target.id === "profile-avatar-outfit") {
     setAvatarOutfitSelection(state.settings.avatar, target.value);
     updateHeaderControls();
@@ -4305,7 +4278,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=205", { updateViaCache: "none" })
+      .register("sw.js?v=206", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
