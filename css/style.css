@@ -317,7 +317,7 @@ body.lesson-immersive .topbar {
 }
 
 .collapsible-card > summary::after {
-  content: "\2192";
+  content: "\2193";
   width: 24px;
   height: 24px;
   border-radius: 999px;
@@ -331,7 +331,7 @@ body.lesson-immersive .topbar {
 }
 
 .collapsible-card[open] > summary::after {
-  content: "\2193";
+  content: "\2191";
 }
 
 .collapsible-card > summary h3 {
