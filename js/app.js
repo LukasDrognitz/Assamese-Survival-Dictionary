@@ -93,7 +93,7 @@ const LEGACY_AVATAR_MAP = {
 };
 
 const AVATAR_META_BY_ID = Object.fromEntries(AVATAR_REWARDS.map((item) => [item.value, item]));
-const AVATAR_IMAGE_VERSION = "20260716-203";
+const AVATAR_IMAGE_VERSION = "20260716-204";
 const PEACOCK_OUTFIT_OPTIONS = [
   { value: "classic", label: "Classic" },
   { value: "professor", label: "Professor" }
@@ -4310,7 +4310,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=215", { updateViaCache: "none" })
+      .register("sw.js?v=216", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
