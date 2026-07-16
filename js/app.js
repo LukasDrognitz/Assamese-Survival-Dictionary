@@ -93,7 +93,7 @@ const LEGACY_AVATAR_MAP = {
 };
 
 const AVATAR_META_BY_ID = Object.fromEntries(AVATAR_REWARDS.map((item) => [item.value, item]));
-const AVATAR_IMAGE_VERSION = "20260716-194";
+const AVATAR_IMAGE_VERSION = "20260716-195";
 const MONKEY_OUTFIT_OPTIONS = [
   { value: "classic", label: "Classic" },
   { value: "student", label: "Student" },
@@ -2632,34 +2632,42 @@ function renderProfile() {
         <div class="achievement-groups" style="margin-top:10px">${renderAchievements()}</div>
       </article>
 
-      <article class="card grid xp-rules-card">
-        <h3>XP Rewards</h3>
-        <p class="meta">How XP is earned in each activity.</p>
-        <ul class="xp-rules-list" aria-label="XP reward rules">
-          <li><span>Complete a lesson</span><strong>+40 XP</strong></li>
-          <li><span>Restart a lesson</span><strong>+10 XP</strong></li>
-          <li><span>Flashcard review</span><strong>+4 XP</strong></li>
-          <li><span>Correct quiz answer</span><strong>+8 XP</strong></li>
-          <li><span>Finish a quiz</span><strong>+20 XP</strong></li>
-          <li><span>Conversation message</span><strong>+2 XP</strong></li>
-        </ul>
-      </article>
-
-      <article class="card grid">
-        <h3>Cloud Sync (Cross-Device)</h3>
-        <p class="meta">Use a hosted API to sync progress between laptop and iPhone, even when your laptop is offline.</p>
-        <label for="profile-sync-endpoint" class="meta">Sync endpoint</label>
-        <input id="profile-sync-endpoint" class="input" value="${syncEndpoint}" placeholder="https://your-worker-domain/api/state" aria-label="Cloud sync endpoint" />
-        <label for="profile-sync-token" class="meta">Sync token</label>
-        <input id="profile-sync-token" class="input" type="password" value="${syncToken}" placeholder="Optional shared secret" aria-label="Cloud sync token" />
-        <div class="row" style="flex-wrap: wrap; justify-content:flex-start;">
-          <button class="btn accent" data-action="sync-save-config">Save Sync Settings</button>
-          <button class="btn ghost" data-action="sync-test-config">Test Sync</button>
-          <button class="btn ghost" data-action="sync-clear-config">Clear</button>
-          <button class="btn secondary" data-action="force-refresh-app">Force Refresh App</button>
+      <details class="card collapsible-card xp-rules-card" open>
+        <summary>
+          <h3>XP Rewards</h3>
+        </summary>
+        <div class="grid collapsible-content">
+          <p class="meta">How XP is earned in each activity.</p>
+          <ul class="xp-rules-list" aria-label="XP reward rules">
+            <li><span>Complete a lesson</span><strong>+40 XP</strong></li>
+            <li><span>Restart a lesson</span><strong>+10 XP</strong></li>
+            <li><span>Flashcard review</span><strong>+4 XP</strong></li>
+            <li><span>Correct quiz answer</span><strong>+8 XP</strong></li>
+            <li><span>Finish a quiz</span><strong>+20 XP</strong></li>
+            <li><span>Conversation message</span><strong>+2 XP</strong></li>
+          </ul>
         </div>
-        <p class="meta">Use Force Refresh when mobile still shows an older app version.</p>
-      </article>
+      </details>
+
+      <details class="card collapsible-card" open>
+        <summary>
+          <h3>Cloud Sync (Cross-Device)</h3>
+        </summary>
+        <div class="grid collapsible-content">
+          <p class="meta">Use a hosted API to sync progress between laptop and iPhone, even when your laptop is offline.</p>
+          <label for="profile-sync-endpoint" class="meta">Sync endpoint</label>
+          <input id="profile-sync-endpoint" class="input" value="${syncEndpoint}" placeholder="https://your-worker-domain/api/state" aria-label="Cloud sync endpoint" />
+          <label for="profile-sync-token" class="meta">Sync token</label>
+          <input id="profile-sync-token" class="input" type="password" value="${syncToken}" placeholder="Optional shared secret" aria-label="Cloud sync token" />
+          <div class="row" style="flex-wrap: wrap; justify-content:flex-start;">
+            <button class="btn accent" data-action="sync-save-config">Save Sync Settings</button>
+            <button class="btn ghost" data-action="sync-test-config">Test Sync</button>
+            <button class="btn ghost" data-action="sync-clear-config">Clear</button>
+            <button class="btn secondary" data-action="force-refresh-app">Force Refresh App</button>
+          </div>
+          <p class="meta">Use Force Refresh when mobile still shows an older app version.</p>
+        </div>
+      </details>
 
       <article class="card grid">
         <h3>Daily XP Goal</h3>
@@ -4278,7 +4286,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=206", { updateViaCache: "none" })
+      .register("sw.js?v=207", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
