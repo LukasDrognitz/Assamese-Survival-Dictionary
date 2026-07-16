@@ -93,7 +93,7 @@ const LEGACY_AVATAR_MAP = {
 };
 
 const AVATAR_META_BY_ID = Object.fromEntries(AVATAR_REWARDS.map((item) => [item.value, item]));
-const AVATAR_IMAGE_VERSION = "20260716-190";
+const AVATAR_IMAGE_VERSION = "20260716-191";
 const MONKEY_OUTFIT_OPTIONS = [
   { value: "classic", label: "Classic" },
   { value: "student", label: "Student" },
@@ -107,7 +107,7 @@ const USER_AVATAR_OPTIONS = {
   peacock: {
     label: "Pavo the Peacock",
     avatarImage: `assets/images/avatars/peacock_no_outfit_high_quality_full_body_no_background.png?v=${AVATAR_IMAGE_VERSION}`,
-    profileImage: `assets/images/avatars/peacock_no_outfit_high_quality_full_body_no_background.png?v=${AVATAR_IMAGE_VERSION}`
+    profileImage: `assets/images/avatars/Peacock_Profile.png?v=${AVATAR_IMAGE_VERSION}`
   },
   monkey: {
     label: "Milo the Monkey",
@@ -671,9 +671,7 @@ function userAvatarAssets(avatarId) {
   const selectedOutfit = avatarOutfitSelection(selectedAvatarId);
   const outfitAssets = option.outfits?.[selectedOutfit];
   const avatarImage = outfitAssets?.avatarImage || option.avatarImage;
-  const profileImage = selectedAvatarId === "peacock"
-    ? avatarImage
-    : (outfitAssets?.profileImage || option.profileImage);
+  const profileImage = outfitAssets?.profileImage || option.profileImage;
 
   return {
     label: option.label,
@@ -4217,7 +4215,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=202", { updateViaCache: "none" })
+      .register("sw.js?v=203", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
