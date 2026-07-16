@@ -93,7 +93,7 @@ const LEGACY_AVATAR_MAP = {
 };
 
 const AVATAR_META_BY_ID = Object.fromEntries(AVATAR_REWARDS.map((item) => [item.value, item]));
-const AVATAR_IMAGE_VERSION = "20260716-206";
+const AVATAR_IMAGE_VERSION = "20260716-207";
 const PEACOCK_OUTFIT_OPTIONS = [
   { value: "classic", label: "Classic" },
   { value: "professor", label: "Professor" }
@@ -2584,7 +2584,7 @@ function renderProfile() {
       <article class="card grid" style="gap:12px;">
         <h3>Avatar</h3>
         <figure class="profile-avatar-frame" aria-label="Avatar preview">
-          <img class="profile-avatar-image avatar-image-${activeAvatar}" src="${activeAvatarOption.avatarImage}" alt="${activeAvatarOption.label} avatar" loading="eager" decoding="async" />
+          <img class="profile-avatar-image avatar-image-${activeAvatar} avatar-outfit-${activeAvatarOption.outfit}" src="${activeAvatarOption.avatarImage}" alt="${activeAvatarOption.label} avatar" loading="eager" decoding="async" />
         </figure>
       </article>
 
@@ -4266,7 +4266,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=218", { updateViaCache: "none" })
+      .register("sw.js?v=219", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.

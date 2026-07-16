@@ -3076,6 +3076,12 @@ body.love-milestone-open .sidebar {
   object-position: center;
 }
 
+.profile-avatar-image.avatar-image-monkey.avatar-outfit-classic {
+  object-fit: contain;
+  object-position: center center;
+  transform: scale(0.84);
+}
+
 .avatar-character-profile {
   border: 1px solid rgba(104, 113, 136, 0.22);
   border-radius: 12px;
