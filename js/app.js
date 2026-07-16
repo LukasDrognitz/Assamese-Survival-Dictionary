@@ -93,7 +93,7 @@ const LEGACY_AVATAR_MAP = {
 };
 
 const AVATAR_META_BY_ID = Object.fromEntries(AVATAR_REWARDS.map((item) => [item.value, item]));
-const AVATAR_IMAGE_VERSION = "20260716-205";
+const AVATAR_IMAGE_VERSION = "20260716-206";
 const PEACOCK_OUTFIT_OPTIONS = [
   { value: "classic", label: "Classic" },
   { value: "professor", label: "Professor" }
@@ -439,14 +439,14 @@ const CONVERSATION_TOPICS = {
 const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
 const LOVE_MILESTONE_STEP_XP = 2110;
 const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
-const APP_BUILD_VERSION = "20260715-187";
+const APP_BUILD_VERSION = "20260716-188";
 const CHEST_OPEN_ANIMATION_MS = 1050;
 
 function customDictionaryEntryCount() {
   return getCustomWords().length;
 }
 
-const CHEST_RUPEE_TIERS = [
+const DAILY_XP_SURPRISE_TIERS = [
   { rarity: "common", weight: 62, min: 80, max: 140 },
   { rarity: "rare", weight: 30, min: 141, max: 230 },
   { rarity: "epic", weight: 8, min: 231, max: 320 }
@@ -464,8 +464,8 @@ function pickWeighted(items) {
   return items[items.length - 1] || null;
 }
 
-function rollChestRupeeReward() {
-  const tier = pickWeighted(CHEST_RUPEE_TIERS) || CHEST_RUPEE_TIERS[0];
+function rollDailyXpSurpriseReward() {
+  const tier = pickWeighted(DAILY_XP_SURPRISE_TIERS) || DAILY_XP_SURPRISE_TIERS[0];
   const value = tier.min + Math.floor(Math.random() * (tier.max - tier.min + 1));
   return { rarity: tier.rarity, value };
 }
@@ -613,10 +613,7 @@ const state = {
   chestResultDialog: {
     isOpen: false,
     rarity: "common",
-    rupees: 0
-  },
-  dailyChestDialog: {
-    isOpen: false
+    xpReward: 0
   }
 };
 
@@ -1138,7 +1135,7 @@ function createChestResultModal() {
   container.setAttribute("role", "dialog");
   container.setAttribute("aria-modal", "true");
   container.setAttribute("aria-live", "polite");
-  container.setAttribute("aria-label", "Treasure chest reward");
+  container.setAttribute("aria-label", "Daily XP surprise");
   container.innerHTML = `
     <article class="chest-result-card glass">
       <div class="chest-visual" id="chest-result-visual" aria-hidden="true">
@@ -1146,110 +1143,57 @@ function createChestResultModal() {
         <span class="chest-lid"></span>
         <span class="chest-burst"></span>
       </div>
-      <p class="eyebrow" id="chest-result-rarity">COMMON CHEST</p>
-      <h2 id="chest-result-rupees">+0 Rupees</h2>
-      <p class="meta" id="chest-result-item">Collect your daily coins and come back tomorrow.</p>
+      <p class="eyebrow" id="chest-result-rarity">COMMON SURPRISE</p>
+      <h2 id="chest-result-xp">+0 XP</h2>
+      <p class="meta" id="chest-result-item">You received your daily XP surprise. Come back tomorrow for another bonus.</p>
       <button class="btn accent" data-action="chest-result-continue">Continue</button>
     </article>
   `;
   document.body.appendChild(container);
 }
-
-function createDailyChestModal() {
-  if (document.getElementById("daily-chest-modal")) return;
-
-  const container = document.createElement("section");
-  container.id = "daily-chest-modal";
-  container.className = "daily-chest-modal hidden";
-  container.setAttribute("role", "dialog");
-  container.setAttribute("aria-modal", "true");
-  container.setAttribute("aria-live", "polite");
-  container.setAttribute("aria-label", "Daily treasure chest");
-  container.innerHTML = `
-    <article class="daily-chest-card glass">
-      <p class="eyebrow">Daily Reward</p>
-      <div class="daily-chest-hero" aria-hidden="true">
-        <span class="chest-base"></span>
-        <span class="chest-lid"></span>
-      </div>
-      <h2>Your Treasure Chest Is Ready</h2>
-      <p class="meta">Open once per day to collect Rupees.</p>
-      <div class="row" style="justify-content:center; gap:10px; flex-wrap:wrap;">
-        <button class="btn accent" data-action="daily-chest-open">Open Chest</button>
-        <button class="btn ghost" data-action="daily-chest-later">Maybe Later</button>
-      </div>
-    </article>
-  `;
-  document.body.appendChild(container);
-}
-
-function openDailyChestModal() {
-  const modal = document.getElementById("daily-chest-modal");
-  if (!modal) return;
-
-  state.dailyChestDialog.isOpen = true;
-  modal.classList.remove("hidden");
-  document.body.classList.add("lock-scroll");
-}
-
-function closeDailyChestModal() {
-  const modal = document.getElementById("daily-chest-modal");
-  if (!modal) return;
-
-  state.dailyChestDialog.isOpen = false;
-  modal.classList.add("hidden");
-  document.body.classList.remove("lock-scroll");
-}
-
-function maybeShowDailyChestPrompt() {
+function maybeGrantDailyXpSurprise() {
   if (!state.settings.onboardingCompleted) return;
-  if (state.startScreen.isOpen || state.onboarding.isOpen || state.dailyChestDialog.isOpen) return;
+  if (state.startScreen.isOpen || state.onboarding.isOpen) return;
 
   const today = todayIso();
-  if (state.progress.lastChestDate === today) return;
-  if (state.progress.lastChestPromptDate === today) return;
-
-  state.progress.lastChestPromptDate = today;
-  persist();
-  openDailyChestModal();
-}
-
-function claimDailyChestReward() {
-  const today = todayIso();
-  if (state.progress.lastChestDate === today) {
-    toast("Treasure chest already opened today");
+  if (state.progress.dailyXpBonusDate === today) {
     return false;
   }
 
-  const rupeeDrop = rollChestRupeeReward();
-  const reward = rupeeDrop.value;
+  const xpDrop = rollDailyXpSurpriseReward();
+  const reward = xpDrop.value;
 
-  state.progress.lastChestDate = today;
-  state.progress.lastChestPromptDate = today;
-  state.progress.rupees = Math.max(0, Number(state.progress.rupees) || 0) + reward;
+  state.progress.dailyXpBonusDate = today;
+  xpGain(reward, "Daily XP surprise");
   persist();
-  renderProfile();
+
   openChestResultModal({
-    rarity: rupeeDrop.rarity,
-    rupees: reward
+    rarity: xpDrop.rarity,
+    xpReward: reward
   });
+
+  renderHome();
+  if (state.view === "profile") {
+    renderProfile();
+  }
+
   return true;
 }
 
 function openChestResultModal(payload) {
   const dialog = document.getElementById("chest-result-celebration");
   const rarityNode = document.getElementById("chest-result-rarity");
-  const rupeeNode = document.getElementById("chest-result-rupees");
+  const xpNode = document.getElementById("chest-result-xp");
   const itemNode = document.getElementById("chest-result-item");
   const chestVisual = document.getElementById("chest-result-visual");
-  if (!dialog || !rarityNode || !rupeeNode || !itemNode || !chestVisual) return;
+  if (!dialog || !rarityNode || !xpNode || !itemNode || !chestVisual) return;
 
   const rarity = String(payload?.rarity || "common").toLowerCase();
-  const rupees = Math.max(0, Number(payload?.rupees) || 0);
+  const xpReward = Math.max(0, Number(payload?.xpReward) || 0);
   state.chestResultDialog = {
     isOpen: true,
     rarity,
-    rupees
+    xpReward
   };
 
   dialog.classList.remove("common", "rare", "epic");
@@ -1259,9 +1203,9 @@ function openChestResultModal(payload) {
   void chestVisual.offsetWidth;
   chestVisual.classList.add("open");
 
-  rarityNode.textContent = `${rarity.toUpperCase()} CHEST`;
-  rupeeNode.textContent = `+${rupees} Rupees`;
-  itemNode.textContent = "No bonus item pool is active. Come back tomorrow for another chest.";
+  rarityNode.textContent = `${rarity.toUpperCase()} SURPRISE`;
+  xpNode.textContent = `+${xpReward} XP`;
+  itemNode.textContent = "Daily bonus claimed. Open the app tomorrow for another XP surprise.";
 
   dialog.classList.remove("hidden");
   document.body.classList.add("lock-scroll");
@@ -1283,7 +1227,7 @@ function closeChestResultModal() {
   state.chestResultDialog = {
     isOpen: false,
     rarity: "common",
-    rupees: 0
+    xpReward: 0
   };
 }
 
@@ -1589,7 +1533,7 @@ function finishOnboarding() {
   closeOnboarding();
   renderCurrentView();
   toast(`Welcome, ${cleanName}!`);
-  maybeShowDailyChestPrompt();
+  maybeGrantDailyXpSurprise();
 }
 
 function xpGain(amount, reason) {
@@ -3259,18 +3203,7 @@ async function onClick(event) {
 
   if (action === "app-start-continue") {
     closeAppStartScreen();
-    maybeShowDailyChestPrompt();
-    return;
-  }
-
-  if (action === "daily-chest-open") {
-    closeDailyChestModal();
-    claimDailyChestReward();
-    return;
-  }
-
-  if (action === "daily-chest-later") {
-    closeDailyChestModal();
+    maybeGrantDailyXpSurprise();
     return;
   }
 
@@ -4333,7 +4266,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=217", { updateViaCache: "none" })
+      .register("sw.js?v=218", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
@@ -4408,7 +4341,6 @@ async function init() {
   createLevelUpCelebrationModal();
   createLoveMilestoneCelebrationModal();
   createChestResultModal();
-  createDailyChestModal();
   syncAchievements(false);
   applyTheme();
   updateHeaderControls();
@@ -4430,7 +4362,7 @@ async function init() {
   } else if (shouldShowAppStartScreen()) {
     openAppStartScreen();
   } else {
-    maybeShowDailyChestPrompt();
+    maybeGrantDailyXpSurprise();
   }
   persist();
 }

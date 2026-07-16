@@ -26,9 +26,7 @@ const DEFAULT_PROGRESS = {
   quizAttempts: 0,
   quizCorrect: 0,
   quizzesCompleted: 0,
-  rupees: 0,
-  lastChestDate: "",
-  lastChestPromptDate: "",
+  dailyXpBonusDate: "",
   avatarSheetSelections: {},
   dailyGoal: {
     targetXp: 120,
@@ -365,9 +363,7 @@ export function getProgress() {
   delete progress.flashWordProgress;
   progress.loveMilestoneXpSeen = Math.max(0, Number(progress.loveMilestoneXpSeen) || 0);
   progress.quizzesCompleted = Math.max(0, Number(progress.quizzesCompleted) || 0);
-  progress.rupees = Math.max(0, Number(progress.rupees) || 0);
-  progress.lastChestDate = String(progress.lastChestDate || "").trim();
-  progress.lastChestPromptDate = String(progress.lastChestPromptDate || "").trim();
+  progress.dailyXpBonusDate = String(progress.dailyXpBonusDate || progress.lastChestDate || "").trim();
   progress.avatarSheetSelections = progress.avatarSheetSelections && typeof progress.avatarSheetSelections === "object"
     ? { ...progress.avatarSheetSelections }
     : {};
