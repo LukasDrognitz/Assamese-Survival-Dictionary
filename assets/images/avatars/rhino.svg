@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Rhino character sheet">
+  <defs>
+    <radialGradient id="bg" cx="34%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#c8e0cb"/>
+      <stop offset="100%" stop-color="#96be9e"/>
+    </radialGradient>
+    <radialGradient id="skin" cx="36%" cy="27%" r="72%">
+      <stop offset="0%" stop-color="#a6a198"/>
+      <stop offset="100%" stop-color="#85817a"/>
+    </radialGradient>
+    <linearGradient id="armor" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5f708a"/>
+      <stop offset="100%" stop-color="#3d4b62"/>
+    </linearGradient>
+  </defs>
+  <circle cx="512" cy="512" r="496" fill="url(#bg)"/>
+  <circle cx="512" cy="512" r="490" fill="none" stroke="#ffffff" stroke-opacity="0.34" stroke-width="12"/>
+  <ellipse cx="512" cy="804" rx="248" ry="172" fill="url(#armor)"/>
+  <ellipse cx="512" cy="506" rx="280" ry="248" fill="url(#skin)"/>
+  <ellipse cx="390" cy="344" rx="60" ry="78" fill="#8e8a83"/>
+  <ellipse cx="634" cy="344" rx="60" ry="78" fill="#8e8a83"/>
+  <path d="M494 276h36l-18 66z" fill="#ece0cd"/>
+  <path d="M402 600h220" stroke="#74706a" stroke-width="14" stroke-linecap="round"/>
+  <path d="M382 670h260" stroke="#74706a" stroke-width="14" stroke-linecap="round"/>
+  <ellipse cx="426" cy="494" rx="52" ry="62" fill="#ffffff"/>
+  <ellipse cx="598" cy="494" rx="52" ry="62" fill="#ffffff"/>
+  <circle cx="426" cy="506" r="28" fill="#1f2a38"/>
+  <circle cx="598" cy="506" r="28" fill="#1f2a38"/>
+  <circle cx="414" cy="490" r="10" fill="#ffffff"/>
+  <circle cx="586" cy="490" r="10" fill="#ffffff"/>
+  <ellipse cx="512" cy="614" rx="84" ry="66" fill="#ded6ca"/>
+  <ellipse cx="484" cy="612" rx="14" ry="10" fill="#52535a"/>
+  <ellipse cx="540" cy="612" rx="14" ry="10" fill="#52535a"/>
+  <path d="M452 678q60 44 120 0" fill="none" stroke="#634a3d" stroke-width="18" stroke-linecap="round"/>
+</svg>

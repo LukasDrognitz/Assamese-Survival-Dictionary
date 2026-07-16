@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Elephant character sheet">
+  <defs>
+    <radialGradient id="bg" cx="34%" cy="28%" r="72%">
+      <stop offset="0%" stop-color="#ddf5b8"/>
+      <stop offset="100%" stop-color="#a7cd5f"/>
+    </radialGradient>
+    <radialGradient id="skin" cx="36%" cy="27%" r="72%">
+      <stop offset="0%" stop-color="#b7b1a7"/>
+      <stop offset="100%" stop-color="#8f8a82"/>
+    </radialGradient>
+    <linearGradient id="vest" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4e7a96"/>
+      <stop offset="100%" stop-color="#315267"/>
+    </linearGradient>
+  </defs>
+  <circle cx="512" cy="512" r="496" fill="url(#bg)"/>
+  <circle cx="512" cy="512" r="490" fill="none" stroke="#ffffff" stroke-opacity="0.34" stroke-width="12"/>
+  <ellipse cx="512" cy="804" rx="246" ry="170" fill="url(#vest)"/>
+  <path d="M366 740c40-30 90-42 146-42s106 12 146 42l-36 90H402z" fill="#d8dfeb"/>
+
+  <ellipse cx="318" cy="446" rx="148" ry="182" fill="#958f86"/>
+  <ellipse cx="706" cy="446" rx="148" ry="182" fill="#958f86"/>
+  <ellipse cx="332" cy="458" rx="96" ry="124" fill="#e0b6a4"/>
+  <ellipse cx="692" cy="458" rx="96" ry="124" fill="#e0b6a4"/>
+
+  <ellipse cx="512" cy="500" rx="270" ry="248" fill="url(#skin)"/>
+  <path d="M470 578c0 110 84 110 84 0v118c0 44-16 78-42 78s-42-34-42-78z" fill="#97928a"/>
+  <ellipse cx="430" cy="488" rx="52" ry="62" fill="#ffffff"/>
+  <ellipse cx="594" cy="488" rx="52" ry="62" fill="#ffffff"/>
+  <circle cx="430" cy="500" r="28" fill="#1f2a38"/>
+  <circle cx="594" cy="500" r="28" fill="#1f2a38"/>
+  <circle cx="418" cy="484" r="10" fill="#ffffff"/>
+  <circle cx="582" cy="484" r="10" fill="#ffffff"/>
+  <ellipse cx="478" cy="634" rx="16" ry="42" fill="#f2e7d3"/>
+  <ellipse cx="546" cy="634" rx="16" ry="42" fill="#f2e7d3"/>
+  <path d="M450 690q62 52 124 0" fill="none" stroke="#6c4a3e" stroke-width="18" stroke-linecap="round"/>
+</svg>
