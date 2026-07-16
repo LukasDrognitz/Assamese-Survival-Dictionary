@@ -93,7 +93,7 @@ const LEGACY_AVATAR_MAP = {
 };
 
 const AVATAR_META_BY_ID = Object.fromEntries(AVATAR_REWARDS.map((item) => [item.value, item]));
-const AVATAR_IMAGE_VERSION = "20260716-195";
+const AVATAR_IMAGE_VERSION = "20260716-196";
 const MONKEY_OUTFIT_OPTIONS = [
   { value: "classic", label: "Classic" },
   { value: "student", label: "Student" },
@@ -2632,7 +2632,7 @@ function renderProfile() {
         <div class="achievement-groups" style="margin-top:10px">${renderAchievements()}</div>
       </article>
 
-      <details class="card collapsible-card xp-rules-card" open>
+      <details class="card collapsible-card xp-rules-card">
         <summary>
           <h3>XP Rewards</h3>
         </summary>
@@ -2649,7 +2649,7 @@ function renderProfile() {
         </div>
       </details>
 
-      <details class="card collapsible-card" open>
+      <details class="card collapsible-card">
         <summary>
           <h3>Cloud Sync (Cross-Device)</h3>
         </summary>
@@ -4286,7 +4286,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=207", { updateViaCache: "none" })
+      .register("sw.js?v=208", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.

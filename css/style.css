@@ -317,14 +317,21 @@ body.lesson-immersive .topbar {
 }
 
 .collapsible-card > summary::after {
-  content: "+";
-  font-size: 1.1rem;
+  content: "\2192";
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid rgba(104, 113, 136, 0.45);
+  display: inline-grid;
+  place-items: center;
+  font-size: 0.9rem;
   font-weight: 700;
   color: var(--muted);
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
 }
 
 .collapsible-card[open] > summary::after {
-  content: "-";
+  content: "\2193";
 }
 
 .collapsible-card > summary h3 {
