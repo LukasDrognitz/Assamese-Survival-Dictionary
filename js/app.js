@@ -93,7 +93,7 @@ const LEGACY_AVATAR_MAP = {
 };
 
 const AVATAR_META_BY_ID = Object.fromEntries(AVATAR_REWARDS.map((item) => [item.value, item]));
-const AVATAR_IMAGE_VERSION = "20260716-191";
+const AVATAR_IMAGE_VERSION = "20260716-192";
 const MONKEY_OUTFIT_OPTIONS = [
   { value: "classic", label: "Classic" },
   { value: "student", label: "Student" },
@@ -148,6 +148,12 @@ const USER_AVATAR_OPTIONS = {
       }
     }
   }
+};
+const USER_AVATAR_UNLOCK_LEVELS = {
+  peacock: 1,
+  monkey: 2,
+  rhino: 3,
+  bear: 4
 };
 const DEFAULT_USER_AVATAR = "peacock";
 
@@ -631,6 +637,21 @@ function userAvatarOption(value) {
   return USER_AVATAR_OPTIONS[resolveUserAvatarId(value)] || USER_AVATAR_OPTIONS[DEFAULT_USER_AVATAR];
 }
 
+function userAvatarUnlockLevel(avatarId) {
+  const selectedAvatarId = resolveUserAvatarId(avatarId);
+  return Number(USER_AVATAR_UNLOCK_LEVELS[selectedAvatarId] || 1);
+}
+
+function isUserAvatarUnlocked(avatarId, level) {
+  const currentLevel = Number(level) || levelMetaFromXp(state.progress.xp).level;
+  return currentLevel >= userAvatarUnlockLevel(avatarId);
+}
+
+function firstUnlockedUserAvatar(level) {
+  const ids = Object.keys(USER_AVATAR_OPTIONS);
+  return ids.find((avatarId) => isUserAvatarUnlocked(avatarId, level)) || DEFAULT_USER_AVATAR;
+}
+
 function avatarOutfitSelection(avatarId) {
   const selectedAvatarId = resolveUserAvatarId(avatarId);
   const stored = state.settings.avatarOutfits && typeof state.settings.avatarOutfits === "object"
@@ -741,6 +762,10 @@ function normalizeSettings() {
   state.settings.onboardingCompleted = Boolean(state.settings.onboardingCompleted);
   state.settings.profileName = state.settings.profileName || "Learner";
   state.settings.avatar = resolveUserAvatarId(state.settings.avatar);
+  const currentLevel = levelMetaFromXp(state.progress.xp).level;
+  if (!isUserAvatarUnlocked(state.settings.avatar, currentLevel)) {
+    state.settings.avatar = firstUnlockedUserAvatar(currentLevel);
+  }
   state.settings.avatarOutfits = state.settings.avatarOutfits && typeof state.settings.avatarOutfits === "object"
     ? { ...state.settings.avatarOutfits }
     : { monkey: "classic", rhino: "classic" };
@@ -2515,8 +2540,40 @@ function renderProfile() {
   const nextLevelCopy = xpToNextLevel === 0 ? "Max level reached" : `${xpToNextLevel} XP to next level`;
   const syncEndpoint = escapeHtmlAttr(state.settings.syncEndpoint || "");
   const syncToken = escapeHtmlAttr(state.settings.syncToken || "");
-  const activeAvatar = resolveUserAvatarId(state.settings.avatar);
+  const avatarChoices = Object.keys(USER_AVATAR_OPTIONS);
+  const activeAvatarValue = resolveUserAvatarId(state.settings.avatar);
+  const activeAvatar = isUserAvatarUnlocked(activeAvatarValue, currentLevel)
+    ? activeAvatarValue
+    : firstUnlockedUserAvatar(currentLevel);
+  if (activeAvatar !== activeAvatarValue) {
+    state.settings.avatar = activeAvatar;
+    updateHeaderControls();
+    persist();
+  }
   const activeAvatarOption = userAvatarAssets(activeAvatar);
+  const avatarProfileGallery = avatarChoices
+    .map((avatarId) => {
+      const option = userAvatarAssets(avatarId);
+      const unlocked = isUserAvatarUnlocked(avatarId, currentLevel);
+      const unlockLevel = userAvatarUnlockLevel(avatarId);
+      const lockBadge = unlocked ? "" : `<span class="avatar-lock">Lv ${unlockLevel}</span>`;
+      return `
+        <button
+          class="avatar-chip ${activeAvatar === avatarId ? "selected" : ""} ${unlocked ? "" : "locked"}"
+          data-action="profile-avatar-pick"
+          data-avatar="${avatarId}"
+          aria-label="Choose avatar ${option.label}${unlocked ? "" : `, unlocks at level ${unlockLevel}` }"
+          ${unlocked ? "" : "disabled"}
+        >
+          ${lockBadge}
+          <span class="animal-badge-image chip" aria-hidden="true">
+            <img src="${option.profileImage}" alt="${option.label} profile" loading="lazy" decoding="async" />
+          </span>
+          <span class="avatar-chip-name">${option.label}</span>
+        </button>
+      `;
+    })
+    .join("");
   const activeOutfitOptions = activeAvatar === "monkey"
     ? MONKEY_OUTFIT_OPTIONS
     : activeAvatar === "rhino"
@@ -2546,12 +2603,18 @@ function renderProfile() {
         <p class="meta">Update your display name and choose your avatar.</p>
         <label for="profile-name" class="meta">Display name</label>
         <input id="profile-name" class="input" value="${state.settings.profileName}" maxlength="30" aria-label="Display name" />
+        <p class="meta">Avatar Gallery (unlocks by level)</p>
+        <div class="avatar-grid profile-avatar-grid">${avatarProfileGallery}</div>
         <label for="profile-avatar-choice" class="meta">Avatar</label>
         <select id="profile-avatar-choice" class="input" aria-label="Avatar choice">
-          <option value="peacock" ${activeAvatar === "peacock" ? "selected" : ""}>Pavo the Peacock</option>
-          <option value="monkey" ${activeAvatar === "monkey" ? "selected" : ""}>Milo the Monkey</option>
-          <option value="bear" ${activeAvatar === "bear" ? "selected" : ""}>Balu the Bear</option>
-          <option value="rhino" ${activeAvatar === "rhino" ? "selected" : ""}>Rani the Rhino</option>
+          ${avatarChoices
+            .map((avatarId) => {
+              const option = userAvatarAssets(avatarId);
+              const unlocked = isUserAvatarUnlocked(avatarId, currentLevel);
+              const unlockLevel = userAvatarUnlockLevel(avatarId);
+              return `<option value="${avatarId}" ${activeAvatar === avatarId ? "selected" : ""} ${unlocked ? "" : "disabled"}>${option.label}${unlocked ? "" : ` (Unlock Lv ${unlockLevel})`}</option>`;
+            })
+            .join("")}
         </select>
         ${avatarOutfitSelector}
       </article>
@@ -3126,6 +3189,22 @@ async function onClick(event) {
   if (action === "onboarding-avatar") {
     state.onboarding.avatar = normalizeAvatarId(actionSource.dataset.avatar || state.onboarding.avatar);
     onboardingStepTemplate();
+    return;
+  }
+
+  if (action === "profile-avatar-pick") {
+    const avatarId = resolveUserAvatarId(actionSource.dataset.avatar || state.settings.avatar);
+    const currentLevel = levelMetaFromXp(state.progress.xp).level;
+    if (!isUserAvatarUnlocked(avatarId, currentLevel)) {
+      toast(`Unlocks at Level ${userAvatarUnlockLevel(avatarId)}`);
+      return;
+    }
+    state.settings.avatar = avatarId;
+    updateHeaderControls();
+    persist();
+    if (state.view === "profile") {
+      renderProfile();
+    }
     return;
   }
 
@@ -4062,7 +4141,14 @@ function onInput(event) {
   }
 
   if (target.id === "profile-avatar-choice") {
-    state.settings.avatar = resolveUserAvatarId(target.value);
+    const selectedAvatar = resolveUserAvatarId(target.value);
+    const currentLevel = levelMetaFromXp(state.progress.xp).level;
+    if (!isUserAvatarUnlocked(selectedAvatar, currentLevel)) {
+      toast(`Unlocks at Level ${userAvatarUnlockLevel(selectedAvatar)}`);
+      target.value = state.settings.avatar;
+      return;
+    }
+    state.settings.avatar = selectedAvatar;
     updateHeaderControls();
     persist();
     if (state.view === "profile") {
@@ -4215,7 +4301,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=203", { updateViaCache: "none" })
+      .register("sw.js?v=204", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.

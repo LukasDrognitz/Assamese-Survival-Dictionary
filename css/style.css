@@ -2388,6 +2388,10 @@ body.love-milestone-open .sidebar {
   cursor: pointer;
 }
 
+.profile-avatar-grid {
+  margin-bottom: 2px;
+}
+
 .avatar-chip-name {
   font-size: 0.7rem;
   font-weight: 600;
@@ -2939,6 +2943,10 @@ body.love-milestone-open .sidebar {
 .avatar-chip.locked {
   opacity: 0.6;
   filter: grayscale(0.18);
+}
+
+.avatar-chip:disabled {
+  cursor: not-allowed;
 }
 
 .avatar-chip .avatar-lock {
