@@ -93,7 +93,7 @@ const LEGACY_AVATAR_MAP = {
 };
 
 const AVATAR_META_BY_ID = Object.fromEntries(AVATAR_REWARDS.map((item) => [item.value, item]));
-const AVATAR_IMAGE_VERSION = "20260716-207";
+const AVATAR_IMAGE_VERSION = "20260716-208";
 const PEACOCK_OUTFIT_OPTIONS = [
   { value: "classic", label: "Classic" },
   { value: "professor", label: "Professor" }
@@ -108,6 +108,11 @@ const RHINO_OUTFIT_OPTIONS = [
   { value: "student", label: "Student" }
 ];
 const USER_AVATAR_OPTIONS = {
+  elephant: {
+    label: "Eli the Elephant",
+    avatarImage: `assets/images/avatars/eli_elephant_no_clothes_full_body_no_background.png?v=${AVATAR_IMAGE_VERSION}`,
+    profileImage: `assets/images/avatars/eli_elephant_no_clothes_profile_no_background.png?v=${AVATAR_IMAGE_VERSION}`
+  },
   peacock: {
     label: "Pavo the Peacock",
     avatarImage: `assets/images/avatars/peacock_no_outfit_high_quality_full_body_no_background.png?v=${AVATAR_IMAGE_VERSION}`,
@@ -164,6 +169,7 @@ const USER_AVATAR_OPTIONS = {
   }
 };
 const USER_AVATAR_UNLOCK_LEVELS = {
+  elephant: 1,
   peacock: 1,
   monkey: 2,
   rhino: 3,
@@ -4266,7 +4272,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=219", { updateViaCache: "none" })
+      .register("sw.js?v=220", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
