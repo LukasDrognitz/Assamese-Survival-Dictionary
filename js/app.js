@@ -44,7 +44,7 @@ import {
   selectLessonMatchingCard,
   startLessonWritingStage,
   submitLessonWritingAnswer
-} from "./lessons.js?v=20260715-07";
+} from "./lessons.js?v=20260716-08";
 import { updateSpacedRepetition, shuffleCards, renderFlashcard, renderFlashSummary } from "./flashcards.js?v=20260713-38";
 import { buildQuizQuestions, renderQuizView } from "./quiz.js?v=20260710-33";
 import {
@@ -93,7 +93,7 @@ const LEGACY_AVATAR_MAP = {
 };
 
 const AVATAR_META_BY_ID = Object.fromEntries(AVATAR_REWARDS.map((item) => [item.value, item]));
-const AVATAR_IMAGE_VERSION = "20260716-204";
+const AVATAR_IMAGE_VERSION = "20260716-205";
 const PEACOCK_OUTFIT_OPTIONS = [
   { value: "classic", label: "Classic" },
   { value: "professor", label: "Professor" }
@@ -3001,7 +3001,7 @@ function finishLessonLearningSession(lesson) {
     const unresolvedMistake = Boolean(session.unresolvedMistakesByWord?.[id]);
     const learned = entry.reviewCompleted
       && entry.matchingCorrectCount >= 1
-      && entry.writingCorrectCount >= 2
+      && entry.writingCorrectCount >= 1
       && !unresolvedMistake;
 
     entry.learned = learned;
@@ -3497,6 +3497,7 @@ async function onClick(event) {
     const result = selectLessonMatchingCard(session, side, cardId);
     if (!result?.changed) return;
     const wrongPairToken = !result.correct ? result?.wrongPair?.token : null;
+    const matchedCardIds = result.correct ? (result?.matchedCardIds || []) : [];
 
     if (result.resolved) {
       (result.wordIds || []).forEach((id) => {
@@ -3519,6 +3520,28 @@ async function onClick(event) {
     persist();
     renderLessons();
 
+    if (matchedCardIds.length) {
+      const hideToken = Date.now() + Math.random();
+      session.matching.vanishToken = hideToken;
+      window.setTimeout(() => {
+        const latestSession = state.lessonLearning.session;
+        const latestMatching = latestSession?.matching;
+        if (!latestSession || latestSession.stage !== "matching" || !latestMatching) return;
+        if (latestMatching.vanishToken !== hideToken) return;
+
+        const vanishingIds = new Set(latestMatching.vanishingCardIds || []);
+        if (!vanishingIds.size) return;
+
+        latestMatching.leftCards = latestMatching.leftCards.filter((card) => !vanishingIds.has(card.id));
+        latestMatching.rightCards = latestMatching.rightCards.filter((card) => !vanishingIds.has(card.id));
+        latestMatching.vanishingCardIds = [];
+
+        if (state.view === "lessons" && state.lessonsScreen === "detail") {
+          renderLessons();
+        }
+      }, 300);
+    }
+
     if (wrongPairToken) {
       window.setTimeout(() => {
         const latestSession = state.lessonLearning.session;
@@ -3539,7 +3562,7 @@ async function onClick(event) {
     const session = state.lessonLearning.session;
     if (!session || session.stage !== "matching" || !session.matching) return;
 
-    const totalPairs = session.matching.leftCards.length;
+    const totalPairs = Math.max(1, Number(session.matching.totalPairs) || session.matching.leftCards.length);
     const matchedPairs = session.matching.matchedWordIds.length;
     if (matchedPairs < totalPairs) return;
 
@@ -4310,7 +4333,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=216", { updateViaCache: "none" })
+      .register("sw.js?v=217", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.

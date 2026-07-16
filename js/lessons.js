@@ -266,7 +266,7 @@ export function lessonSessionProgressPercent(session) {
     ? (session.matching.matchedWordIds.length / total)
     : (session.stage === "review" ? 0 : 1);
 
-  const requiredWrites = Math.max(1, Number(session.writing?.requiredCorrectPerWord || 2));
+  const requiredWrites = Math.max(1, Number(session.writing?.requiredCorrectPerWord || 1));
   let writingScore = 0;
   if (session.writing) {
     writingScore = session.words.reduce((sum, item) => {
@@ -340,7 +340,9 @@ export function startLessonMatchingStage(session) {
     })),
     selectedLeftId: "",
     selectedRightId: "",
+    totalPairs: pairs.length,
     matchedWordIds: [],
+    vanishingCardIds: [],
     wrongPair: null,
     feedback: {
       tone: "neutral",
@@ -377,6 +379,7 @@ export function selectLessonMatchingCard(session, side, cardId) {
 
   if (left.wordId === right.wordId) {
     matching.matchedWordIds.push(left.wordId);
+    matching.vanishingCardIds = Array.from(new Set([...(matching.vanishingCardIds || []), left.id, right.id]));
     matching.selectedLeftId = "";
     matching.selectedRightId = "";
     matching.feedback = {
@@ -389,7 +392,8 @@ export function selectLessonMatchingCard(session, side, cardId) {
       resolved: true,
       correct: true,
       wordIds: [left.wordId],
-      completed: matching.matchedWordIds.length === matching.leftCards.length
+      matchedCardIds: [left.id, right.id],
+      completed: matching.matchedWordIds.length === Math.max(1, Number(matching.totalPairs) || matching.leftCards.length)
     };
   }
 
@@ -422,7 +426,7 @@ export function startLessonWritingStage(session) {
 
   session.stage = "writing";
   session.writing = {
-    requiredCorrectPerWord: 2,
+    requiredCorrectPerWord: 1,
     queue,
     currentWordId: queue.shift() || "",
     passCounts: ids.reduce((acc, id) => {
@@ -518,8 +522,9 @@ function renderLessonMatchingDetail(lesson, session) {
   const matching = session?.matching;
   if (!matching) return "";
   const matchedIds = new Set(matching.matchedWordIds || []);
+  const vanishingIds = new Set(matching.vanishingCardIds || []);
   const wrongPair = matching.wrongPair || { leftId: "", rightId: "" };
-  const totalPairs = Math.max(1, matching.leftCards.length);
+  const totalPairs = Math.max(1, Number(matching.totalPairs) || matching.leftCards.length);
   const matchedCount = matchedIds.size;
   const completed = matchedCount >= totalPairs;
   const feedbackTone = matching.feedback.tone || "neutral";
@@ -532,7 +537,7 @@ function renderLessonMatchingDetail(lesson, session) {
         wrong: wrongPair.leftId === card.id
       });
       return `
-        <button class="lesson-match-card ${cardClass}" data-action="lesson-match-select" data-side="left" data-card-id="${card.id}" ${matchedIds.has(card.wordId) ? "disabled" : ""}>${escapeHtml(card.label)}</button>
+        <button class="lesson-match-card ${cardClass} ${vanishingIds.has(card.id) ? "vanishing" : ""}" data-action="lesson-match-select" data-side="left" data-card-id="${card.id}" ${matchedIds.has(card.wordId) || vanishingIds.has(card.id) ? "disabled" : ""}>${escapeHtml(card.label)}</button>
       `;
     })
     .join("");
@@ -545,7 +550,7 @@ function renderLessonMatchingDetail(lesson, session) {
         wrong: wrongPair.rightId === card.id
       });
       return `
-        <button class="lesson-match-card ${cardClass}" data-action="lesson-match-select" data-side="right" data-card-id="${card.id}" ${matchedIds.has(card.wordId) ? "disabled" : ""}>${escapeHtml(card.label)}</button>
+        <button class="lesson-match-card ${cardClass} ${vanishingIds.has(card.id) ? "vanishing" : ""}" data-action="lesson-match-select" data-side="right" data-card-id="${card.id}" ${matchedIds.has(card.wordId) || vanishingIds.has(card.id) ? "disabled" : ""}>${escapeHtml(card.label)}</button>
       `;
     })
     .join("");
@@ -554,7 +559,7 @@ function renderLessonMatchingDetail(lesson, session) {
     <article class="card lesson-detail-card lesson-learning-card">
       ${renderLessonSessionHeader(session, `${lesson.icon} ${lesson.title} · Step 2: Match`)}
       <div class="lesson-match-description">
-        <p class="meta">Cards stay available until you find the correct pair.</p>
+        <p class="meta">Correct pairs vanish automatically after matching.</p>
       </div>
       <div class="row lesson-match-meta" style="flex-wrap: wrap;">
         <span class="pill lesson-match-counter">${matchedCount}/${totalPairs} pairs</span>
@@ -580,7 +585,7 @@ function renderLessonWritingDetail(lesson, session) {
 
   const currentWord = session.words.find((item) => String(item.id) === String(writing.currentWordId)) || null;
   const payload = currentWord ? lessonWordPayload(currentWord) : null;
-  const required = Math.max(1, Number(writing.requiredCorrectPerWord) || 2);
+  const required = Math.max(1, Number(writing.requiredCorrectPerWord) || 1);
   const score = session.words.reduce((sum, item) => {
     const count = Math.max(0, Number(writing.passCounts[String(item.id)]) || 0);
     return sum + Math.min(required, count);
@@ -592,7 +597,7 @@ function renderLessonWritingDetail(lesson, session) {
       ${renderLessonSessionHeader(session, `${lesson.icon} ${lesson.title} · Step 3: Write`)}
       <div class="row" style="flex-wrap:wrap; align-items:center;">
         <p class="meta">Typed mastery: ${score}/${scoreTotal}</p>
-        <span class="pill">Need ${required} correct per word</span>
+        <span class="pill">Need ${required} correct answer per word</span>
       </div>
       <div class="lesson-writing-prompt">
         <p class="meta">Translate this Assamese prompt:</p>
