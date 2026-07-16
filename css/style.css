@@ -4439,6 +4439,16 @@ body.love-milestone-open .sidebar {
   display: block;
 }
 
+.animal-badge-image.animal-monkey img {
+  transform: scale(1.18);
+  transform-origin: center;
+}
+
+.profile-avatar-image.avatar-image-monkey {
+  transform: scale(1.18);
+  transform-origin: center;
+}
+
 .avatar-animal.avatar-portrait {
   overflow: hidden;
   border-radius: 50%;
