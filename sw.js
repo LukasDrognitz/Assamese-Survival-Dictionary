@@ -1,10 +1,10 @@
-const CACHE_NAME = "assamese-survival-dictionary-v199";
+const CACHE_NAME = "assamese-survival-dictionary-v200";
 
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./css/style.css?v=20260715-104",
-  "./js/app.js?v=20260715-187",
+  "./css/style.css?v=20260716-188",
+  "./js/app.js?v=20260716-188",
   "./js/dictionary.js?v=20260710-45",
   "./js/lessons.js?v=20260715-07",
   "./js/flashcards.js?v=20260713-38",
@@ -31,20 +31,20 @@ const APP_SHELL = [
   "./assets/images/avatars/nilgai.svg",
   "./assets/images/avatars/fox.svg",
   "./assets/images/avatars/langur.svg",
-  "./assets/images/avatars/Peacock.png?v=20260715-187",
-  "./assets/images/avatars/Peacock_Profile.png?v=20260715-187",
-  "./assets/images/avatars/Monkey.png?v=20260715-187",
-  "./assets/images/avatars/Monkey_Profile.png?v=20260715-187",
-  "./assets/images/avatars/langur_monkey_clothed_same_style_full_body.png?v=20260715-187",
-  "./assets/images/avatars/langur_monkey_clothed_same_style_profile.png?v=20260715-187",
-  "./assets/images/avatars/langur_monkey_high_quality_same_style_full_body_no_background.png?v=20260715-187",
-  "./assets/images/avatars/langur_monkey_high_quality_same_style_profile_no_background.png?v=20260715-187",
-  "./assets/images/avatars/Bear.png?v=20260715-187",
-  "./assets/images/avatars/Bear_Profile.png?v=20260715-187",
-  "./assets/images/avatars/Rhino.png?v=20260715-187",
-  "./assets/images/avatars/rani_rhino_one_horn_full_body.png?v=20260715-187",
-  "./assets/images/avatars/rani_rhino_one_horn_clothed_full_body.png?v=20260715-187",
-  "./assets/images/avatars/rani_rhino_one_horn_clothed_profile.png?v=20260715-187",
+  "./assets/images/avatars/Peacock.png?v=20260716-188",
+  "./assets/images/avatars/Peacock_Profile.png?v=20260716-188",
+  "./assets/images/avatars/Monkey.png?v=20260716-188",
+  "./assets/images/avatars/Monkey_Profile.png?v=20260716-188",
+  "./assets/images/avatars/langur_monkey_clothed_same_style_full_body.png?v=20260716-188",
+  "./assets/images/avatars/langur_monkey_clothed_same_style_profile.png?v=20260716-188",
+  "./assets/images/avatars/langur_monkey_high_quality_same_style_full_body_no_background.png?v=20260716-188",
+  "./assets/images/avatars/langur_monkey_high_quality_same_style_profile_no_background.png?v=20260716-188",
+  "./assets/images/avatars/Bear.png?v=20260716-188",
+  "./assets/images/avatars/Bear_Profile.png?v=20260716-188",
+  "./assets/images/avatars/Rhino.png?v=20260716-188",
+  "./assets/images/avatars/rani_rhino_one_horn_full_body.png?v=20260716-188",
+  "./assets/images/avatars/rani_rhino_one_horn_clothed_full_body.png?v=20260716-188",
+  "./assets/images/avatars/rani_rhino_one_horn_clothed_profile.png?v=20260716-188",
   "./assets/vendor/chart.umd.min.js"
 ];
 
