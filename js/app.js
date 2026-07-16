@@ -106,7 +106,7 @@ const RHINO_OUTFIT_OPTIONS = [
 const USER_AVATAR_OPTIONS = {
   peacock: {
     label: "Pavo the Peacock",
-    avatarImage: `assets/images/avatars/Peacock.png?v=${AVATAR_IMAGE_VERSION}`,
+    avatarImage: `assets/images/avatars/peacock_no_outfit_high_quality_full_body_no_background.png?v=${AVATAR_IMAGE_VERSION}`,
     profileImage: `assets/images/avatars/Peacock_Profile.png?v=${AVATAR_IMAGE_VERSION}`
   },
   monkey: {

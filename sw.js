@@ -31,7 +31,7 @@ const APP_SHELL = [
   "./assets/images/avatars/nilgai.svg",
   "./assets/images/avatars/fox.svg",
   "./assets/images/avatars/langur.svg",
-  "./assets/images/avatars/Peacock.png?v=20260716-188",
+  "./assets/images/avatars/peacock_no_outfit_high_quality_full_body_no_background.png?v=20260716-188",
   "./assets/images/avatars/Peacock_Profile.png?v=20260716-188",
   "./assets/images/avatars/Monkey.png?v=20260716-188",
   "./assets/images/avatars/Monkey_Profile.png?v=20260716-188",
