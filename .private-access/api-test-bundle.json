@@ -1,0 +1,41 @@
+﻿{
+  "progress": {
+    "xp": 0,
+    "streak": 0,
+    "longestStreak": 0,
+    "wordsLearned": [],
+    "lessonsCompleted": [],
+    "quizAttempts": 0,
+    "quizCorrect": 0,
+    "dailyGoal": {
+      "targetWords": 5,
+      "learnedWords": 0,
+      "flashcardsTarget": 10,
+      "flashcardsDone": 0,
+      "lessonsTarget": 1,
+      "lessonsDone": 0,
+      "quizTarget": 1,
+      "quizDone": 0,
+      "date": "2026-07-10"
+    },
+    "spacedRepetition": {},
+    "achievements": [],
+    "activity": []
+  },
+  "settings": {
+    "theme": "light",
+    "animations": true,
+    "audio": true,
+    "notifications": false,
+    "onboardingCompleted": true,
+    "profileName": "Learner",
+    "avatar": "🦜"
+  },
+  "favorites": { "words": [], "sentences": [], "lessons": [] },
+  "history": [],
+  "search": [],
+  "recentWords": [],
+  "customWords": [],
+  "dictionaryMutations": { "overrides": {}, "deleted": [] },
+  "exportedAt": "2026-07-10T12:31:00.000Z"
+}

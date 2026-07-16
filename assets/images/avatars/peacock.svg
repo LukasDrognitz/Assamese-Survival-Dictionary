@@ -1,42 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Peacock character sheet">
-  <defs>
-    <radialGradient id="bg" cx="34%" cy="28%" r="72%">
-      <stop offset="0%" stop-color="#bde1f4"/>
-      <stop offset="100%" stop-color="#77b2da"/>
-    </radialGradient>
-    <radialGradient id="feather" cx="35%" cy="26%" r="72%">
-      <stop offset="0%" stop-color="#19a0ee"/>
-      <stop offset="100%" stop-color="#0a5ea9"/>
-    </radialGradient>
-    <linearGradient id="cape" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#2a8e4e"/>
-      <stop offset="100%" stop-color="#1b6a39"/>
-    </linearGradient>
-  </defs>
-  <circle cx="512" cy="512" r="496" fill="url(#bg)"/>
-  <circle cx="512" cy="512" r="490" fill="none" stroke="#ffffff" stroke-opacity="0.34" stroke-width="12"/>
-  <ellipse cx="512" cy="804" rx="222" ry="160" fill="url(#cape)"/>
-  <ellipse cx="512" cy="504" rx="214" ry="258" fill="url(#feather)"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-label="Peacock character sheet">
+  <title>Peacock character sheet</title>
+  <desc>Full body and profile peacock images.</desc>
 
-  <ellipse cx="466" cy="358" rx="18" ry="98" fill="#0f4f8e" transform="rotate(-18 466 358)"/>
-  <ellipse cx="558" cy="358" rx="18" ry="98" fill="#0f4f8e" transform="rotate(18 558 358)"/>
-  <ellipse cx="512" cy="338" rx="18" ry="108" fill="#0f4f8e"/>
-  <circle cx="454" cy="262" r="28" fill="#1f6fc0"/>
-  <circle cx="570" cy="262" r="28" fill="#1f6fc0"/>
-  <circle cx="512" cy="228" r="28" fill="#1f6fc0"/>
-
-  <ellipse cx="426" cy="490" rx="52" ry="62" fill="#ffffff"/>
-  <ellipse cx="598" cy="490" rx="52" ry="62" fill="#ffffff"/>
-  <circle cx="426" cy="502" r="28" fill="#1f2a38"/>
-  <circle cx="598" cy="502" r="28" fill="#1f2a38"/>
-  <circle cx="414" cy="486" r="10" fill="#ffffff"/>
-  <circle cx="586" cy="486" r="10" fill="#ffffff"/>
-  <path d="M470 594h84l-42 62z" fill="#f2bd4e"/>
-  <path d="M456 678q56 44 112 0" fill="none" stroke="#8b4522" stroke-width="18" stroke-linecap="round"/>
-
-  <ellipse cx="778" cy="612" rx="120" ry="96" fill="#2e8f4f"/>
-  <circle cx="724" cy="602" r="38" fill="#1f6fb0"/>
-  <circle cx="724" cy="602" r="18" fill="#f2c548"/>
-  <circle cx="816" cy="628" r="34" fill="#1f6fb0"/>
-  <circle cx="816" cy="628" r="16" fill="#f2c548"/>
+  <image href="./Peacock.png" x="40" y="40" width="760" height="820" preserveAspectRatio="xMidYMid meet"/>
+  <image href="./Peacock_Profile.png" x="860" y="120" width="700" height="700" preserveAspectRatio="xMidYMid meet"/>
 </svg>
