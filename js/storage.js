@@ -58,6 +58,7 @@ const DEFAULT_SETTINGS = {
   profileName: "Learner",
   avatar: "peacock",
   avatarOutfits: {
+    peacock: "classic",
     monkey: "classic",
     rhino: "classic"
   },

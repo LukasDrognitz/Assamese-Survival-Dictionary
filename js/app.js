@@ -93,7 +93,11 @@ const LEGACY_AVATAR_MAP = {
 };
 
 const AVATAR_META_BY_ID = Object.fromEntries(AVATAR_REWARDS.map((item) => [item.value, item]));
-const AVATAR_IMAGE_VERSION = "20260716-198";
+const AVATAR_IMAGE_VERSION = "20260716-199";
+const PEACOCK_OUTFIT_OPTIONS = [
+  { value: "classic", label: "Classic" },
+  { value: "professor", label: "Professor" }
+];
 const MONKEY_OUTFIT_OPTIONS = [
   { value: "classic", label: "Classic" },
   { value: "student", label: "Student" },
@@ -107,7 +111,17 @@ const USER_AVATAR_OPTIONS = {
   peacock: {
     label: "Pavo the Peacock",
     avatarImage: `assets/images/avatars/peacock_no_outfit_high_quality_full_body_no_background.png?v=${AVATAR_IMAGE_VERSION}`,
-    profileImage: `assets/images/avatars/Peacock_Profile.png?v=${AVATAR_IMAGE_VERSION}`
+    profileImage: `assets/images/avatars/Peacock_Profile.png?v=${AVATAR_IMAGE_VERSION}`,
+    outfits: {
+      classic: {
+        avatarImage: `assets/images/avatars/peacock_no_outfit_high_quality_full_body_no_background.png?v=${AVATAR_IMAGE_VERSION}`,
+        profileImage: `assets/images/avatars/Peacock_Profile.png?v=${AVATAR_IMAGE_VERSION}`
+      },
+      professor: {
+        avatarImage: `assets/images/avatars/peacock_professor_full_body_no_background.png?v=${AVATAR_IMAGE_VERSION}`,
+        profileImage: `assets/images/avatars/peacock_professor_profile_no_background.png?v=${AVATAR_IMAGE_VERSION}`
+      }
+    }
   },
   monkey: {
     label: "Milo the Monkey",
@@ -658,6 +672,10 @@ function avatarOutfitSelection(avatarId) {
     ? state.settings.avatarOutfits
     : {};
 
+  if (selectedAvatarId === "peacock") {
+    return stored.peacock === "professor" ? "professor" : "classic";
+  }
+
   if (selectedAvatarId === "monkey") {
     return ["classic", "student", "explorer"].includes(stored.monkey) ? stored.monkey : "classic";
   }
@@ -674,6 +692,10 @@ function setAvatarOutfitSelection(avatarId, outfit) {
   const nextOutfits = state.settings.avatarOutfits && typeof state.settings.avatarOutfits === "object"
     ? { ...state.settings.avatarOutfits }
     : {};
+
+  if (selectedAvatarId === "peacock") {
+    nextOutfits.peacock = outfit === "professor" ? "professor" : "classic";
+  }
 
   if (selectedAvatarId === "monkey") {
     nextOutfits.monkey = ["classic", "student", "explorer"].includes(outfit) ? outfit : "classic";
@@ -768,7 +790,8 @@ function normalizeSettings() {
   }
   state.settings.avatarOutfits = state.settings.avatarOutfits && typeof state.settings.avatarOutfits === "object"
     ? { ...state.settings.avatarOutfits }
-    : { monkey: "classic", rhino: "classic" };
+    : { peacock: "classic", monkey: "classic", rhino: "classic" };
+  state.settings.avatarOutfits.peacock = state.settings.avatarOutfits.peacock === "professor" ? "professor" : "classic";
   state.settings.avatarOutfits.monkey = ["classic", "student", "explorer"].includes(state.settings.avatarOutfits.monkey)
     ? state.settings.avatarOutfits.monkey
     : "classic";
@@ -2578,7 +2601,9 @@ function renderProfile() {
       `;
     })
     .join("");
-  const activeOutfitOptions = activeAvatar === "monkey"
+  const activeOutfitOptions = activeAvatar === "peacock"
+    ? PEACOCK_OUTFIT_OPTIONS
+    : activeAvatar === "monkey"
     ? MONKEY_OUTFIT_OPTIONS
     : activeAvatar === "rhino"
       ? RHINO_OUTFIT_OPTIONS
@@ -4285,7 +4310,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=210", { updateViaCache: "none" })
+      .register("sw.js?v=211", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
