@@ -93,7 +93,7 @@ const LEGACY_AVATAR_MAP = {
 };
 
 const AVATAR_META_BY_ID = Object.fromEntries(AVATAR_REWARDS.map((item) => [item.value, item]));
-const AVATAR_IMAGE_VERSION = "20260716-208";
+const AVATAR_IMAGE_VERSION = "20260722-209";
 const PEACOCK_OUTFIT_OPTIONS = [
   { value: "classic", label: "Classic" },
   { value: "professor", label: "Professor" }
@@ -1458,11 +1458,17 @@ function onboardingStepTemplate() {
 
   if (step === 2) {
     const currentLevel = levelMetaFromXp(state.progress.xp).level;
-    const avatarButtons = unlockedAvatars(currentLevel)
+    const avatarButtons = Object.keys(USER_AVATAR_OPTIONS)
+      .filter((avatarId) => isUserAvatarUnlocked(avatarId, currentLevel))
+      .sort((a, b) => {
+        const unlockDiff = userAvatarUnlockLevel(a) - userAvatarUnlockLevel(b);
+        if (unlockDiff !== 0) return unlockDiff;
+        return avatarDisplayName(a).localeCompare(avatarDisplayName(b));
+      })
       .map(
         (avatar) => {
-          const meta = avatarMeta(avatar);
-          return `<button class="avatar-chip ${state.onboarding.avatar === avatar ? "selected" : ""}" data-action="onboarding-avatar" data-avatar="${avatar}" aria-label="Choose avatar ${meta.label}">${renderAnimalBadge(avatar, "chip")}<span class="avatar-chip-name">${meta.label}</span></button>`;
+          const label = avatarDisplayName(avatar);
+          return `<button class="avatar-chip ${state.onboarding.avatar === avatar ? "selected" : ""}" data-action="onboarding-avatar" data-avatar="${avatar}" aria-label="Choose avatar ${label}">${renderAnimalBadge(avatar, "chip")}<span class="avatar-chip-name">${label}</span></button>`;
         }
       )
       .join("");
@@ -1527,7 +1533,7 @@ function finishOnboarding() {
   const dailyXp = Math.max(20, Math.min(5000, Number(state.onboarding.dailyXpTarget) || 120));
 
   state.settings.profileName = cleanName;
-  state.settings.avatar = resolveUserAvatarId(state.settings.avatar || state.onboarding.avatar);
+  state.settings.avatar = resolveUserAvatarId(state.onboarding.avatar || state.settings.avatar);
   state.settings.theme = state.onboarding.preferredTheme;
   state.settings.onboardingCompleted = true;
 
@@ -4272,7 +4278,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=220", { updateViaCache: "none" })
+      .register("sw.js?v=221", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
