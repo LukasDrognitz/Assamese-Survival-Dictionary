@@ -28,7 +28,8 @@ export function buildQuizQuestions(words, size = 10, mode = "mixed") {
       return {
         id: `q-${word.id}-${idx}-en`,
         kind: "translate-english",
-        prompt: `Translate to English: ${word.assamese}`,
+        instruction: "Translate to English",
+        prompt: word.assamese,
         answer: word.english,
         options: uniqueOptions(word.english, englishPool)
       };
@@ -37,7 +38,8 @@ export function buildQuizQuestions(words, size = 10, mode = "mixed") {
     return {
       id: `q-${word.id}-${idx}-as`,
       kind: "translate-assamese",
-      prompt: `Translate to Assamese: ${word.english}`,
+      instruction: "",
+      prompt: word.english,
       answer: word.assamese,
       options: uniqueOptions(word.assamese, assamesePool)
     };
@@ -137,7 +139,8 @@ export function renderQuizView({ question, total, score, answered, selected, sho
       <h3>Quiz Challenge</h3>
       <p class="quiz-meta">Mode: ${modeLabel}</p>
       <p class="quiz-meta">Score: ${score}/${total}</p>
-      <h4>${question.prompt}</h4>
+      ${question.instruction ? `<p class="quiz-instruction">${question.instruction}</p>` : ""}
+      <h4 class="quiz-prompt">${question.prompt}</h4>
       <div class="grid">${optionsHtml}</div>
       <div class="row">
         <button class="btn ghost" data-action="quiz-restart">Restart</button>

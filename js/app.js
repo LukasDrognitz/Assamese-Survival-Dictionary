@@ -46,7 +46,7 @@ import {
   submitLessonWritingAnswer
 } from "./lessons.js?v=20260716-08";
 import { updateSpacedRepetition, shuffleCards, renderFlashcard, renderFlashSummary } from "./flashcards.js?v=20260713-38";
-import { buildQuizQuestions, renderQuizView } from "./quiz.js?v=20260710-33";
+import { buildQuizQuestions, renderQuizView } from "./quiz.js?v=20260911-223";
 import {
   NAV_ITEMS,
   renderNavigation,
@@ -445,7 +445,7 @@ const CONVERSATION_TOPICS = {
 const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
 const LOVE_MILESTONE_STEP_XP = 2110;
 const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
-const APP_BUILD_VERSION = "20260911-222";
+const APP_BUILD_VERSION = "20260911-223";
 const CHEST_OPEN_ANIMATION_MS = 1050;
 
 function customDictionaryEntryCount() {
@@ -3921,7 +3921,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=222", { updateViaCache: "none" })
+      .register("sw.js?v=223", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.
