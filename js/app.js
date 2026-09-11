@@ -445,7 +445,7 @@ const CONVERSATION_TOPICS = {
 const START_SCREEN_SESSION_KEY = "assamese-app-start-screen-seen";
 const LOVE_MILESTONE_STEP_XP = 2110;
 const LOVE_MILESTONE_MESSAGE = "Candles may fade and cake will be gone but my love for you burns brightly forever strong!";
-const APP_BUILD_VERSION = "20260716-188";
+const APP_BUILD_VERSION = "20260911-222";
 const CHEST_OPEN_ANIMATION_MS = 1050;
 
 function customDictionaryEntryCount() {
@@ -504,8 +504,6 @@ function ensureAvatarSheetSelections() {
   state.progress.avatarSheetSelections = stored;
   return stored;
 }
-
-let chatPinIntervalId = null;
 
 const state = {
   view: "home",
@@ -569,27 +567,6 @@ const state = {
     showSummary: false,
     mode: "",
     setupStage: "mode"
-  },
-  chat: [
-    {
-      who: "bot",
-      text: "Nomoskar!",
-      translation: "Hello"
-    }
-  ],
-  chatSession: {
-    topicId: "",
-    isStarted: false,
-    isStopped: false,
-    stage: "idle",
-    currentQuestionId: "",
-    answerOptions: [],
-    askOptions: [],
-    turn: 0,
-    introducedEntryIds: [],
-    recentEntryIds: [],
-    lastExplainedEntryId: "",
-    lastUserText: ""
   },
   progress: getProgress(),
   settings: getSettings(),
@@ -1637,8 +1614,7 @@ function buildQuickCards() {
     { id: "lessons", title: "Lessons", subtitle: "Scenario based units", icon: navIconById.lessons || "📚" },
     { id: "dictionary", title: "Dictionary", subtitle: "Search full vocabulary", icon: navIconById.dictionary || "📖" },
     { id: "flashcards", title: "Flashcards", subtitle: "Spaced repetition", icon: navIconById.practice || "🧠" },
-    { id: "quiz", title: "Quiz", subtitle: "Challenge mode", icon: navIconById.practice || "🧠" },
-    { id: "conversation", title: "Conversation", subtitle: "Chat practice", icon: navIconById.practice || "🧠" }
+    { id: "quiz", title: "Quiz", subtitle: "Challenge mode", icon: navIconById.practice || "🧠" }
   ];
 }
 
@@ -2237,86 +2213,6 @@ function ensureFlashDeck() {
   resetFlashSession(deck);
 }
 
-function renderConversationPanel() {
-  if (state.chatSession.isStopped) {
-    return `
-      <article class="card grid" style="justify-items:center; text-align:center; gap:12px;">
-        <h3>Conversation Practice</h3>
-        <img src="assets/images/Come back soon.png" alt="Tutor in a flower garden" style="display:block; margin:0 auto; width:min(170px, 45vw); height:auto;" />
-        <p style="max-width:560px;">See you soon! I'll be relaxing in my mom's garden while I wait for you. The chrysanthemums are in bloom and smell amazing!</p>
-        <button class="btn accent" data-action="chat-start">Start Again</button>
-      </article>
-    `;
-  }
-
-  if (!state.chatSession.isStarted) {
-    return `
-      <article class="card grid" style="justify-items:center; text-align:center; gap:12px;">
-        <h3>Conversation Practice</h3>
-        <img src="assets/images/Tutor.png" alt="Conversation tutor" style="width:min(280px, 70vw); height:auto;" />
-        <p style="max-width:540px;">👋 Hey there! Think you're ready? Hit Start and let's have a conversation. Let's see what you already know!</p>
-        <button class="btn accent" data-action="chat-start">Start</button>
-      </article>
-    `;
-  }
-
-  const bubbles = state.chat
-    .map(
-      (msg) => `
-      <div class="chat-bubble ${msg.who}">
-        <p>${msg.text}</p>
-      </div>
-    `
-    )
-    .join("");
-
-  const answerOptionButtons = (state.chatSession.answerOptions || [])
-    .map((entryId) => getDictionaryEntryById(entryId))
-    .filter(Boolean)
-    .map((entry) => `
-      <button class="btn ghost" data-action="chat-answer-option" data-entry-id="${entry.id}" style="text-align:left; display:block; width:100%;">
-        <strong>${entry.assamese}</strong>
-      </button>
-    `)
-    .join("");
-
-  const askOptionButtons = (state.chatSession.askOptions || [])
-    .map((entryId) => getDictionaryEntryById(entryId))
-    .filter(Boolean)
-    .map((entry) => `
-      <button class="btn ghost" data-action="chat-ask-option" data-entry-id="${entry.id}" style="text-align:left; display:block; width:100%;">
-        <strong>${entry.assamese}</strong>
-      </button>
-    `)
-    .join("");
-
-  const controls = state.chatSession.stage === "answer"
-    ? `
-      <div class="grid" style="gap:8px;">
-        <p class="meta">Choose the best Assamese answer:</p>
-        ${answerOptionButtons}
-      </div>
-    `
-    : `
-      <div class="grid" style="gap:8px;">
-        <p class="meta">Now choose one question to ask the tutor:</p>
-        ${askOptionButtons}
-      </div>
-    `;
-
-  return `
-    <article class="card grid">
-      <h3>Conversation Practice</h3>
-      <div class="chat-panel" id="chat-panel">${bubbles}</div>
-      ${controls}
-      <div class="row" style="justify-content:flex-end; flex-wrap:wrap; gap:8px;">
-        <button class="btn ghost" data-action="chat-stop">Stop Conversation</button>
-      </div>
-      <p class="meta">Only Assamese phrases are shown in this mode.</p>
-    </article>
-  `;
-}
-
 function renderQuizModeControls() {
   const mode = ["english-to-assamese", "assamese-to-english", "mixed"].includes(state.quiz.mode)
     ? state.quiz.mode
@@ -2375,7 +2271,6 @@ function renderPractice() {
         <div class="row" style="flex-wrap: wrap;">
           <button class="btn ${state.practiceTab === "flashcards" ? "primary" : "ghost"}" data-action="practice-tab" data-tab="flashcards">Flashcards</button>
           <button class="btn ${state.practiceTab === "quiz" ? "primary" : "ghost"}" data-action="practice-tab" data-tab="quiz">Quiz</button>
-          <button class="btn ${state.practiceTab === "conversation" ? "primary" : "ghost"}" data-action="practice-tab" data-tab="conversation">Conversation</button>
         </div>
       </article>
       ${
@@ -2424,41 +2319,8 @@ function renderPractice() {
               })
           : ""
       }
-      ${state.practiceTab === "conversation" ? renderConversationPanel() : ""}
     </section>
   `;
-
-  const pinConversationToLatest = () => {
-    const chatPanel = document.getElementById("chat-panel");
-    if (!chatPanel) return;
-    chatPanel.style.overflowAnchor = "none";
-    chatPanel.scrollTop = chatPanel.scrollHeight;
-    const lastBubble = chatPanel.querySelector(".chat-bubble:last-child");
-    if (lastBubble && typeof lastBubble.scrollIntoView === "function") {
-      lastBubble.scrollIntoView({ block: "end" });
-    }
-  };
-
-  if (chatPinIntervalId) {
-    clearInterval(chatPinIntervalId);
-    chatPinIntervalId = null;
-  }
-
-  if (state.practiceTab === "conversation") {
-    pinConversationToLatest();
-    requestAnimationFrame(pinConversationToLatest);
-    [0, 50, 120, 250, 400, 600, 900].forEach((delay) => setTimeout(pinConversationToLatest, delay));
-
-    const startedAt = Date.now();
-    chatPinIntervalId = setInterval(() => {
-      if (Date.now() - startedAt > 3000 || state.practiceTab !== "conversation") {
-        clearInterval(chatPinIntervalId);
-        chatPinIntervalId = null;
-        return;
-      }
-      pinConversationToLatest();
-    }, 100);
-  }
 }
 
 function renderAchievements() {
@@ -2624,7 +2486,6 @@ function renderProfile() {
             <li><span>Flashcard review</span><strong>+4 XP</strong></li>
             <li><span>Correct quiz answer</span><strong>+8 XP</strong></li>
             <li><span>Finish a quiz</span><strong>+20 XP</strong></li>
-            <li><span>Conversation message</span><strong>+2 XP</strong></li>
           </ul>
         </div>
       </details>
@@ -2718,151 +2579,6 @@ function toggleFavoriteWord(id) {
   const index = list.indexOf(id);
   if (index >= 0) list.splice(index, 1);
   else list.push(id);
-}
-
-function normalizeChatText(text) {
-  return String(text || "").trim().toLowerCase();
-}
-
-function getDictionaryEntryById(entryId) {
-  return state.dictionary.find((entry) => String(entry.id) === String(entryId)) || null;
-}
-
-function getDictionaryEntryByEnglish(englishText) {
-  const wanted = normalizeChatText(englishText);
-  return state.dictionary.find((entry) => normalizeChatText(entry.english) === wanted) || null;
-}
-
-function getDictionaryEntryByAssamese(assameseText) {
-  const wanted = normalizeChatText(assameseText);
-  return state.dictionary.find((entry) => normalizeChatText(entry.assamese) === wanted) || null;
-}
-
-function getQuestionEntries() {
-  return state.dictionary.filter((entry) => {
-    const as = String(entry?.assamese || "").trim();
-    const en = String(entry?.english || "").trim();
-    return as.includes("?") || en.includes("?");
-  });
-}
-
-function pushChatEntry(who, entry, translationOverride = "") {
-  if (!entry) return;
-  const translation = translationOverride || String(entry.english || "").trim();
-  state.chat.push({
-    who,
-    text: String(entry.assamese || "").trim(),
-    translation
-  });
-}
-
-function pickUniqueEntries(entries, maxCount = 4) {
-  const seen = new Set();
-  const picked = [];
-  entries.forEach((entry) => {
-    if (!entry) return;
-    const id = String(entry.id);
-    if (seen.has(id)) return;
-    seen.add(id);
-    picked.push(entry);
-  });
-  return picked.slice(0, maxCount);
-}
-
-function buildGuidedConversationRound(turn) {
-  const howAreYou = getDictionaryEntryByEnglish("How are you?");
-  const iAmFine = getDictionaryEntryByEnglish("I am fine");
-  const whereFrom = getDictionaryEntryByEnglish("Where are you from?");
-  const iLiveIn = getDictionaryEntryByEnglish("I live in...");
-  const hello = getDictionaryEntryByEnglish("Hello") || getDictionaryEntryByAssamese("Nomoskar");
-  const thankYou = getDictionaryEntryByEnglish("Thank you");
-
-  const templates = [
-    {
-      question: howAreYou,
-      correctAnswer: iAmFine,
-      distractors: [hello, thankYou, iLiveIn]
-    },
-    {
-      question: whereFrom,
-      correctAnswer: iLiveIn,
-      distractors: [iAmFine, hello, thankYou]
-    }
-  ].filter((template) => template.question && template.correctAnswer);
-
-  const fallbackQuestion = getQuestionEntries()[0] || state.dictionary[0] || null;
-  const fallbackAnswer = state.dictionary.find((entry) => String(entry.assamese || "").trim()) || fallbackQuestion;
-  const activeTemplate = templates.length ? templates[turn % templates.length] : {
-    question: fallbackQuestion,
-    correctAnswer: fallbackAnswer,
-    distractors: state.dictionary.slice(0, 6)
-  };
-
-  const answerOptions = pickUniqueEntries([
-    activeTemplate.correctAnswer,
-    ...(activeTemplate.distractors || []),
-    ...state.dictionary
-  ], 4);
-
-  const preferredAskEntries = [howAreYou, whereFrom, getDictionaryEntryByEnglish("What is your name?")].filter(Boolean);
-  const askOptions = pickUniqueEntries([
-    ...preferredAskEntries,
-    ...getQuestionEntries(),
-    ...state.dictionary
-  ], 4);
-
-  return {
-    question: activeTemplate.question,
-    correctAnswer: activeTemplate.correctAnswer,
-    answerOptions,
-    askOptions
-  };
-}
-
-function beginNextGuidedConversationRound() {
-  const round = buildGuidedConversationRound(state.chatSession.turn || 0);
-  state.chatSession.currentQuestionId = String(round.question?.id || "");
-  state.chatSession.answerOptions = round.answerOptions.map((entry) => String(entry.id));
-  state.chatSession.askOptions = round.askOptions.map((entry) => String(entry.id));
-  state.chatSession.lastExplainedEntryId = String(round.question?.id || "");
-  state.chatSession.stage = "answer";
-  pushChatEntry("bot", round.question);
-}
-
-function startGuidedConversationSession() {
-  state.chatSession.isStarted = true;
-  state.chatSession.isStopped = false;
-  state.chatSession.stage = "answer";
-  state.chatSession.currentQuestionId = "";
-  state.chatSession.answerOptions = [];
-  state.chatSession.askOptions = [];
-  state.chatSession.turn = 0;
-  state.chatSession.introducedEntryIds = [];
-  state.chatSession.recentEntryIds = [];
-  state.chatSession.lastExplainedEntryId = "";
-  state.chatSession.lastUserText = "";
-  state.chat = [];
-
-  const greeting = getDictionaryEntryByEnglish("Hello") || getDictionaryEntryByAssamese("Nomoskar");
-  pushChatEntry("bot", greeting);
-  beginNextGuidedConversationRound();
-}
-
-function guidedAnswerForLearnerQuestion(questionEntry) {
-  const answerMap = {
-    "How are you?": "I am fine",
-    "Where are you from?": "I live in...",
-    "What is your name?": "Hello"
-  };
-
-  const matched = getDictionaryEntryByEnglish(answerMap[String(questionEntry?.english || "")]);
-  if (matched) return matched;
-
-  return getDictionaryEntryByEnglish("I am fine") ||
-    getDictionaryEntryByEnglish("I live in...") ||
-    getDictionaryEntryByEnglish("Hello") ||
-    state.dictionary[0] ||
-    null;
 }
 
 function ensureLessonProgressStore() {
@@ -3246,8 +2962,8 @@ async function onClick(event) {
     const targetView = actionSource.dataset.target;
     if (["home", "lessons", "dictionary", "practice", "profile"].includes(targetView)) {
       setView(targetView);
-    } else if (["flashcards", "quiz", "conversation"].includes(targetView)) {
-      state.practiceTab = targetView === "flashcards" ? "flashcards" : targetView;
+    } else if (["flashcards", "quiz"].includes(targetView)) {
+      state.practiceTab = targetView;
       setView("practice");
     } else if (targetView === "favorites") {
       const hasFavoriteLessons = state.favorites.lessons.length > 0;
@@ -3601,7 +3317,7 @@ async function onClick(event) {
 
   if (action === "practice-tab") {
     const nextTab = actionSource.dataset.tab;
-    if (!nextTab || nextTab === state.practiceTab) return;
+    if (!["flashcards", "quiz"].includes(nextTab) || nextTab === state.practiceTab) return;
     if (nextTab === "quiz") {
       state.quiz.questions = [];
       state.quiz.index = 0;
@@ -3622,33 +3338,7 @@ async function onClick(event) {
       state.flash.mode = "session";
       state.flash.flipped = false;
     }
-    if (nextTab === "conversation") {
-      state.chatSession.isStarted = false;
-      state.chatSession.isStopped = false;
-      state.chatSession.stage = "idle";
-      state.chatSession.currentQuestionId = "";
-      state.chatSession.answerOptions = [];
-      state.chatSession.askOptions = [];
-      state.chatSession.turn = 0;
-      state.chatSession.lastExplainedEntryId = "";
-      state.chatSession.lastUserText = "";
-      state.chat = [{ who: "bot", text: "Nomoskar!", translation: "Hello" }];
-    }
     state.practiceTab = nextTab;
-    renderPractice();
-    return;
-  }
-
-  if (action === "chat-start") {
-    startGuidedConversationSession();
-    renderPractice();
-    return;
-  }
-
-  if (action === "chat-stop") {
-    state.chatSession.isStarted = false;
-    state.chatSession.isStopped = true;
-    state.chatSession.stage = "idle";
     renderPractice();
     return;
   }
@@ -3977,53 +3667,6 @@ async function onClick(event) {
     return;
   }
 
-  if (action === "chat-answer-option") {
-    if (!state.chatSession.isStarted || state.chatSession.stage !== "answer") return;
-    const chosenEntry = getDictionaryEntryById(actionSource.dataset.entryId);
-    const questionEntry = getDictionaryEntryById(state.chatSession.currentQuestionId);
-    if (!chosenEntry || !questionEntry) return;
-
-    const round = buildGuidedConversationRound(state.chatSession.turn || 0);
-    const correctAnswer = round.correctAnswer || chosenEntry;
-    const isCorrect = String(chosenEntry.id) === String(correctAnswer.id);
-
-    pushChatEntry("user", chosenEntry);
-    pushChatEntry(
-      "bot",
-      correctAnswer,
-      isCorrect
-        ? `Correct. "${correctAnswer.english}" is the best answer for "${questionEntry.english}".`
-        : `Not quite. "${correctAnswer.english}" is a better answer for "${questionEntry.english}".`
-    );
-
-    state.chatSession.lastExplainedEntryId = String(correctAnswer.id || "");
-    state.chatSession.stage = "ask";
-    xpGain(2, "Conversation practice");
-    persist();
-    renderPractice();
-    return;
-  }
-
-  if (action === "chat-ask-option") {
-    if (!state.chatSession.isStarted || state.chatSession.stage !== "ask") return;
-    const learnerQuestion = getDictionaryEntryById(actionSource.dataset.entryId);
-    if (!learnerQuestion) return;
-
-    pushChatEntry("user", learnerQuestion);
-
-    const tutorAnswer = guidedAnswerForLearnerQuestion(learnerQuestion);
-    pushChatEntry("bot", tutorAnswer);
-
-    state.chatSession.lastExplainedEntryId = String(tutorAnswer?.id || "");
-    state.chatSession.turn += 1;
-    beginNextGuidedConversationRound();
-
-    xpGain(2, "Conversation practice");
-    persist();
-    renderPractice();
-    return;
-  }
-
   if (action === "export-data") {
     const blob = new Blob([exportDataBundle()], { type: "application/json" });
     const a = document.createElement("a");
@@ -4278,7 +3921,7 @@ function bindGlobalEvents() {
 function initServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker
-      .register("sw.js?v=221", { updateViaCache: "none" })
+      .register("sw.js?v=222", { updateViaCache: "none" })
       .then((registration) => registration.update())
       .catch(() => {
         // App should continue even if service worker update fails.

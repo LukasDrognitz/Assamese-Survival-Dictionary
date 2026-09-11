@@ -504,7 +504,6 @@ body.lesson-immersive .topbar {
 .word-card,
 .flash-card,
 .quiz-card,
-.chat-bubble,
 .achievement {
   border-radius: var(--radius-md);
   background: var(--surface);
@@ -1831,55 +1830,6 @@ textarea {
 
 .flash-face.back {
   transform: rotateY(180deg);
-}
-
-.chat-panel {
-  height: 260px;
-  overflow-y: auto;
-  display: grid;
-  gap: 10px;
-  padding: 12px;
-  background: color-mix(in srgb, var(--surface) 92%, transparent);
-  border: 1px solid rgba(104, 113, 136, 0.22);
-  border-radius: var(--radius-md);
-}
-
-.chat-topic-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.chat-topic-chip {
-  border: 1px solid rgba(104, 113, 136, 0.35);
-  background: color-mix(in srgb, var(--surface) 86%, transparent);
-  color: var(--text);
-  border-radius: 999px;
-  padding: 7px 12px;
-  font-size: 0.84rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.chat-topic-chip.active {
-  color: #fff;
-  border-color: transparent;
-  background: linear-gradient(120deg, var(--accent), #6075ec);
-}
-
-.chat-bubble {
-  padding: 10px 12px;
-  max-width: 85%;
-}
-
-.chat-bubble.user {
-  justify-self: end;
-  background: linear-gradient(120deg, var(--accent), #5f72dd);
-  color: white;
-}
-
-.chat-bubble.bot {
-  justify-self: start;
 }
 
 .toast {
